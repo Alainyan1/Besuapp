@@ -13,12 +13,14 @@ const Aift = () => {
           contractAddress: address,
         },
       });
-      const loansData = Object.entries(response.data).map(([address, allocated]) => ({
-        lender: address,
-        allocated: allocated,
-        lensed: 0,
-        interest: 0,
+      console.log('Loans response:', response.data);
+      const loansData = response.data.map((loan) => ({
+        lender: loan.account,
+        allocated: loan.allocation,
+        lensed: loan.balancePrincipal,
+        interest: loan.balanceInterest,
       }));
+      console.log('Loans data:', loansData);
       setLoans(loansData);
     } catch (error) {
       console.error('Error fetching loans:', error);
@@ -31,8 +33,8 @@ const Aift = () => {
   };
 
   return (
-    <div>
-      <h1>Tokenized loan Platform</h1>
+    <div className="aift-container">
+      <h1>Tokenized Loan Platform</h1>
       <div style={{ marginBottom: '20px' }}>
         <label htmlFor="contractAddress">Contract Address:</label>
         <input
@@ -45,44 +47,46 @@ const Aift = () => {
         <button onClick={handleFetchLoans} style={{ marginLeft: '10px', padding: '5px 10px' }}>Fetch</button>
       </div>
       <h2>Contract Address: {contractAddress || 'N/A'}</h2>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={{ backgroundColor: '#2c7be5', color: 'white', padding: '10px' }}>Lender</th>
-                <th style={{ backgroundColor: '#2c7be5', color: 'white', padding: '10px' }}>Allocated</th>
-                <th style={{ backgroundColor: '#2c7be5', color: 'white', padding: '10px' }}>Lensed</th>
-                <th style={{ backgroundColor: '#2c7be5', color: 'white', padding: '10px' }}>Lender Operation</th>
-                <th style={{ backgroundColor: '#2c7be5', color: 'white', padding: '10px' }}>Borrower</th>
-                <th style={{ backgroundColor: '#2c7be5', color: 'white', padding: '10px' }}>Interest</th>
-                <th style={{ backgroundColor: '#2c7be5', color: 'white', padding: '10px' }}>Borrower</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loans.length > 0 ? (
-                loans.map((loan, index) => (
-                  <tr key={index}>
-                    <td>{loan.lender}</td>
-                    <td>{loan.allocated}</td>
-                    <td>{loan.lensed}</td>
-                    <td>
-                      <button>Fund</button>
-                    </td>
-                    <td>
-                      <button>Repay</button>
-                    </td>
-                    <td>{loan.interest}</td>
-                    <td>
-                      <button>Repay</button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7">No loans available</td>
+      <div className="table-container">
+        <table className="loan-table">
+          <thead>
+            <tr>
+              <th>Lender</th>
+              <th>Allocated</th>
+              <th>Lensed</th>
+              <th>Lender Operation</th>
+              <th>Borrower Operation</th>
+              <th>Interest</th>
+              <th>Borrower Operation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loans.length > 0 ? (
+              loans.map((loan, index) => (
+                <tr key={index}>
+                  <td>{loan.lender}</td>
+                  <td>{loan.allocated}</td>
+                  <td>{loan.lensed}</td>
+                  <td>
+                    <button>Fund</button>
+                  </td>
+                  <td>
+                    <button>Repay</button>
+                  </td>
+                  <td>{loan.interest}</td>
+                  <td>
+                    <button>Repay</button>
+                  </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7">No loans available</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

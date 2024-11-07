@@ -10,8 +10,8 @@ const Jetco = () => {
   const [status, setStatus] = useState(null); // 用于存储请求的结果状态
   const [walletAddress, setWalletAddress] = useState(null); // 用于存储钱包地址
   const [operation, setOperation] = useState('');
-  const [lenderAddress, setLenderAddress] = useState(''); // 用于存储输入的lender地址
-
+  const [lenderAddress, setLenderAddress] = useState('0xf17f52151EbEF6C7334FAD080c5704D77216b732'); // 用于存储输入的lender地址
+  const [transactionHash, setTransactionHash] = useState(''); // 用于存储交易哈希
 
   useEffect(() => {
     const storedWalletAddress = localStorage.getItem('walletAddress');
@@ -26,8 +26,8 @@ const Jetco = () => {
       if (provider) {
         const ethersProvider = new ethers.providers.Web3Provider(provider);
         const signer = ethersProvider.getSigner();
-        // const fromAddress = await signer.getAddress();
-        const fromAddress = '0xf17f52151EbEF6C7334FAD080c5704D77216b732';
+        const escrowAddress = await signer.getAddress();
+
         // 获取合约的 ABI 和 bytecode
         const contractDataResponse = await axios.get('http://20.2.203.99:3002/api/contractData');
         const { abi } = contractDataResponse.data;
@@ -35,32 +35,43 @@ const Jetco = () => {
         // 创建合约实例
         const contract = new ethers.Contract(contractAddress, abi, signer);
 
-        const allowance = await contract.allowance(fromAddress, signer.getAddress());
-        console.log('Allowance:', allowance.toString());
-          
-        // 调用 transferFrom 方法
-        const tx = await contract.transferFrom(
-          fromAddress,
-          paymentFrom,
-          parseInt(amount, 10),
-          {
-            gasLimit: 300000,
-            gasPrice: ethers.utils.parseUnits('0', 'gwei'),
-          }
-        );
+        let tx;
+        if (operation === 'interestRepay') {
+          tx = await contract.repayInterest(lenderAddress, parseInt(amount, 10), ethers.utils.formatBytes32String("Interest"), {
+            gasLimit: 3000000,
+            maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
+            maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
+          });
+          console.log('tx:', tx);
+        } else if (operation === 'principalRepay') {
+          tx = await contract.redeemFrom(lenderAddress, parseInt(amount, 10), ethers.utils.formatBytes32String("Principal"));
+        } else if (operation === 'drawdown') {
+          const allowance = await contract.getEscrowAllowance(escrowAddress);
+          console.log('escrow allowance from owner:', allowance);
+
+          tx = await contract.drawdown(paymentFrom, parseInt(amount, 10), {
+            gasLimit: 3000000,
+            maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
+            maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
+        });
+        }
 
         // 等待交易被矿工打包
-        await tx.wait();
-        console.log('Transfer successful:', tx);
+        const receipt = await tx.wait();
+        console.log('Transaction successful:', receipt);
         setStatus('success');
+        setTransactionHash(receipt.transactionHash);
+        alert('Transaction successful!');
       } else {
         console.error('MetaMask is not installed');
         setStatus('error');
+        alert('MetaMask is not installed. Please install it to use this feature.');
       }
     } catch (error) {
-      console.error('Error during transfer:', error);
+      console.error('Error during transaction:', error);
       setStatus('error');
-    } 
+      alert('Transaction failed. Please try again.');
+    }
   };
 
   const connectWallet = async () => {
@@ -111,20 +122,16 @@ const Jetco = () => {
             style={{ width: '100%', padding: '10px', margin: '10px 0' }}
           />
         </div>
-        <div className="form-group">
-            <label htmlFor="operation">Function</label>
-            <select
-              id="operation"
-              value={operation}
-              onChange={handleOperationChange}
-              className="form-control"
-            >
-              <option value="">Select an operation</option>
-              <option value="interestRepay">Repay Interest</option>
-              <option value="principalRepay">Repay Principal</option>
-              <option value="drawdown">Drawdown</option>
-            </select>
-          </div>
+        <div>
+          <label>Payment To:</label>
+          <input
+            type="text"
+            value={lenderAddress}
+            onChange={handleInputChange(setLenderAddress, 'lenderAddress')}
+            required
+            style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+          />
+        </div>
         <div>
           <label>Amount:</label>
           <input
@@ -145,9 +152,29 @@ const Jetco = () => {
             style={{ width: '100%', padding: '10px', margin: '10px 0' }}
           />
         </div>
+        <div className="form-group">
+          <label htmlFor="operation">Function</label>
+          <select
+            id="operation"
+            value={operation}
+            onChange={handleOperationChange}
+            className="form-control"
+            style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+          >
+            <option value="">Select an operation</option>
+            <option value="interestRepay">Repay Interest</option>
+            <option value="principalRepay">Repay Principal</option>
+            <option value="drawdown">Drawdown</option>
+          </select>
+        </div>
         <button type="submit" style={{ backgroundColor: '#fff', color: '#1a1a1a', border: 'none', padding: '10px 20px', marginTop: '20px' }}>Confirm</button>
       </form>
-      {status === 'success' && <p style={{ color: 'green' }}>Payment confirmed!</p>}
+      {status === 'success' && (
+        <div>
+          <p style={{ color: 'green' }}>Payment confirmed!</p>
+          <p>Transaction Hash: {transactionHash}</p>
+        </div>
+      )}
       {status === 'error' && <p style={{ color: 'red' }}>Payment failed. Please try again.</p>}
     </div>
   );

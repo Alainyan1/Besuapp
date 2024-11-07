@@ -71,11 +71,11 @@ const LoanDeployment = () => {
           formattedLoanData.name,
           formattedLoanData.symbol,
           formattedLoanData.initialSupply,
-          formattedLoanData.interestRate * 1000,
           formattedLoanData.escrow,
-          formattedLoanData.ancillaryInfo,
           formattedLoanData.buyers,
-          formattedLoanData.amounts
+          formattedLoanData.amounts,
+          formattedLoanData.interestRate * 1000,
+          formattedLoanData.ancillaryInfo
         );
 
         await contract.deployed();

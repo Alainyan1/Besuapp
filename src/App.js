@@ -9,9 +9,6 @@ import Bank from './components/bank'; // 引入Bank组件
 import LoanTransfer from './components/lender';
 import { ContractProvider } from './components/ContractContext'; // 引入ContractProvider
 
-// aift@frontend.eastasia.cloudapp.azure.com
-// aift@vmc3gosyy.eastasia.cloudapp.azure.com
-
 function App() {
   return (
     <ContractProvider>

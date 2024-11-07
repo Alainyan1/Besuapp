@@ -113,3 +113,44 @@ select.form-control {
   background-color: white; /* 设置 Jetco 页面选择框的背景颜色为白色 */
   color: #333; /* 设置 Jetco 页面选择框的字体颜色为黑色 */
 }
+
+.aift-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%; /* 设置容器宽度为100% */
+  max-width: 1200px; /* 设置最大宽度 */
+  margin: 0 auto;
+}
+
+.table-container {
+  width: 100%; /* 设置容器宽度为100% */
+}
+
+.loan-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.loan-table th, .loan-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.loan-table th {
+  background-color: #2c7be5;
+  color: white;
+  text-align: left;
+}
+
+.loan-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.loan-table tr:hover {
+  background-color: #ddd;
+}
+
+.loan-table th, .loan-table td {
+  padding: 12px 15px;
+}
