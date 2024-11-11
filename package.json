@@ -8,6 +8,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.7",
+    "cross-env": "^7.0.3",
     "ethers": "^5.7.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -17,7 +18,7 @@
     "web3": "^4.14.0"
   },
   "scripts": {
-    "start": "PORT=3003 react-scripts start",
+    "start": "cross-env PORT=3003 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

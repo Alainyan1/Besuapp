@@ -50,7 +50,7 @@ const Aift = () => {
     }
   };
 
-        const fetchLoans = async (address) => {
+    const fetchLoans = async (address) => {
       const account = Object.values(accounts).find((acc) => acc.address === walletAddress);
       if (!account) {
         console.error('Account not found');
@@ -67,11 +67,11 @@ const Aift = () => {
           params.account = walletAddress;
           processResponseData = (data) => {
             return [{
-              lender: data.account,
-              allocated: data.allocation,
-              lensed: data.lensed,
-              principal: data.balancePrincipal,
-              interest: data.balanceInterest,
+              Lender: data.account,
+              Allocated: data.allocation,
+              Lensed: data.lensed,
+              Principal: data.balancePrincipal,
+              Interest: data.balanceInterest,
             }];
           };
           break;
@@ -79,10 +79,11 @@ const Aift = () => {
           apiUrl = `http://20.2.203.99:3002/api/getNonzeroLenders`;
           processResponseData = (data) => {
             return Object.entries(data).map(([key, value]) => ({
-              lender: key,
-              allocated: value.allocation,
-              lensed: value.balancePrincipal,
-              interest: value.balanceInterest,
+              Lender: value.account,
+              Allocated: value.allocation,
+              Lensed: value.lensed,
+              Principal: value.balancePrincipal,
+              Interest: value.balanceInterest,
             }));
           };
           break;
@@ -90,8 +91,8 @@ const Aift = () => {
           apiUrl = `http://20.2.203.99:3002/api/getDeployInfo`;
           processResponseData = (data) => {
             return [{
-              totalSupply: data.totalSupply,
-              principal: data.principal,
+              TotalSupply: ethers.BigNumber.from(data.totalSupply).toString(),
+              Principal: ethers.BigNumber.from(data.principal).toString(),
             }];
           };
           break;
@@ -125,30 +126,44 @@ const Aift = () => {
 
     switch (account.type) {
       case 'lender':
-        return ['Lender', 'Allocated', 'Lensed', 'Principal', 'Lender Operation'];
+        return ['Lender', 'Allocated', 'Lensed', 'Principal', 'Interest', 'Lender Operation'];
       case 'borrower':
-        return ['Lender', 'Allocated', 'Lensed', 'Lender Operation', 'Borrower', 'Interest', 'Borrower Operation'];
+        return ['Lender', 'Allocated', 'Lensed', 'Principal', 'Borrower', 'Interest', 'Borrower Operation'];
       case 'deployer':
-        return ['Total Supply', 'Principal'];
+        return ['TotalSupply', 'Principal'];
       default:
         return [];
     }
+  };
+
+  const handleRepay = (loan) => {
+    // Implement the repay logic here
+    console.log('Repay button clicked for loan:', loan);
   };
 
   const renderTableBody = () => {
     if (loans.length === 0) {
       return <tr><td colSpan={getTableColumns().length}>No loans available</td></tr>;
     }
-
+  
     return loans.map((loan, index) => (
       <tr key={index}>
-        {getTableColumns().map((column, idx) => (
-          <td key={idx}>{loan[column.toLowerCase()]}</td>
-        ))}
+        {getTableColumns().map((column, idx) => {
+          const key = column.replace(' ', '');
+          return (
+            <td key={idx}>
+              {key === 'LenderOperation' || key === 'BorrowerOperation' ? (
+                <button onClick={() => handleRepay(loan)}>Repay</button>
+              ) : (
+                loan[key]
+              )}
+            </td>
+          );
+        })}
       </tr>
     ));
   };
-
+  
   return (
     <div>
       <h1>Tokenized Loan Platform</h1>
