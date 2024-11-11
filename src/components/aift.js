@@ -1,40 +1,160 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { ethers } from 'ethers';
+import detectEthereumProvider from '@metamask/detect-provider';
+import { AccountsContext } from './AccountsContext';
 
 const Aift = () => {
+  const { accounts, addAccount } = useContext(AccountsContext);
   const [loans, setLoans] = useState([]);
   const [inputContractAddress, setInputContractAddress] = useState('');
   const [contractAddress, setContractAddress] = useState('');
+  const [walletAddress, setWalletAddress] = useState(null); // 用于存储钱包地址
 
-  const fetchLoans = async (address) => {
-    try {
-      const response = await axios.get('http://20.2.203.99:3002/api/getAllBalances', {
-        params: {
-          contractAddress: address,
-        },
-      });
-      console.log('Loans response:', response.data);
-      const loansData = response.data.map((loan) => ({
-        lender: loan.account,
-        allocated: loan.allocation,
-        lensed: loan.balancePrincipal,
-        interest: loan.balanceInterest,
-      }));
-      console.log('Loans data:', loansData);
-      setLoans(loansData);
-    } catch (error) {
-      console.error('Error fetching loans:', error);
+  useEffect(() => {
+    const storedWalletAddress = localStorage.getItem('walletAddress');
+    if (storedWalletAddress) {
+      setWalletAddress(storedWalletAddress);
+    }
+  }, []);
+
+  const connectWallet = async () => {
+    const provider = await detectEthereumProvider();
+
+    if (provider) {
+      try {
+        console.log('MetaMask detected');
+        // 每次都请求用户连接他们的 MetaMask 钱包
+        await provider.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
+        await provider.request({ method: 'eth_requestAccounts' });
+        const ethersProvider = new ethers.providers.Web3Provider(provider);
+        const signer = ethersProvider.getSigner();
+        const address = await signer.getAddress();
+        setWalletAddress(address);
+        localStorage.setItem('walletAddress', address);
+        console.log('Connected Wallet Address:', address);
+
+        // 添加地址到 accounts 字典中，如果不存在则默认设置为 borrower
+        if (!Object.values(accounts).some(account => account.address === address)) {
+          addAccount(`account${Object.keys(accounts).length + 1}`, address, "borrower");
+        }
+
+        // 打印account类型
+        console.log('Accounts:', accounts, accounts.type);
+      } catch (error) {
+        console.error('Error connecting wallet:', error);
+      }
+    } else {
+      console.error('MetaMask is not installed');
+      alert('MetaMask is not installed. Please install it to use this feature.');
     }
   };
+
+        const fetchLoans = async (address) => {
+      const account = Object.values(accounts).find((acc) => acc.address === walletAddress);
+      if (!account) {
+        console.error('Account not found');
+        return;
+      }
+    
+      let apiUrl;
+      let params = { contractAddress: address };
+      let processResponseData;
+    
+      switch (account.type) {
+        case 'lender':
+          apiUrl = `http://20.2.203.99:3002/api/getLenderInfo`;
+          params.account = walletAddress;
+          processResponseData = (data) => {
+            return [{
+              lender: data.account,
+              allocated: data.allocation,
+              lensed: data.lensed,
+              principal: data.balancePrincipal,
+              interest: data.balanceInterest,
+            }];
+          };
+          break;
+        case 'borrower':
+          apiUrl = `http://20.2.203.99:3002/api/getNonzeroLenders`;
+          processResponseData = (data) => {
+            return Object.entries(data).map(([key, value]) => ({
+              lender: key,
+              allocated: value.allocation,
+              lensed: value.balancePrincipal,
+              interest: value.balanceInterest,
+            }));
+          };
+          break;
+        case 'deployer':
+          apiUrl = `http://20.2.203.99:3002/api/getDeployInfo`;
+          processResponseData = (data) => {
+            return [{
+              totalSupply: data.totalSupply,
+              principal: data.principal,
+            }];
+          };
+          break;
+        default:
+          console.error('Unknown account type');
+          return;
+      }
+    
+      try {
+        const response = await axios.get(apiUrl, { params });
+        console.log('Loans response:', response.data);
+    
+        const loansData = processResponseData(response.data);
+        console.log('Loans data:', loansData);
+        setLoans(loansData);
+      } catch (error) {
+        console.error('Error fetching loans:', error);
+      }
+    };
 
   const handleFetchLoans = () => {
     setContractAddress(inputContractAddress);
     fetchLoans(inputContractAddress);
   };
 
+  const getTableColumns = () => {
+    const account = Object.values(accounts).find((acc) => acc.address === walletAddress);
+    if (!account) {
+      return [];
+    }
+
+    switch (account.type) {
+      case 'lender':
+        return ['Lender', 'Allocated', 'Lensed', 'Principal', 'Lender Operation'];
+      case 'borrower':
+        return ['Lender', 'Allocated', 'Lensed', 'Lender Operation', 'Borrower', 'Interest', 'Borrower Operation'];
+      case 'deployer':
+        return ['Total Supply', 'Principal'];
+      default:
+        return [];
+    }
+  };
+
+  const renderTableBody = () => {
+    if (loans.length === 0) {
+      return <tr><td colSpan={getTableColumns().length}>No loans available</td></tr>;
+    }
+
+    return loans.map((loan, index) => (
+      <tr key={index}>
+        {getTableColumns().map((column, idx) => (
+          <td key={idx}>{loan[column.toLowerCase()]}</td>
+        ))}
+      </tr>
+    ));
+  };
+
   return (
-    <div className="aift-container">
+    <div>
       <h1>Tokenized Loan Platform</h1>
+      <button onClick={connectWallet} style={{ position: 'absolute', top: 10, right: 10 }}>
+        {walletAddress ? `Connected: ${walletAddress}` : 'Connect Wallet'}
+      </button>
       <div style={{ marginBottom: '20px' }}>
         <label htmlFor="contractAddress">Contract Address:</label>
         <input
@@ -47,46 +167,18 @@ const Aift = () => {
         <button onClick={handleFetchLoans} style={{ marginLeft: '10px', padding: '5px 10px' }}>Fetch</button>
       </div>
       <h2>Contract Address: {contractAddress || 'N/A'}</h2>
-      <div className="table-container">
-        <table className="loan-table">
-          <thead>
-            <tr>
-              <th>Lender</th>
-              <th>Allocated</th>
-              <th>Lensed</th>
-              <th>Lender Operation</th>
-              <th>Borrower Operation</th>
-              <th>Interest</th>
-              <th>Borrower Operation</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loans.length > 0 ? (
-              loans.map((loan, index) => (
-                <tr key={index}>
-                  <td>{loan.lender}</td>
-                  <td>{loan.allocated}</td>
-                  <td>{loan.lensed}</td>
-                  <td>
-                    <button>Fund</button>
-                  </td>
-                  <td>
-                    <button>Repay</button>
-                  </td>
-                  <td>{loan.interest}</td>
-                  <td>
-                    <button>Repay</button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7">No loans available</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            {getTableColumns().map((column, idx) => (
+              <th key={idx} style={{ backgroundColor: '#2c7be5', color: 'white', padding: '10px' }}>{column}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {renderTableBody()}
+        </tbody>
+      </table>
     </div>
   );
 };

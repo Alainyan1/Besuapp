@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
+import { AccountsContext } from './AccountsContext';
 
 const Jetco = () => {
-  const [paymentFrom, setPaymentFrom] = useState(localStorage.getItem('paymentFrom') || '0x9B200E948576dA9BE216537C42b7f0dbff4E8d0C');
+  const { accounts, addAccount } = useContext(AccountsContext);
+  const [paymentFrom, setPaymentFrom] = useState(localStorage.getItem('paymentFrom') || '');
   const [amount, setAmount] = useState(localStorage.getItem('amount') || 1000);
   const [contractAddress, setContractAddress] = useState(localStorage.getItem('contractAddress') || '');
   const [status, setStatus] = useState(null); // 用于存储请求的结果状态
   const [walletAddress, setWalletAddress] = useState(null); // 用于存储钱包地址
   const [operation, setOperation] = useState('');
-  const [lenderAddress, setLenderAddress] = useState('0xf17f52151EbEF6C7334FAD080c5704D77216b732'); // 用于存储输入的lender地址
+  const [lenderAddress, setLenderAddress] = useState(''); // 用于存储输入的lender地址
   const [transactionHash, setTransactionHash] = useState(''); // 用于存储交易哈希
+  const [selectedPaymentFromKey, setSelectedPaymentFromKey] = useState('');
+  const [selectedLenderAddressKey, setSelectedLenderAddressKey] = useState('');
+  const [customAddress, setCustomAddress] = useState(''); // 用于存储用户输入的自定义地址
 
   useEffect(() => {
     const storedWalletAddress = localStorage.getItem('walletAddress');
@@ -79,6 +84,7 @@ const Jetco = () => {
 
     if (provider) {
       try {
+        console.log('MetaMask detected');
         // 每次都请求用户连接他们的 MetaMask 钱包
         await provider.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
         await provider.request({ method: 'eth_requestAccounts' });
@@ -91,6 +97,7 @@ const Jetco = () => {
         console.error('Error connecting wallet:', error);
       }
     } else {
+      console.error('MetaMask is not installed');
       alert('MetaMask is not installed. Please install it to use this feature.');
     }
   };
@@ -105,6 +112,31 @@ const Jetco = () => {
     localStorage.setItem(key, value);
   };
 
+  const handleSelectChange = (setter, key, setSelectedKey) => (event) => {
+    const selectedKey = event.target.value;
+    setSelectedKey(selectedKey);
+    if (selectedKey === 'custom') {
+      setter('');
+    } else if (accounts[selectedKey]) {
+      const value = accounts[selectedKey].address;
+      setter(value);
+      localStorage.setItem(key, value);
+    }
+  };
+
+  const handleCustomAddressChange = (event) => {
+    setCustomAddress(event.target.value);
+  };
+
+  const handleAddCustomAddress = (setter, key, setSelectedKey) => {
+    const [customKey, customValue] = customAddress.split(':');
+    addAccount(customKey, customValue, 'borrower');
+    setter(customValue);
+    setSelectedKey(customKey);
+    localStorage.setItem(key, customValue);
+    setCustomAddress('');
+  };
+
   return (
     <div style={{ backgroundColor: '#1a1a1a', borderRadius: '10px', padding: '20px', color: 'white' }}>
       <button onClick={connectWallet} style={{ position: 'absolute', top: 10, right: 10 }}>
@@ -114,23 +146,63 @@ const Jetco = () => {
       <form onSubmit={(e) => { e.preventDefault(); handleConfirm(); }}>
         <div>
           <label>Payment From:</label>
-          <input
-            type="text"
-            value={paymentFrom}
-            onChange={handleInputChange(setPaymentFrom, 'paymentFrom')}
+          <select
+            value={selectedPaymentFromKey}
+            onChange={handleSelectChange(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)}
             required
             style={{ width: '100%', padding: '10px', margin: '10px 0' }}
-          />
+          >
+            <option value="">Select an account</option>
+            {Object.entries(accounts).map(([key, value]) => (
+              <option key={key} value={key}>{key}</option>
+            ))}
+            <option value="custom">Enter custom address</option>
+          </select>
+          {selectedPaymentFromKey === 'custom' && (
+            <div>
+              <input
+                type="text"
+                value={customAddress}
+                onChange={handleCustomAddressChange}
+                placeholder="Enter address in format Name:address"
+                style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+              />
+              <button type="button" onClick={() => handleAddCustomAddress(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)}>
+                Add Address
+              </button>
+            </div>
+          )}
+          {paymentFrom && <p>Address: {paymentFrom}</p>}
         </div>
         <div>
           <label>Payment To:</label>
-          <input
-            type="text"
-            value={lenderAddress}
-            onChange={handleInputChange(setLenderAddress, 'lenderAddress')}
+          <select
+            value={selectedLenderAddressKey}
+            onChange={handleSelectChange(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)}
             required
             style={{ width: '100%', padding: '10px', margin: '10px 0' }}
-          />
+          >
+            <option value="">Select an account</option>
+            {Object.entries(accounts).map(([key, value]) => (
+              <option key={key} value={key}>{key}</option>
+            ))}
+            <option value="custom">Enter custom address</option>
+          </select>
+          {selectedLenderAddressKey === 'custom' && (
+            <div>
+              <input
+                type="text"
+                value={customAddress}
+                onChange={handleCustomAddressChange}
+                placeholder="Enter address in format Name:address"
+                style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+              />
+              <button type="button" onClick={() => handleAddCustomAddress(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)}>
+                Add Address
+              </button>
+            </div>
+          )}
+          {lenderAddress && <p>Address: {lenderAddress}</p>}
         </div>
         <div>
           <label>Amount:</label>

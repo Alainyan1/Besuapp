@@ -3,21 +3,23 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { ContractContext } from './ContractContext';
+import { useNavigate } from 'react-router-dom';
 
 const LoanDeployment = () => {
   const [loanData, setLoanData] = useState({
     name: "Fosun",
     symbol: "FOS",
     initialSupply: 10000000000,
-    interestRate: 4.5, // 确保 interestRate 是字符串
-    escrow: "0x8adD025FBd37A46c5af45798cc94ec4e97A49698",
+    interestRate: 4.5, // 确保 interestRate 是字符串 
+    escrow: "escrow:0x8adD025FBd37A46c5af45798cc94ec4e97A49698",
     ancillaryInfo: "Loan Term: 3 years (36 months)\nRepayment: Bullet at maturity\nInterest Period: 1 month\nFinal Maturity: 3 years",
-    buyers: ["0xf17f52151EbEF6C7334FAD080c5704D77216b732", "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"],
+    buyers: ["lender1:0xf17f52151EbEF6C7334FAD080c5704D77216b732", "lender2:0x627306090abaB3A6e1400e9345bC60c78a8BEf57"],
     amounts: [4000000000, 6000000000]
   });
+
   const [walletAddress, setWalletAddress] = useState(null); // 用于存储钱包地址
-  const [deployedContractAddress, setDeployedContractAddress] = useState(null); // 用于存储部署的合约地址
   const { setContractAddress } = useContext(ContractContext);
+  const navigate = useNavigate();
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -36,8 +38,14 @@ const LoanDeployment = () => {
     }
   };
 
+  const parseKeyValue = (input) => {
+    const [key, value] = input.split(':');
+    return { key, value };
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    navigate('/deployment-status', { state: { status: 'deploying' } });
 
     try {
       console.log('Loan Data:', loanData);
@@ -47,9 +55,9 @@ const LoanDeployment = () => {
         symbol: loanData.symbol,
         initialSupply: parseFloat(loanData.initialSupply),
         interestRate: parseFloat(loanData.interestRate), // 确保 interestRate 是数字
-        escrow: loanData.escrow,
+        escrow: parseKeyValue(loanData.escrow).value, // 使用键值对中的值
         ancillaryInfo: loanData.ancillaryInfo,
-        buyers: loanData.buyers.filter(buyer => buyer !== ''),
+        buyers: loanData.buyers.map(buyer => parseKeyValue(buyer).value), // 使用键值对中的值
         amounts: loanData.amounts.filter(amount => amount !== 0)
       };
       console.log('Formatted Loan Data:', formattedLoanData); // 添加日志
@@ -61,12 +69,15 @@ const LoanDeployment = () => {
       // 连接 MetaMask 钱包
       const provider = await detectEthereumProvider();
       if (provider) {
+        console.log('MetaMask detected');
         await provider.request({ method: 'eth_requestAccounts' });
         const ethersProvider = new ethers.providers.Web3Provider(provider);
         const signer = ethersProvider.getSigner();
+        console.log('Connected Wallet Address:', await signer.getAddress());
 
         // 部署合约
         const factory = new ethers.ContractFactory(abi, bytecode, signer);
+        console.log('Deploying contract with the following parameters:', formattedLoanData);
         const contract = await factory.deploy(
           formattedLoanData.name,
           formattedLoanData.symbol,
@@ -75,20 +86,24 @@ const LoanDeployment = () => {
           formattedLoanData.buyers,
           formattedLoanData.amounts,
           formattedLoanData.interestRate * 1000,
-          formattedLoanData.ancillaryInfo
+          formattedLoanData.ancillaryInfo,
+          {
+            gasLimit: 3000000
+          }
         );
 
         await contract.deployed();
         console.log('Contract deployed at address:', contract.address);
         setContractAddress(contract.address); // 设置合约地址
-        setDeployedContractAddress(contract.address); // 设置部署的合约地址
-        alert('Loan deployed successfully!');
+        navigate('/deployment-status', { state: { status: 'success', address: contract.address } });
       } else {
+        console.error('MetaMask is not installed');
         alert('MetaMask is not installed. Please install it to use this feature.');
+        navigate('/deployment-status', { state: { status: 'error' } });
       }
     } catch (error) {
       console.error('Error deploying loan:', error);
-      alert('Failed to deploy loan. Please check your inputs and try again.');
+      navigate('/deployment-status', { state: { status: 'error' } });
     }
   };
 
@@ -97,6 +112,7 @@ const LoanDeployment = () => {
 
     if (provider) {
       try {
+        console.log('MetaMask detected');
         // 每次都请求用户连接他们的 MetaMask 钱包
         await provider.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
         await provider.request({ method: 'eth_requestAccounts' });
@@ -109,6 +125,7 @@ const LoanDeployment = () => {
         console.error('Error connecting wallet:', error);
       }
     } else {
+      console.error('MetaMask is not installed');
       alert('MetaMask is not installed. Please install it to use this feature.');
     }
   };
@@ -160,14 +177,8 @@ const LoanDeployment = () => {
         <label htmlFor="ancillaryInfo">Ancillary Information</label>
         <textarea id="ancillaryInfo" name="ancillaryInfo" rows="4" cols="50" value={loanData.ancillaryInfo} onChange={handleInputChange} required />
   
-        <button type="submit">Issue</button>
+        <button type="submit">Deploy</button>
       </form>
-      {deployedContractAddress && (
-        <div>
-          <h2>Contract Deployment Successful</h2>
-          <p>Contract Address: {deployedContractAddress}</p>
-        </div>
-      )}
     </div>
   );
 };
