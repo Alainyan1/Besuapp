@@ -7,7 +7,7 @@ import { AccountsContext } from './AccountsContext';
 const Jetco = () => {
   const { accounts, addAccount } = useContext(AccountsContext);
   const [paymentFrom, setPaymentFrom] = useState(localStorage.getItem('paymentFrom') || '');
-  const [amount, setAmount] = useState(localStorage.getItem('amount') || 1000);
+  const [amount, setAmount] = useState(localStorage.getItem('amount') || 4000000000);
   const [contractAddress, setContractAddress] = useState(localStorage.getItem('contractAddress') || '');
   const [status, setStatus] = useState(null); // 用于存储请求的结果状态
   const [walletAddress, setWalletAddress] = useState(null); // 用于存储钱包地址
@@ -49,7 +49,11 @@ const Jetco = () => {
           });
           console.log('tx:', tx);
         } else if (operation === 'principalRepay') {
-          tx = await contract.redeemFrom(lenderAddress, parseInt(amount, 10), ethers.utils.formatBytes32String("Principal"));
+          tx = await contract.redeemFrom(lenderAddress, parseInt(amount, 10), ethers.utils.formatBytes32String("Principal"), {
+            gasLimit: 3000000,
+            maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
+            maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
+          });
         } else if (operation === 'drawdown') {
           const allowance = await contract.getEscrowAllowance(escrowAddress);
           console.log('escrow allowance from owner:', allowance);
@@ -58,7 +62,7 @@ const Jetco = () => {
             gasLimit: 3000000,
             maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
             maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
-        });
+          });
         }
 
         // 等待交易被矿工打包
@@ -149,7 +153,6 @@ const Jetco = () => {
           <select
             value={selectedPaymentFromKey}
             onChange={handleSelectChange(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)}
-            required
             style={{ width: '100%', padding: '10px', margin: '10px 0' }}
           >
             <option value="">Select an account</option>
@@ -179,7 +182,6 @@ const Jetco = () => {
           <select
             value={selectedLenderAddressKey}
             onChange={handleSelectChange(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)}
-            required
             style={{ width: '100%', padding: '10px', margin: '10px 0' }}
           >
             <option value="">Select an account</option>

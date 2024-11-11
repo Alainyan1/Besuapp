@@ -41,6 +41,7 @@ const Aift = () => {
 
         // 打印account类型
         console.log('Accounts:', accounts, accounts.type);
+        setLoans([]);
       } catch (error) {
         console.error('Error connecting wallet:', error);
       }
