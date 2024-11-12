@@ -12,9 +12,9 @@ const LoanDeployment = () => {
     symbol: "FOS",
     initialSupply: 10000000000,
     interestRate: 4.5, // 确保 interestRate 是字符串
-    escrow: "escrow:0x8adD025FBd37A46c5af45798cc94ec4e97A49698",
+    escrow: "Jetco:0x8adD025FBd37A46c5af45798cc94ec4e97A49698",
     ancillaryInfo: "Loan Term: 3 years (36 months)\nRepayment: Bullet at maturity\nInterest Period: 1 month\nFinal Maturity: 3 years",
-    buyers: ["Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732", "lender2:0x627306090abaB3A6e1400e9345bC60c78a8BEf57"],
+    buyers: ["Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732", "CCA(Asia):0x627306090abaB3A6e1400e9345bC60c78a8BEf57"],
     amounts: [4000000000, 6000000000]
   });
   const [walletAddress, setWalletAddress] = useState(null); // 用于存储钱包地址
@@ -91,6 +91,7 @@ const LoanDeployment = () => {
         await contract.deployed();
         console.log('Contract deployed at address:', contract.address);
         setContractAddress(contract.address); // 设置合约地址
+        localStorage.setItem('contractAddress', contract.address); // 将合约地址保存到本地存储
 
         // 清空并添加新的 accounts
         clearAccounts();
@@ -154,6 +155,7 @@ const LoanDeployment = () => {
         <input type="number" id="initialSupply" name="initialSupply" value={loanData.initialSupply} onChange={handleInputChange} required />
   
         <label htmlFor="interestRate">Interest Rate</label>
+        <span style={{ marginRight: '10px' }}></span>
         <input type="number" id="interestRate" name="interestRate" value={loanData.interestRate} onChange={handleInputChange} required 
         style={{ width: '100px' }}
         />
