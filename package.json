@@ -7,6 +7,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "antd": "^5.22.0",
     "axios": "^1.7.7",
     "cross-env": "^7.0.3",
     "ethers": "^5.7.2",
@@ -15,7 +16,8 @@
     "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4",
-    "web3": "^4.14.0"
+    "web3": "^1.10.4",
+    "web3js-quorum": "^22.4.0"
   },
   "scripts": {
     "start": "cross-env PORT=3003 react-scripts start",

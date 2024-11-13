@@ -5,19 +5,27 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { ContractContext } from './ContractContext';
 import { AccountsContext } from './AccountsContext';
 import { useNavigate } from 'react-router-dom';
+import { Form, Button, Select, Typography } from 'antd';
+import { WalletOutlined } from '@ant-design/icons'; // Import the Wallet icon
+import LoanForm from './LoanForm';
+import BondForm from './BondForm';
+import '../css/loanDeployment.css';
+
+const { Option } = Select;
 
 const LoanDeployment = () => {
   const [loanData, setLoanData] = useState({
     name: "Fosun",
     symbol: "FOS",
     initialSupply: 10000000000,
-    interestRate: 4.5, // 确保 interestRate 是字符串
+    interestRate: 4.5,
     escrow: "Jetco:0x8adD025FBd37A46c5af45798cc94ec4e97A49698",
     ancillaryInfo: "Loan Term: 3 years (36 months)\nRepayment: Bullet at maturity\nInterest Period: 1 month\nFinal Maturity: 3 years",
     buyers: ["Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732", "CCA(Asia):0x627306090abaB3A6e1400e9345bC60c78a8BEf57"],
     amounts: [4000000000, 6000000000]
   });
-  const [walletAddress, setWalletAddress] = useState(null); // 用于存储钱包地址
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [assetType, setAssetType] = useState('loan'); // New state for asset type
   const { setContractAddress } = useContext(ContractContext);
   const { clearAccounts, addAccount } = useContext(AccountsContext);
   const navigate = useNavigate();
@@ -44,30 +52,26 @@ const LoanDeployment = () => {
     return { key, value };
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (values) => {
     navigate('/deployment-status', { state: { status: 'deploying' } });
 
     try {
       console.log('Loan Data:', loanData);
-      // 将数组形式的数据转换为JSON对象所需的格式
       const formattedLoanData = {
         name: loanData.name,
         symbol: loanData.symbol,
         initialSupply: parseFloat(loanData.initialSupply),
-        interestRate: parseFloat(loanData.interestRate), // 确保 interestRate 是数字
-        escrow: parseKeyValue(loanData.escrow).value, // 使用键值对中的值
+        interestRate: parseFloat(loanData.interestRate),
+        escrow: parseKeyValue(loanData.escrow).value,
         ancillaryInfo: loanData.ancillaryInfo,
-        buyers: loanData.buyers.map(buyer => parseKeyValue(buyer).value), // 使用键值对中的值
+        buyers: loanData.buyers.map(buyer => parseKeyValue(buyer).value),
         amounts: loanData.amounts.filter(amount => amount !== 0)
       };
-      console.log('Formatted Loan Data:', formattedLoanData); // 添加日志
+      console.log('Formatted Loan Data:', formattedLoanData);
 
-      // 获取合约的 ABI 和 bytecode
       const contractDataResponse = await axios.get('http://20.2.203.99:3002/api/contractData');
       const { abi, bytecode } = contractDataResponse.data;
 
-      // 连接 MetaMask 钱包
       const provider = await detectEthereumProvider();
       if (provider) {
         await provider.request({ method: 'eth_requestAccounts' });
@@ -75,7 +79,6 @@ const LoanDeployment = () => {
         const signer = ethersProvider.getSigner();
         const deployerAddress = await signer.getAddress();
 
-        // 部署合约
         const factory = new ethers.ContractFactory(abi, bytecode, signer);
         const contract = await factory.deploy(
           formattedLoanData.name,
@@ -90,10 +93,9 @@ const LoanDeployment = () => {
 
         await contract.deployed();
         console.log('Contract deployed at address:', contract.address);
-        setContractAddress(contract.address); // 设置合约地址
-        localStorage.setItem('contractAddress', contract.address); // 将合约地址保存到本地存储
+        setContractAddress(contract.address);
+        localStorage.setItem('contractAddress', contract.address);
 
-        // 清空并添加新的 accounts
         clearAccounts();
         addAccount('deployer', deployerAddress, 'deployer');
         loanData.buyers.forEach((buyer) => {
@@ -121,7 +123,6 @@ const LoanDeployment = () => {
     if (provider) {
       try {
         console.log('MetaMask detected');
-        // 每次都请求用户连接他们的 MetaMask 钱包
         await provider.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
         await provider.request({ method: 'eth_requestAccounts' });
         const ethersProvider = new ethers.providers.Web3Provider(provider);
@@ -138,56 +139,44 @@ const LoanDeployment = () => {
     }
   };
 
+  const renderForm = () => {
+    switch (assetType) {
+      case 'loan':
+        return <LoanForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
+      case 'bond':
+        return <BondForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div>
-      <h1 style={{ textAlign: 'center', marginTop: '20px' }}>Syndicated Loan Configuration</h1>
-      <button onClick={connectWallet} style={{ position: 'absolute', top: 10, right: 10 }}>
+    <div className="page-container" style={{ padding: '20px'}}>
+      <Typography.Title level={1} style={{ color: '#000', margin: '10px', textAlign: 'center', minHeight: '8vh' }}>Syndicated Loan Configuration</Typography.Title>
+      <Button onClick={connectWallet} style={{
+        backgroundColor: '#fff', // 背景颜色为白色
+        color: '#000', // 字体颜色为黑色
+        borderRadius: '10px', // 设置按钮的圆角
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
+        fontSize: '18px', // 增大按钮的字体
+        height: '50px', // 增加按钮的高度
+        position: 'absolute', top: 10, right: 10
+      }} icon={<WalletOutlined />}>
         {walletAddress ? `Connected: ${walletAddress}` : 'Connect Wallet'}
-      </button>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Company Name</label>
-        <input type="text" id="name" name="name" value={loanData.name} onChange={handleInputChange} required />
-  
-        <label htmlFor="symbol">Symbol</label>
-        <input type="text" id="symbol" name="symbol" value={loanData.symbol} onChange={handleInputChange} required />
-  
-        <label htmlFor="initialSupply">Initial Supply</label>
-        <input type="number" id="initialSupply" name="initialSupply" value={loanData.initialSupply} onChange={handleInputChange} required />
-  
-        <label htmlFor="interestRate">Interest Rate</label>
-        <span style={{ marginRight: '10px' }}></span>
-        <input type="number" id="interestRate" name="interestRate" value={loanData.interestRate} onChange={handleInputChange} required 
-        style={{ width: '100px' }}
-        />
-        <span style={{ marginLeft: '10px' }}>%</span>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Lenders</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><input type="text" value={loanData.buyers[0]} onChange={(e) => handleInputChange(e)} name="buyers[0]" required /></td>
-              <td><input type="number" value={loanData.amounts[0]} onChange={(e) => handleInputChange(e)} name="amounts[0]" required /></td>
-            </tr>
-            <tr>
-              <td><input type="text" value={loanData.buyers[1]} onChange={(e) => handleInputChange(e)} name="buyers[1]" required /></td>
-              <td><input type="number" value={loanData.amounts[1]} onChange={(e) => handleInputChange(e)} name="amounts[1]" required /></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <label htmlFor="escrow">Escrow Account</label>
-        <input type="text" id="escrow" name="escrow" value={loanData.escrow} onChange={handleInputChange} required />
-  
-        <label htmlFor="ancillaryInfo">Ancillary Information</label>
-        <textarea id="ancillaryInfo" name="ancillaryInfo" rows="4" cols="50" value={loanData.ancillaryInfo} onChange={handleInputChange} required />
-  
-        <button type="submit">Deploy</button>
-      </form>
+      </Button>
+      <div>
+        <Form layout="horizontal" style={{ margin: '0 auto' }}>
+          <Form.Item label={<label style={{ color: "#000", fontSize: "18px" }}>Asset Type</label>} name="assetType" labelCol={{ span: 9 }} wrapperCol={{ span: 12 }}>
+          <Select value={assetType} onChange={(value) => setAssetType(value)} style={{ width: '200px', backgroundColor: '#000', color: '#fff' }}>
+              <Option value="loan">Loan</Option>
+              <Option value="bond">Bond</Option>
+              {/* Add more asset types as needed */}
+            </Select>
+          </Form.Item>
+        </Form>
+      </div>
+      <div style={{ marginTop: '0px' }}></div>
+      {renderForm()}
     </div>
   );
 };

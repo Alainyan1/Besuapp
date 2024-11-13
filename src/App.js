@@ -16,7 +16,7 @@ function App() {
       <AccountsProvider>
         <Router>
           <div className="container">
-            <nav>
+            {/* <nav>
               <ul className="nav-links">
                 <li>
                   <Link to="/">CSPro</Link>
@@ -34,7 +34,7 @@ function App() {
                   <Link to="/lender">Lender</Link>
                 </li>
               </ul>
-            </nav>
+            </nav> */}
             <Routes>
               <Route path="/" element={<LoanDeployment />} />
               <Route path="/jetco" element={<Jetco />} />
