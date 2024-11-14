@@ -3,6 +3,13 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { AccountsContext } from './AccountsContext';
+import { Form, Input, Button, Select, Typography } from 'antd';
+import { WalletOutlined } from '@ant-design/icons'; // Import the Wallet icon
+import '../css/jetco.css';
+import logo from '../images/jetco.png';
+
+const { Option } = Select;
+const { Title } = Typography;
 
 const Jetco = () => {
   const { accounts, addAccount } = useContext(AccountsContext);
@@ -49,11 +56,7 @@ const Jetco = () => {
           });
           console.log('tx:', tx);
         } else if (operation === 'principalRepay') {
-          tx = await contract.redeemFrom(lenderAddress, parseInt(amount, 10), ethers.utils.formatBytes32String("Principal"), {
-            gasLimit: 3000000,
-            maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
-            maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
-          });
+          tx = await contract.redeemFrom(lenderAddress, parseInt(amount, 10), ethers.utils.formatBytes32String("Principal"));
         } else if (operation === 'drawdown') {
           const allowance = await contract.getEscrowAllowance(escrowAddress);
           console.log('escrow allowance from owner:', allowance);
@@ -62,7 +65,7 @@ const Jetco = () => {
             gasLimit: 3000000,
             maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
             maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
-          });
+        });
         }
 
         // 等待交易被矿工打包
@@ -106,8 +109,8 @@ const Jetco = () => {
     }
   };
 
-  const handleOperationChange = (e) => {
-    setOperation(e.target.value);
+  const handleOperationChange = (value) => {
+    setOperation(value);
   };
 
   const handleInputChange = (setter, key) => (event) => {
@@ -116,15 +119,14 @@ const Jetco = () => {
     localStorage.setItem(key, value);
   };
 
-  const handleSelectChange = (setter, key, setSelectedKey) => (event) => {
-    const selectedKey = event.target.value;
-    setSelectedKey(selectedKey);
-    if (selectedKey === 'custom') {
+  const handleSelectChange = (setter, key, setSelectedKey) => (value) => {
+    setSelectedKey(value);
+    if (value === 'custom') {
       setter('');
-    } else if (accounts[selectedKey]) {
-      const value = accounts[selectedKey].address;
-      setter(value);
-      localStorage.setItem(key, value);
+    } else if (accounts[value]) {
+      const accountValue = accounts[value].address;
+      setter(accountValue);
+      localStorage.setItem(key, accountValue);
     }
   };
 
@@ -142,114 +144,128 @@ const Jetco = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#1a1a1a', borderRadius: '10px', padding: '20px', color: 'white' }}>
-      <button onClick={connectWallet} style={{ position: 'absolute', top: 10, right: 10 }}>
+    <div className='jetco-page-container' style={{ padding: '20px' }}>
+      <img src={logo} alt="Logo" style={{ position: 'absolute', top: '20px', left: '10px', height: '100px' }} />
+      <Button onClick={connectWallet} style={{
+        backgroundColor: '#fff', // 背景颜色为白色
+        color: 'red', // 字体颜色为红色
+        borderRadius: '10px', // 设置按钮的圆角
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
+        fontSize: '18px', // 增大按钮的字体
+        height: '50px', // 增加按钮的高度
+        position: 'absolute', top: 20, right: 10
+      }} icon={<WalletOutlined />}>
         {walletAddress ? `Connected: ${walletAddress}` : 'Connect Wallet'}
-      </button>
-      <h2>Payment Confirmation</h2>
-      <form onSubmit={(e) => { e.preventDefault(); handleConfirm(); }}>
-        <div>
-          <label>Payment From:</label>
-          <select
-            value={selectedPaymentFromKey}
-            onChange={handleSelectChange(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)}
-            style={{ width: '100%', padding: '10px', margin: '10px 0' }}
-          >
-            <option value="">Select an account</option>
-            {Object.entries(accounts).map(([key, value]) => (
-              <option key={key} value={key}>{key}</option>
-            ))}
-            <option value="custom">Enter custom address</option>
-          </select>
-          {selectedPaymentFromKey === 'custom' && (
-            <div>
-              <input
-                type="text"
-                value={customAddress}
-                onChange={handleCustomAddressChange}
-                placeholder="Enter address in format Name:address"
-                style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+      </Button>
+      <div style={{ marginTop: '120px'}}> {/* Move the form down */}
+        <div style={{ backgroundColor: '#1a1a1a', borderRadius: '10px', padding: '20px', color: 'white', width: 'auto', maxWidth: '500px', margin: '20px auto' }}>
+        <Title level={2} style={{ color: 'white', textAlign: 'center', marginTop: '1px' }}>Payment Confirmation</Title>
+          <Form layout='vertical' onFinish={handleConfirm} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Payment From</label>} style={{ width: '100%' }}>
+              <Select
+                value={selectedPaymentFromKey}
+                onChange={handleSelectChange(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)}
+                style={{ width: '100%' }}
+              >
+                <Option value="">Select an account</Option>
+                {Object.entries(accounts).map(([key, value]) => (
+                  <Option key={key} value={key}>{key}</Option>
+                ))}
+                <Option value="custom">Enter custom address</Option>
+              </Select>
+              {selectedPaymentFromKey === 'custom' && (
+                <div>
+                  <Input
+                    type="text"
+                    value={customAddress}
+                    onChange={handleCustomAddressChange}
+                    placeholder="Enter address in format Name:address"
+                    style={{ width: '100%', marginTop: '10px' }}
+                  />
+                  <Button color='white' type="button" onClick={() => handleAddCustomAddress(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)} style={{ marginTop: '10px', backgroundColor: 'white' }}>
+                    Add Address
+                  </Button>
+                </div>
+              )}
+              {paymentFrom && <p>Address: {paymentFrom}</p>}
+            </Form.Item>
+            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Payment To</label>} style={{ width: '100%' }}>
+              <Select
+                value={selectedLenderAddressKey}
+                onChange={handleSelectChange(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)}
+                style={{ width: '100%' }}
+              >
+                <Option value="">Select an account</Option>
+                {Object.entries(accounts).map(([key, value]) => (
+                  <Option key={key} value={key}>{key}</Option>
+                ))}
+                <Option value="custom">Enter custom address</Option>
+              </Select>
+              {selectedLenderAddressKey === 'custom' && (
+                <div>
+                  <Input
+                    type="text"
+                    value={customAddress}
+                    onChange={handleCustomAddressChange}
+                    placeholder="Enter address in format Name:address"
+                    style={{ width: '100%', marginTop: '10px' }}
+                  />
+                  <Button type="button" color='white' onClick={() => handleAddCustomAddress(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)} style={{ marginTop: '10px', backgroundColor: 'white'}}>
+                    Add Address
+                  </Button>
+                </div>
+              )}
+              {lenderAddress && <p>Address: {lenderAddress}</p>}
+            </Form.Item>
+            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Amount</label>} required style={{ width: '100%' }}>
+              <Input
+                type="number"
+                value={amount}
+                onChange={handleInputChange(setAmount, 'amount')}
+                style={{ width: '100%' }}
               />
-              <button type="button" onClick={() => handleAddCustomAddress(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)}>
-                Add Address
-              </button>
+            </Form.Item>
+            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Contract Address</label>} required style={{ width: '100%' }}>
+              <Input
+                type="text"
+                value={contractAddress}
+                onChange={handleInputChange(setContractAddress, 'contractAddress')}
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Function</label>} required style={{ width: '100%' }}>
+              <Select
+                value={operation}
+                onChange={handleOperationChange}
+                style={{ width: '100%' }}
+              >
+                <Option value="">Select an operation</Option>
+                <Option value="interestRepay">Repay Interest</Option>
+                <Option value="principalRepay">Repay Principal</Option>
+                <Option value="drawdown">Drawdown</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item style={{ textAlign: 'center' }}>
+              <Button type="primary" htmlType="submit" style={{
+                backgroundColor: 'white', // 背景颜色设为白色
+                color: '#000', // 字体颜色设为黑色
+                padding: '15px 30px', // 增大内边距，使按钮整体变大
+                fontSize: '24px', // 墛大按钮的字体
+                height: '40px', // 增加按钮的高度
+                borderRadius: '15px', // 设置按钮的圆角
+                width: '150px'
+               }}>Confirm</Button>
+            </Form.Item>
+          </Form>
+          {status === 'success' && (
+            <div>
+              <p style={{ color: 'green' }}>Payment confirmed!</p>
+              <p>Transaction Hash: {transactionHash}</p>
             </div>
           )}
-          {paymentFrom && <p>Address: {paymentFrom}</p>}
+          {status === 'error' && <p style={{ color: 'red' }}>Payment failed. Please try again.</p>}
         </div>
-        <div>
-          <label>Payment To:</label>
-          <select
-            value={selectedLenderAddressKey}
-            onChange={handleSelectChange(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)}
-            style={{ width: '100%', padding: '10px', margin: '10px 0' }}
-          >
-            <option value="">Select an account</option>
-            {Object.entries(accounts).map(([key, value]) => (
-              <option key={key} value={key}>{key}</option>
-            ))}
-            <option value="custom">Enter custom address</option>
-          </select>
-          {selectedLenderAddressKey === 'custom' && (
-            <div>
-              <input
-                type="text"
-                value={customAddress}
-                onChange={handleCustomAddressChange}
-                placeholder="Enter address in format Name:address"
-                style={{ width: '100%', padding: '10px', margin: '10px 0' }}
-              />
-              <button type="button" onClick={() => handleAddCustomAddress(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)}>
-                Add Address
-              </button>
-            </div>
-          )}
-          {lenderAddress && <p>Address: {lenderAddress}</p>}
-        </div>
-        <div>
-          <label>Amount:</label>
-          <input
-            type="number"
-            value={amount}
-            onChange={handleInputChange(setAmount, 'amount')}
-            required
-            style={{ width: '100%', padding: '10px', margin: '10px 0' }}
-          />
-        </div>
-        <div>
-          <label>Contract Address:</label>
-          <input
-            type="text"
-            value={contractAddress}
-            onChange={handleInputChange(setContractAddress, 'contractAddress')}
-            required
-            style={{ width: '100%', padding: '10px', margin: '10px 0' }}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="operation">Function</label>
-          <select
-            id="operation"
-            value={operation}
-            onChange={handleOperationChange}
-            className="form-control"
-            style={{ width: '100%', padding: '10px', margin: '10px 0' }}
-          >
-            <option value="">Select an operation</option>
-            <option value="interestRepay">Repay Interest</option>
-            <option value="principalRepay">Repay Principal</option>
-            <option value="drawdown">Drawdown</option>
-          </select>
-        </div>
-        <button type="submit" style={{ backgroundColor: '#fff', color: '#1a1a1a', border: 'none', padding: '10px 20px', marginTop: '20px' }}>Confirm</button>
-      </form>
-      {status === 'success' && (
-        <div>
-          <p style={{ color: 'green' }}>Payment confirmed!</p>
-          <p>Transaction Hash: {transactionHash}</p>
-        </div>
-      )}
-      {status === 'error' && <p style={{ color: 'red' }}>Payment failed. Please try again.</p>}
+      </div>
     </div>
   );
 };

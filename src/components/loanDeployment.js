@@ -10,8 +10,10 @@ import { WalletOutlined } from '@ant-design/icons'; // Import the Wallet icon
 import LoanForm from './LoanForm';
 import BondForm from './BondForm';
 import '../css/loanDeployment.css';
+import logo from '../images/cspro.png';
 
 const { Option } = Select;
+
 
 const LoanDeployment = () => {
   const [loanData, setLoanData] = useState({
@@ -50,6 +52,15 @@ const LoanDeployment = () => {
   const parseKeyValue = (input) => {
     const [key, value] = input.split(':');
     return { key, value };
+  };
+
+  const saveToDatabase = async (data) => {
+    try {
+      await axios.post('http://your-backend-api-url.com/api/saveDeployment', data);
+      console.log('Data saved to database successfully');
+    } catch (error) {
+      console.error('Error saving data to database:', error);
+    }
   };
 
   const handleSubmit = async (values) => {
@@ -105,6 +116,14 @@ const LoanDeployment = () => {
         const { key: escrowKey, value: escrowValue } = parseKeyValue(loanData.escrow);
         addAccount(escrowKey, escrowValue, 'escrow');
 
+        // Save data to database
+        const deploymentData = {
+          contractAddress: contract.address,
+          assetType,
+          ...formattedLoanData
+        };
+        await saveToDatabase(deploymentData);
+
         navigate('/deployment-status', { state: { status: 'success', address: contract.address } });
       } else {
         console.error('MetaMask is not installed');
@@ -144,15 +163,17 @@ const LoanDeployment = () => {
       case 'loan':
         return <LoanForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
       case 'bond':
-        return <BondForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
+        //return <BondForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
+        return <LoanForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="page-container" style={{ padding: '20px'}}>
-      <Typography.Title level={1} style={{ color: '#000', margin: '10px', textAlign: 'center', minHeight: '8vh' }}>Syndicated Loan Configuration</Typography.Title>
+    <div className="cspro-page-container" style={{ padding: '20px'}}>
+      <img src={logo} alt="Logo" style={{ position: 'absolute', top: '20px', left: '20px', height: '80px' }} />
+      <Typography.Title level={1} style={{ color: '#000', margin: '10px', textAlign: 'center', minHeight: '8vh', fontSize: '45px' }}>Syndicated Loan Configuration</Typography.Title>
       <Button onClick={connectWallet} style={{
         backgroundColor: '#fff', // 背景颜色为白色
         color: '#000', // 字体颜色为黑色
@@ -166,8 +187,9 @@ const LoanDeployment = () => {
       </Button>
       <div>
         <Form layout="horizontal" style={{ margin: '0 auto' }}>
-          <Form.Item label={<label style={{ color: "#000", fontSize: "18px" }}>Asset Type</label>} name="assetType" labelCol={{ span: 9 }} wrapperCol={{ span: 12 }}>
-          <Select value={assetType} onChange={(value) => setAssetType(value)} style={{ width: '200px', backgroundColor: '#000', color: '#fff' }}>
+          <Form.Item label={<label style={{ fontSize: "18px" }}>Asset Type</label>} name="assetType" labelCol={{ span: 9 }} wrapperCol={{ span: 12 }}>
+            <Select value={assetType} onChange={(value) => setAssetType(value)} 
+            style={{ width: '200px', color: '#fff' }}>
               <Option value="loan">Loan</Option>
               <Option value="bond">Bond</Option>
               {/* Add more asset types as needed */}

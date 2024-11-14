@@ -1,0 +1,48 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+  
+.container {
+display: flex;
+flex-direction: column;
+min-height: 100vh; /* Ensure the container takes up the full viewport height */
+}
+
+.jetco-page-container {
+background-color: white; /* Set the background color */
+padding: 20px;
+flex: 1; /* Allow the page-container to grow and fill the remaining space */
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+
+/* 添加黑线和红线 */
+.jetco-page-container::before {
+    content: ""; /* 创建一个空内容 */
+    position: absolute; /* 绝对定位以相对于父元素 */
+    top: 110px; /* 距离顶部-5像素（使线条位于页面顶部） */
+    left: 0; /* 左边距为0 */
+    width: 100%; /* 宽度为100% */
+    height: 25px; /* 高度为5像素 */
+    background-color: #000; /* 黑色 */
+}
+
+/* 添加红线 */
+.jetco-page-container::after {
+    content: ""; /* 创建一个空内容 */
+    position: absolute; /* 绝对定位以相对于父元素 */
+    top: 100px; /* 距离顶部0像素 */
+    right: 0; /* 左边距为0 */
+    width: 50%; /* 宽度为100% */
+    height: 10px; /* 高度为5像素 */
+    background-color: red; /* 红色 */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); /* 剪辑路径 */
+}
+
+
+.ant-btn {
+color: black; /* 你可以根据需要调整颜色 */
+}

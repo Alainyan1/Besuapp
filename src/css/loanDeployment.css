@@ -11,11 +11,25 @@ html, body {
   min-height: 100vh; /* Ensure the container takes up the full viewport height */
 }
 
-.page-container {
-  background-color: #ebc139; /* Set the background color */
+.cspro-page-container {
+  background-color: #f0c26c; /* Set the background color */
   padding: 20px;
   flex: 1; /* Allow the page-container to grow and fill the remaining space */
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.ant-select-selection {
+  background-color: #000 !important; /* 背景颜色 */
+  color: #fff !important; /* 文字颜色 */
+}
+
+.ant-select-arrow {
+  color: #fff !important; /* 箭头颜色 */
+}
+
+.ant-select-dropdown-menu-item {
+  background-color: #000 !important; /* 下拉选项的背景颜色 */
+  color: #fff !important; /* 下拉选项的文字颜色 */
 }

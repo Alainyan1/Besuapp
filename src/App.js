@@ -6,6 +6,9 @@ import Jetco from './components/jetco'; // 引入Jetco组件
 import Aift from './components/aift'; // 引入Aift组件
 import Bank from './components/bank'; // 引入Bank组件
 import LoanTransfer from './components/lender';
+import LenderAll from './components/LenderAll'; // 引入LenderAll组件
+import AiftRouter from './components/AiftRouter'; // 引入AiftRouter组件
+import IssuerInfo from './components/IssuerInfo';
 import DeploymentStatus from './components/DeploymentStatus'; // 引入DeploymentStatus组件
 import { ContractProvider } from './components/ContractContext'; // 引入ContractProvider
 import { AccountsProvider } from './components/AccountsContext'; // 引入AccountsProvider
@@ -42,6 +45,9 @@ function App() {
               <Route path="/bank" element={<Bank />} />
               <Route path="/lender" element={<LoanTransfer />} />
               <Route path="/deployment-status" element={<DeploymentStatus />} />
+              <Route path="/lenderInfo" element={<LenderAll />} />
+              <Route path="/aift-router" element={<AiftRouter />} />
+              <Route path="/issuer" element={<IssuerInfo />} />
             </Routes>
           </div>
         </Router>

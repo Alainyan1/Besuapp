@@ -211,7 +211,7 @@ const Aift = () => {
 
   return (
     <div>
-      <h1>Tokenized Loan Platform</h1>
+      <h1>AIFT Aequitas Asset Platform</h1>
       <button onClick={connectWallet} style={{ position: 'absolute', top: 10, right: 10 }}>
         {walletAddress ? `Connected: ${walletAddress}` : 'Connect Wallet'}
       </button>
