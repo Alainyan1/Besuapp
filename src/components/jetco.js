@@ -5,6 +5,7 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { AccountsContext } from './AccountsContext';
 import { Form, Input, Button, Select, Typography } from 'antd';
 import { WalletOutlined } from '@ant-design/icons'; // Import the Wallet icon
+import { useLocation } from 'react-router-dom';
 import '../css/jetco.css';
 import logo from '../images/jetco.png';
 
@@ -25,12 +26,19 @@ const Jetco = () => {
   const [selectedLenderAddressKey, setSelectedLenderAddressKey] = useState('');
   const [customAddress, setCustomAddress] = useState(''); // 用于存储用户输入的自定义地址
 
+  const location = useLocation();
+
   useEffect(() => {
     const storedWalletAddress = localStorage.getItem('walletAddress');
     if (storedWalletAddress) {
       setWalletAddress(storedWalletAddress);
     }
-  }, []);
+
+    // Set contract address from navigation state
+    if (location.state?.contractAddress) {
+      setContractAddress(location.state.contractAddress);
+    }
+  }, [location.state]);
 
   const handleConfirm = async () => {
     try {
@@ -74,6 +82,16 @@ const Jetco = () => {
         setStatus('success');
         setTransactionHash(receipt.transactionHash);
         alert('Transaction successful!');
+
+        // Save transaction data to the database
+        const transactionData = {
+          paymentFrom: { key: selectedPaymentFromKey, value: paymentFrom },
+          paymentTo: { key: selectedLenderAddressKey, value: lenderAddress },
+          amount,
+          contractAddress,
+          operation
+        };
+        await saveTransactionData(transactionData);
       } else {
         console.error('MetaMask is not installed');
         setStatus('error');
@@ -83,6 +101,15 @@ const Jetco = () => {
       console.error('Error during transaction:', error);
       setStatus('error');
       alert('Transaction failed. Please try again.');
+    }
+  };
+
+  const saveTransactionData = async (data) => {
+    try {
+      await axios.post('http://your-backend-api-url.com/api/saveTransaction', data);
+      console.log('Transaction data saved to database successfully');
+    } catch (error) {
+      console.error('Error saving transaction data to database:', error);
     }
   };
 
@@ -144,8 +171,8 @@ const Jetco = () => {
   };
 
   return (
-    <div className='jetco-page-container' style={{ padding: '20px' }}>
-      <img src={logo} alt="Logo" style={{ position: 'absolute', top: '20px', left: '10px', height: '100px' }} />
+    <div className='jetco-page-container'>
+      <img src={logo} alt="Logo" className="responsive-logo" />
       <Button onClick={connectWallet} style={{
         backgroundColor: '#fff', // 背景颜色为白色
         color: 'red', // 字体颜色为红色
@@ -153,7 +180,7 @@ const Jetco = () => {
         boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
         fontSize: '18px', // 增大按钮的字体
         height: '50px', // 增加按钮的高度
-        position: 'absolute', top: 20, right: 10
+        position: 'fixed', top: 20, right: 10
       }} icon={<WalletOutlined />}>
         {walletAddress ? `Connected: ${walletAddress}` : 'Connect Wallet'}
       </Button>

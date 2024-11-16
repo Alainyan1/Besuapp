@@ -8,6 +8,7 @@ body, html {
 .app-container {
   display: flex;
   height: 100vh;
+  position: relative;
 }
 
 .background-container {
@@ -36,18 +37,18 @@ body, html {
 }
 
 .responsive-logo {
-  width: auto; /* Adjust the width as needed */
+  width: 20%; /* Adjust the width as needed */
   height: auto; /* Maintain aspect ratio */
   max-width: 150px; /* Set a maximum width */
-  position: fixed;
+  position: absolute; /* Position the logo fixed to the viewport */
   top: 20px;
-  right: 40px;
+  right: 20px; /* Position the logo to the right */
 }
 
 .title {
   text-align: center;
   font-size: 40px;
-  margin-top: -10rem; 
+  margin-top: -3rem; /* Adjust the margin to control the gap between the logo and the title */
 }
 
 .description {
@@ -67,9 +68,15 @@ body, html {
   font-size: 24px;
 }
 
-.aift-select-container .ant-select-selection-item, 
-.aift-select-container .ant-select-selection-placeholder {
+.custom-select .ant-select-selection-placeholder {
+  color: black !important; /* Change the placeholder color */
+  text-align: center; /* Center the placeholder text */
+  font-size: 18px !important; /* Change the placeholder font size */
+}
+
+.aift-select-container .ant-select-selection-item {
   font-size: 20px !important;
+  text-align: center; /* Center the placeholder text */
 }
 
 .role-container {
@@ -87,6 +94,16 @@ body, html {
   .content-container {
     width: 40%;
   }
+
+  .responsive-logo {
+    width: 18%;
+    max-width: 130px;
+  }
+
+  .title {
+    font-size: 35px;
+    margin-top: 1.5rem;
+  }
 }
 
 @media (max-width: 992px) {
@@ -98,8 +115,14 @@ body, html {
     width: 50%;
   }
 
+  .responsive-logo {
+    width: 16%;
+    max-width: 110px;
+  }
+
   .title {
-    font-size: 35px;
+    font-size: 30px;
+    margin-top: 1rem;
   }
 
   .description {
@@ -132,12 +155,13 @@ body, html {
   }
 
   .responsive-logo {
-    width: 30%; /* Adjust the width for smaller screens */
-    max-width: 100px; /* Set a maximum width */
+    width: 14%;
+    max-width: 90px;
   }
 
   .title {
-    font-size: 30px;
+    font-size: 25px;
+    margin-top: 0.5rem;
   }
 
   .description {
@@ -160,12 +184,13 @@ body, html {
 
 @media (max-width: 576px) {
   .responsive-logo {
-    width: 40%; /* Adjust the width for smaller screens */
-    max-width: 80px; /* Set a maximum width */
+    width: 12%;
+    max-width: 70px;
   }
 
   .title {
-    font-size: 25px;
+    font-size: 20px;
+    margin-top: 0.5rem;
   }
 
   .description {

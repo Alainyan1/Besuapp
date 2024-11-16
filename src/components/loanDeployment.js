@@ -56,7 +56,8 @@ const LoanDeployment = () => {
 
   const saveToDatabase = async (data) => {
     try {
-      await axios.post('http://your-backend-api-url.com/api/saveDeployment', data);
+      console.log('Saving data to database:', data);
+      await axios.post('https://eurybia.xyz/api/test/saveDeployment', data);
       console.log('Data saved to database successfully');
     } catch (error) {
       console.error('Error saving data to database:', error);
@@ -119,8 +120,21 @@ const LoanDeployment = () => {
         // Save data to database
         const deploymentData = {
           contractAddress: contract.address,
-          assetType,
-          ...formattedLoanData
+          deployerAddress,
+          assetType: assetType,
+          companyName: loanData.name,
+          symbol: loanData.symbol,
+          initialSupply: loanData.initialSupply,
+          interestRate: loanData.interestRate,
+          lender1Address: formattedLoanData.buyers[0],
+          lender1Key: parseKeyValue(loanData.buyers[0]).key,
+          lender1amount: loanData.amounts[0],
+          lender2Address: formattedLoanData.buyers[1],
+          lender2Key: parseKeyValue(loanData.buyers[1]).key,
+          lender2amount: loanData.amounts[1],
+          escrowAddress: formattedLoanData.escrow,
+          escrowKey: parseKeyValue(loanData.escrow).key,
+          ancillaryInfo: loanData.ancillaryInfo
         };
         await saveToDatabase(deploymentData);
 
@@ -187,9 +201,10 @@ const LoanDeployment = () => {
       </Button>
       <div>
         <Form layout="horizontal" style={{ margin: '0 auto' }}>
-          <Form.Item label={<label style={{ fontSize: "18px" }}>Asset Type</label>} name="assetType" labelCol={{ span: 9 }} wrapperCol={{ span: 12 }}>
-            <Select value={assetType} onChange={(value) => setAssetType(value)} 
-            style={{ width: '200px', color: '#fff' }}>
+          <Form.Item label={<label style={{ fontSize: "18px" }}>Asset Type</label>} name="assetType" required labelCol={{ span: 9 }} wrapperCol={{ span: 12 }}>
+            <Select placeholder="Loan" value={assetType} onChange={(value) => setAssetType(value)} 
+            style={{ width: '200px', color: '#fff' }}
+            className="loan-custom-select">
               <Option value="loan">Loan</Option>
               <Option value="bond">Bond</Option>
               {/* Add more asset types as needed */}

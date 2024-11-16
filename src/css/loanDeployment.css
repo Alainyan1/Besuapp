@@ -33,3 +33,8 @@ html, body {
   background-color: #000 !important; /* 下拉选项的背景颜色 */
   color: #fff !important; /* 下拉选项的文字颜色 */
 }
+
+.loan-custom-select .ant-select-selection-placeholder {
+  color: black !important; /* Change the placeholder color */
+  text-align: left;
+}

@@ -46,3 +46,15 @@ justify-content: center;
 .ant-btn {
 color: black; /* 你可以根据需要调整颜色 */
 }
+
+.responsive-logo {
+    width: auto; /* 根据需要调整百分比 */
+    height: 120%; /* 保持宽高比 */
+    position: relative; /* 相对定位 */
+    left: 1%; /* 左边距为25% */
+    top: 10%; /* 顶部距离为10% */
+}
+
+.custom-select .ant-select-selection-placeholder {
+    color: black !important; /* Change the placeholder color */
+}

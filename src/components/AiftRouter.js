@@ -7,13 +7,13 @@ import { Button, Typography, Select } from 'antd';
 import '../css/aiftRouter.css';
 import logo from '../images/aift.png';
 
-const { Title } = Typography;
+//const { Title } = Typography;
 const { Option } = Select;
 
 const AiftRouter = () => {
   const { accounts, addAccount } = useContext(AccountsContext);
   const [walletAddress, setWalletAddress] = useState(null);
-  const [role, setRole] = useState(''); // New state for role selection
+  const [role, setRole] = useState(undefined); // New state for role selection
   const navigate = useNavigate();
 
   const connectWallet = async () => {
@@ -63,13 +63,15 @@ const AiftRouter = () => {
         </p>
         <div className="aift-select-container">
           <Select
-            placeholder="Select Role"
+            placeholder="Please Select Role"
             onChange={(value) => setRole(value)}
             value={role}
-            style={{ width: '300px', marginBottom: '20px', height: '50px', fontSize: '24px', textAlign: 'center' }}
+            style={{ width: '300px', marginBottom: '20px', height: '50px' }}
+            dropdownStyle={{ textAlign: 'center' }}
+            className="custom-select"
           >
-            <Option value="lender" style={{ textAlign: 'center', fontSize: '18px' }}>Lender</Option>
             <Option value="issuer" style={{ textAlign: 'center', fontSize: '18px' }}>Issuer</Option>
+            <Option value="lender" style={{ textAlign: 'center', fontSize: '18px' }}>Lender</Option>
             <Option value="borrower" style={{ textAlign: 'center', fontSize: '18px' }}>Borrower</Option>
           </Select>
         </div>
@@ -79,7 +81,7 @@ const AiftRouter = () => {
             <h3 className="selected-role">Selected Role: {role.charAt(0).toUpperCase() + role.slice(1)}</h3>
             {!walletAddress ? (
               <Button type="primary" onClick={connectWallet} style={{
-                backgroundColor: 'lightblue', // 背景颜色为白色
+                backgroundColor: '#6EA1EB', // 背景颜色为白色
                 color: '#000', // 字体颜色为黑色
                 borderRadius: '10px', // 设置按钮的圆角
                 boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
