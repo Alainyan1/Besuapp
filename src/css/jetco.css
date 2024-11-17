@@ -19,27 +19,30 @@ flex-direction: column;
 justify-content: center;
 }
 
-/* 添加黑线和红线 */
 .jetco-page-container::before {
     content: ""; /* 创建一个空内容 */
-    position: absolute; /* 绝对定位以相对于父元素 */
-    top: 110px; /* 距离顶部-5像素（使线条位于页面顶部） */
+    position: relative; /* 相对定位 */
+    top: 60px; /* 距离顶部100像素 */
     left: 0; /* 左边距为0 */
     width: 100%; /* 宽度为100% */
-    height: 25px; /* 高度为5像素 */
-    background-color: #000; /* 黑色 */
+    height: 30px; /* 总高度为35像素，包含红线和黑线 */
+    background: 
+        linear-gradient(to bottom, 
+            red 0%, 
+            red 10px, 
+            transparent 10px, 
+            transparent 30px), /* 红线 */
+        linear-gradient(to bottom, 
+            black 0%, 
+            black 25px, 
+            transparent 20px, 
+            transparent 30px); /* 黑线 */
 }
 
-/* 添加红线 */
-.jetco-page-container::after {
-    content: ""; /* 创建一个空内容 */
-    position: absolute; /* 绝对定位以相对于父元素 */
-    top: 100px; /* 距离顶部0像素 */
-    right: 0; /* 左边距为0 */
-    width: 50%; /* 宽度为100% */
-    height: 10px; /* 高度为5像素 */
-    background-color: red; /* 红色 */
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); /* 剪辑路径 */
+.jetco-page-container::before {
+    background-size: 50% 100%, 100% 100%; /* 红线宽度为50%，黑线宽度为100% */
+    background-position: right top, left 10px; /* 调整位置 */
+    background-repeat: no-repeat; /* 不重复 */
 }
 
 
@@ -49,7 +52,7 @@ color: black; /* 你可以根据需要调整颜色 */
 
 .responsive-logo {
     width: auto; /* 根据需要调整百分比 */
-    height: 120%; /* 保持宽高比 */
+    height: 100%; /* 保持宽高比 */
     position: relative; /* 相对定位 */
     left: 1%; /* 左边距为25% */
     top: 10%; /* 顶部距离为10% */

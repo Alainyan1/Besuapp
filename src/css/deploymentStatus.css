@@ -1,0 +1,9 @@
+.status-page-container {
+    background-color: #f0c26c; /* Set the background color */
+    padding: 20px;
+    flex: 1; /* Allow the page-container to grow and fill the remaining space */
+    display: flex;
+    flex-direction: column;
+    font-size: 30px;
+  }
+  

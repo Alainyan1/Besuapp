@@ -9,6 +9,8 @@ import LoanTransfer from './components/lender';
 import LenderAll from './components/LenderAll'; // 引入LenderAll组件
 import AiftRouter from './components/AiftRouter'; // 引入AiftRouter组件
 import IssuerInfo from './components/IssuerInfo';
+import BorrowInfo from './components/BorrowInfo';
+import Asset from './components/Asset';
 import ViewConfiguration from './components/viewConfiguration'; // 引入ViewConfiguration组件
 import DeploymentStatus from './components/DeploymentStatus'; // 引入DeploymentStatus组件
 import { ContractProvider } from './components/ContractContext'; // 引入ContractProvider
@@ -50,6 +52,8 @@ function App() {
               <Route path="/aift-router" element={<AiftRouter />} />
               <Route path="/issuer" element={<IssuerInfo />} />
               <Route path="/configuration" element={<ViewConfiguration />} />
+              <Route path="/borrower" element={<BorrowInfo />} />
+              <Route path="/asset" element={<Asset />} />
             </Routes>
           </div>
         </Router>

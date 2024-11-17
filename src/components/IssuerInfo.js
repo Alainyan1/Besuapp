@@ -33,7 +33,7 @@ function IssuerInfo() {
 
   const columns = [
     {
-      title: 'Asset Name',
+      title: 'Asset',
       dataIndex: 'asset_name',
       key: 'asset_name',
       align: 'center',
@@ -57,11 +57,31 @@ function IssuerInfo() {
       align: 'center',
     },
     {
+      title: 'View Details',
+      key: 'viewDetails',
+      align: 'center',
+      render: (text, record) => (
+        <Button type="primary" onClick={() => navigate('/asset', { state: { contractAddress: record.contractAddress } })}
+        style={{
+          backgroundColor: '#6EA1EB', // 背景颜色为白色
+          color: '#000', // 字体颜色为黑色
+          borderRadius: '10px', // 设置按钮的圆角
+          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
+          fontSize: '18px', // 增大按钮的字体>
+          height: '40px', // 增加按钮的高度
+          width: '120px', // 增加按钮的宽度
+        }}>
+          View Details
+        </Button>
+      ),
+    },
+    {
       title: 'Configuration',
       key: 'configuration',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => navigate('/configuration', { state: { contractAddress: record.contractAddress } })}style={{
+        <Button type="primary" onClick={() => navigate('/configuration', { state: { contractAddress: record.contractAddress } })}
+        style={{
           backgroundColor: '#6EA1EB', // 背景颜色为白色
           color: '#000', // 字体颜色为黑色
           borderRadius: '10px', // 设置按钮的圆角

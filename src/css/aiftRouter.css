@@ -12,7 +12,7 @@ body, html {
 }
 
 .background-container {
-  width: 70%; /* Occupies 70% of the screen */
+  width: 75%; /* Occupies 70% of the screen */
   height: 100%;
   background-image: url('../images/aiftback.jpg');
   background-size: cover;
@@ -21,7 +21,7 @@ body, html {
 }
 
 .content-container {
-  width: 30%; /* Occupies 30% of the screen */
+  width: 25%; /* Occupies 30% of the screen */
   display: flex;
   flex-direction: column;
   justify-content: center;

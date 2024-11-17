@@ -78,7 +78,7 @@ function LenderAll() {
 
   const columns = [
     {
-      title: 'Asset Name',
+      title: 'Asset',
       dataIndex: 'asset_name',
       key: 'asset_name',
       align: 'center',
@@ -112,8 +112,8 @@ function LenderAll() {
       key: 'viewDetails',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => navigate(`/asset/${record.key}`)}style={{
-          backgroundColor: '#6EA1EB', // 背景颜色为白色
+        <Button type="primary" onClick={() => navigate(`/asset/${record.key}`)} style={{
+          backgroundColor: '#6EA1EB',
           color: '#000', // 字体颜色为黑色
           borderRadius: '10px', // 设置按钮的圆角
           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
@@ -132,7 +132,7 @@ function LenderAll() {
       render: (text, record) => (
         <Button type="primary" onClick={() => navigate('/jetco', { state: { contractAddress: record.contractAddress } })}
         style={{
-          backgroundColor: '#6EA1EB', // 背景颜色为白色
+          backgroundColor: '#6EA1EB', 
           color: '#000', // 字体颜色为黑色
           borderRadius: '10px', // 设置按钮的圆角
           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
