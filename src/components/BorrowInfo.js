@@ -19,8 +19,21 @@ function BorrowInfo() {
       try {
         const response = await axios.get('https://eurybia.xyz/api/test/getNonzeroLenders');
         const data = await response.data;
-        console.log(data);
-        setLendersData(data);
+        console.log('Axios response data:', data);
+
+        // Flatten the nested list
+        const flattenedData = data.flatMap(asset => 
+          asset.map(lender => ({
+            asset_name: lender.asset_name,
+            lender_address: lender.lender_address,
+            principal: lender.principal,
+            interest: lender.interest,
+            key: lender.lender_address // Use lender address as a unique key
+          }))
+        );
+
+        console.log('Flattened data:', flattenedData);
+        setLendersData(flattenedData);
       } catch (error) {
         console.error('Error fetching lenders:', error);
       }
@@ -81,9 +94,9 @@ function BorrowInfo() {
             boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
             fontSize: '18px', // 增大按钮的字体>
             height: '40px', // 增加按钮的高度
-            width: '100px', // 增加按钮的宽度
+            width: '130px', // 增加按钮的宽度
           }}>
-            Repay Interest
+            Repay Principal
           </Button>
         ),
     },
@@ -100,7 +113,7 @@ function BorrowInfo() {
             boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
             fontSize: '18px', // 增大按钮的字体>
             height: '40px', // 增加按钮的高度
-            width: '100px', // 增加按钮的宽度
+            width: '130px', // 增加按钮的宽度
           }}>
             Repay Interest
           </Button>

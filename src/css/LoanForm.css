@@ -2,3 +2,36 @@
 .ant-form-item-label > label {
   font-size: 38px; /* Adjust the font size as needed */
 }
+
+/* LoanForm.css */
+
+.cspro-page-container {
+  background-color: #f0f2f5;
+}
+
+.ant-descriptions-bordered .ant-descriptions-item-label {
+  background-color: #000;
+  color: #fff;
+  font-size: 18px;
+}
+
+.ant-descriptions-bordered .ant-descriptions-item-content {
+  color: #000;
+  font-size: 18px;
+}
+
+.ant-descriptions-item {
+  padding: 16px;
+}
+
+.ant-descriptions-bordered .ant-descriptions-item {
+  border: 1px solid #000;
+}
+
+.ant-descriptions-bordered .ant-descriptions-item-label {
+  border-right: 1px solid #000;
+}
+
+.ant-descriptions-bordered .ant-descriptions-item-content {
+  border-left: 1px solid #000;
+}

@@ -17,7 +17,10 @@ function IssuerInfo() {
   useEffect(() => {
     async function fetchData(walletAddress) {
       try {
-        const response = await axios.get('https://eurybia.xyz/api/test/loan_issuer');
+        const requestConfig = {
+          params: { deployerAddress: walletAddress }
+        };
+        const response = await axios.get('https://eurybia.xyz/api/test/issuerInfo', requestConfig);
         const data = await response.data;
         console.log(data);
         setAssetsData(data);
@@ -34,9 +37,12 @@ function IssuerInfo() {
   const columns = [
     {
       title: 'Asset',
-      dataIndex: 'asset_name',
-      key: 'asset_name',
-      align: 'center',
+      render: (text, record) => (
+        <div>
+          <div>{record.asset_name}</div>
+          <div style={{ fontSize: '12px', color: 'gray' }}>{record.ContractAddress}</div>
+        </div>
+      ),
     },
     {
       title: 'Type',
@@ -61,7 +67,7 @@ function IssuerInfo() {
       key: 'viewDetails',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => navigate('/asset', { state: { contractAddress: record.contractAddress } })}
+        <Button type="primary" onClick={() => navigate('/asset', { state: { contractAddress: record.ContractAddress } })}
         style={{
           backgroundColor: '#6EA1EB', // 背景颜色为白色
           color: '#000', // 字体颜色为黑色
@@ -80,7 +86,7 @@ function IssuerInfo() {
       key: 'configuration',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => navigate('/configuration', { state: { contractAddress: record.contractAddress } })}
+        <Button type="primary" onClick={() => navigate('/configuration', { state: { contractAddress: record.ContractAddress } })}
         style={{
           backgroundColor: '#6EA1EB', // 背景颜色为白色
           color: '#000', // 字体颜色为黑色

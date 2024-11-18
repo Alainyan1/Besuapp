@@ -33,8 +33,8 @@ function Asset() {
   const columns = [
     {
       title: 'Account',
-      dataIndex: 'account',
-      key: 'account',
+      dataIndex: 'address',
+      key: 'address',
       align: 'center',
     },
     {

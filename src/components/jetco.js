@@ -85,8 +85,10 @@ const Jetco = () => {
 
         // Save transaction data to the database
         const transactionData = {
-          paymentFrom: { key: selectedPaymentFromKey, value: paymentFrom },
-          paymentTo: { key: selectedLenderAddressKey, value: lenderAddress },
+          paymentFrom: paymentFrom ,
+          paymentFromKey: selectedPaymentFromKey,
+          paymentTo: lenderAddress,
+          paymentToKey: selectedLenderAddressKey,
           amount,
           contractAddress,
           operation

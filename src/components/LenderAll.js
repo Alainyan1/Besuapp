@@ -20,9 +20,12 @@ function LenderAll() {
   const walletAddress = location.state?.walletAddress || 'No wallet address provided';
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchData(walletAddress) {
       try {
-        const response = await axios.get('https://eurybia.xyz/api/test/loan');
+        const requestConfig = {
+          params: { lenderAddress: walletAddress }
+        };
+        const response = await axios.get('https://eurybia.xyz/api/test/lendersInfo', requestConfig);
         const data = await response.data;
         
         console.log(data);
@@ -32,8 +35,10 @@ function LenderAll() {
       }
     }
 
-    fetchData();
-  }, []);
+    if (walletAddress !== 'No wallet address provided') {
+      fetchData(walletAddress);
+    }
+  }, [walletAddress]);
 
   const handleTransferAll = async () => {
     if (!ethers.utils.isAddress(transferAddress)) {
@@ -53,7 +58,7 @@ function LenderAll() {
         const { abi } = contractDataResponse.data;
 
         // 创建合约实例
-        const contract = new ethers.Contract(selectedRecord.contractAddress, abi, signer);
+        const contract = new ethers.Contract(selectedRecord.ContractAddress, abi, signer);
         console.log('to address:', transferAddress);
         console.log('from address:', fromAddress);
         let tx = await contract.transferAllData(fromAddress, transferAddress, ethers.utils.formatBytes32String("transferAllData"), {
@@ -79,9 +84,12 @@ function LenderAll() {
   const columns = [
     {
       title: 'Asset',
-      dataIndex: 'asset_name',
-      key: 'asset_name',
-      align: 'center',
+      render: (text, record) => (
+        <div>
+          <div>{record.asset_name}</div>
+          <div style={{ fontSize: '12px', color: 'gray' }}>{record.ContractAddress}</div>
+        </div>
+      ),
     },
     {
       title: 'Allocated',
