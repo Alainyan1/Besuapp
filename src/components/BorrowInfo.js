@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../css/BorrowInfo.css';
 import logo from '../images/aift.png';
+import { Contract } from 'ethers';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -25,10 +26,13 @@ function BorrowInfo() {
         const flattenedData = data.flatMap(asset => 
           asset.map(lender => ({
             asset_name: lender.asset_name,
-            lender_address: lender.lender_address,
+            lender_address: lender.address,
             principal: lender.principal,
             interest: lender.interest,
-            key: lender.lender_address // Use lender address as a unique key
+            allocated: lender.allocated,
+            lensed: lender.lensed,
+            ContractAddress: lender.ContractAddress,
+            key: lender.address // Use lender address as a unique key
           }))
         );
 
@@ -47,9 +51,12 @@ function BorrowInfo() {
   const columns = [
     {
       title: 'Asset',
-      dataIndex: 'asset_name',
-      key: 'asset_name',
-      align: 'center',
+      render: (text, record) => (
+        <div>
+          <div>{record.asset_name}</div>
+          <div style={{ fontSize: '12px', color: 'gray' }}>{record.ContractAddress}</div>
+        </div>
+      ),
     },
     {
       title: 'Lender',

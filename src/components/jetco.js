@@ -38,7 +38,24 @@ const Jetco = () => {
     if (location.state?.contractAddress) {
       setContractAddress(location.state.contractAddress);
     }
+
+    // Fetch addresses from the API
+    const fetchAddresses = async () => {
+      try {
+        const response = await axios.get('https://eurybia.xyz/api/test/getAccount');
+        const data = response.data;
+        data.forEach((account) => {
+          addAccount(account.addresskey, account.address, 'none');
+        });
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
+      }
+    };
+
+    fetchAddresses();
   }, [location.state]);
+
+  
 
   const handleConfirm = async () => {
     try {
@@ -108,7 +125,7 @@ const Jetco = () => {
 
   const saveTransactionData = async (data) => {
     try {
-      await axios.post('http://your-backend-api-url.com/api/saveTransaction', data);
+      await axios.post('https://eurybia.xyz/api/test/saveTransaction', data);
       console.log('Transaction data saved to database successfully');
     } catch (error) {
       console.error('Error saving transaction data to database:', error);
@@ -173,7 +190,7 @@ const Jetco = () => {
   };
 
   return (
-    <div className='jetco-page-container'>
+   <div className='jetco-page-container'>
       <img src={logo} alt="Logo" className="responsive-logo" />
       <Button onClick={connectWallet} style={{
         backgroundColor: '#fff', // 背景颜色为白色
@@ -194,7 +211,7 @@ const Jetco = () => {
               <Select
                 value={selectedPaymentFromKey}
                 onChange={handleSelectChange(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)}
-                style={{ width: '100%' }}
+                style={{ width: '100%'}}
               >
                 <Option value="">Select an account</Option>
                 {Object.entries(accounts).map(([key, value]) => (
@@ -216,7 +233,9 @@ const Jetco = () => {
                   </Button>
                 </div>
               )}
-              {paymentFrom && <p>Address: {paymentFrom}</p>}
+              {selectedPaymentFromKey && selectedPaymentFromKey !== 'custom' && (
+                <p style={{ color: 'white', marginTop: '10px' }}>Address: {accounts[selectedPaymentFromKey].address}</p>
+              )}
             </Form.Item>
             <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Payment To</label>} style={{ width: '100%' }}>
               <Select
@@ -244,7 +263,9 @@ const Jetco = () => {
                   </Button>
                 </div>
               )}
-              {lenderAddress && <p>Address: {lenderAddress}</p>}
+              {selectedLenderAddressKey && selectedLenderAddressKey !== 'custom' && (
+                <p style={{ color: 'white', marginTop: '10px' }}>Address: {accounts[selectedLenderAddressKey].address}</p>
+              )}
             </Form.Item>
             <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Amount</label>} required style={{ width: '100%' }}>
               <Input
