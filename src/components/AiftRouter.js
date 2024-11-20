@@ -57,7 +57,7 @@ const AiftRouter = () => {
       <div className="background-container"></div>
       <div className="content-container">
         <img src={logo} alt="Logo" className="responsive-logo" />
-        <h1 className="title">AIFT Aequitas Asset Platform</h1>
+        <h1 className="title">AIFT Aequitas Tokenized Asset Management Platform</h1>
         <p className="description">
           This is an introduction about the platform and its features.
         </p>

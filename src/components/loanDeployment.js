@@ -83,6 +83,7 @@ const LoanDeployment = () => {
 
       const contractDataResponse = await axios.get('http://20.2.203.99:3002/api/contractData');
       const { abi, bytecode } = contractDataResponse.data;
+      // console.log('Contract data:', abi, bytecode);
 
       const provider = await detectEthereumProvider();
       if (provider) {
@@ -116,7 +117,6 @@ const LoanDeployment = () => {
         });
         const { key: escrowKey, value: escrowValue } = parseKeyValue(loanData.escrow);
         addAccount(escrowKey, escrowValue, 'escrow');
-
         // Save data to database
         const deploymentData = {
           contractAddress: contract.address,
@@ -134,7 +134,8 @@ const LoanDeployment = () => {
           lender2amount: loanData.amounts[1],
           escrowAddress: formattedLoanData.escrow,
           escrowKey: parseKeyValue(loanData.escrow).key,
-          ancillaryInfo: loanData.ancillaryInfo
+          ancillaryInfo: loanData.ancillaryInfo,
+          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19)
         };
         await saveToDatabase(deploymentData);
 

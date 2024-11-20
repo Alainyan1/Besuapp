@@ -138,7 +138,7 @@ function IssuerInfo() {
             border: '1px solid black', // 边框颜色为黑色
             fontSize: '20px', // 墛大按钮的字体
           }}>
-          Create Asset
+          Create New Asset
         </Button>
         <Table
           columns={columns}

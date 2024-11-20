@@ -75,19 +75,19 @@ const Jetco = () => {
 
         let tx;
         if (operation === 'interestRepay') {
-          tx = await contract.repayInterest(lenderAddress, parseInt(amount, 10), ethers.utils.formatBytes32String("Interest"), {
+          tx = await contract.repayInterest(lenderAddress, paymentFrom, parseInt(amount, 10), ethers.utils.formatBytes32String("Interest"), {
             gasLimit: 3000000,
             maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
             maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
           });
           console.log('tx:', tx);
         } else if (operation === 'principalRepay') {
-          tx = await contract.redeemFrom(lenderAddress, parseInt(amount, 10), ethers.utils.formatBytes32String("Principal"));
+          tx = await contract.myredeemFrom(lenderAddress, paymentFrom, parseInt(amount, 10), ethers.utils.formatBytes32String("Principal"));
         } else if (operation === 'drawdown') {
           const allowance = await contract.getEscrowAllowance(escrowAddress);
           console.log('escrow allowance from owner:', allowance);
 
-          tx = await contract.drawdown(paymentFrom, parseInt(amount, 10), {
+          tx = await contract.drawdown(paymentFrom, lenderAddress, parseInt(amount, 10), {
             gasLimit: 3000000,
             maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
             maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
@@ -110,6 +110,7 @@ const Jetco = () => {
           paymentToKey: selectedLenderAddressKey,
           amount: amount,
           operation: operation,
+          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19)
         };
         await saveTransactionData(transactionData);
       } else {
@@ -209,7 +210,7 @@ const Jetco = () => {
         <div style={{ backgroundColor: '#1a1a1a', borderRadius: '10px', padding: '20px', color: 'white', width: 'auto', maxWidth: '500px', margin: '20px auto' }}>
         <Title level={2} style={{ color: 'white', textAlign: 'center', marginTop: '1px' }}>Payment Confirmation</Title>
           <Form layout='vertical' onFinish={handleConfirm} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Payment From</label>} style={{ width: '100%' }}>
+            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Payment From</label>} required style={{ width: '100%' }}>
               <Select
                 value={selectedPaymentFromKey}
                 onChange={handleSelectChange(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)}
@@ -239,7 +240,7 @@ const Jetco = () => {
                 <p style={{ color: 'white', marginTop: '10px' }}>Address: {accounts[selectedPaymentFromKey].address}</p>
               )}
             </Form.Item>
-            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Payment To</label>} style={{ width: '100%' }}>
+            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Payment To</label>} required style={{ width: '100%' }}>
               <Select
                 value={selectedLenderAddressKey}
                 onChange={handleSelectChange(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)}

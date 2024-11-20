@@ -18,27 +18,36 @@ function BorrowInfo() {
   useEffect(() => {
     async function fetchData(walletAddress) {
       try {
-        const response = await axios.get('https://eurybia.xyz/api/test/getNonzeroLenders');
+        const requestConfig = {
+          params: { borrowerAddress: walletAddress }
+        };
+        const response = await axios.get('https://eurybia.xyz/api/test/getBorrowerBalance', requestConfig);
         const data = await response.data;
         console.log('Axios response data:', data);
 
-        // Flatten the nested list
-        const flattenedData = data.flatMap(asset => 
-          asset.map(lender => ({
-            asset_name: lender.asset_name,
-            lender_address: lender.address,
-            principal: lender.principal,
-            interest: lender.interest,
-            allocated: lender.allocated,
-            lensed: lender.lensed,
-            ContractAddress: lender.ContractAddress,
-            name: lender.name,
-            key: lender.address // Use lender address as a unique key
-          }))
-        );
+        // Check if data is an array
+        if (Array.isArray(data)) {
+          // Flatten the nested list
+          const flattenedData = data.flatMap(asset => 
+            Array.isArray(asset) ? asset.map(lender => ({
+              asset_name: lender.asset_name,
+              lender_address: lender.lender,
+              lender_name: lender.lender_name,
+              borrower_name: lender.name,
+              company_name: lender.company_name,
+              principal: lender.principal,
+              interest: lender.interest,
+              ContractAddress: lender.ContractAddress,
+              type: lender.Type,
+              key: lender.ContractAddress,
+            })) : []
+          );
 
-        console.log('Flattened data:', flattenedData);
-        setLendersData(flattenedData);
+          console.log('Flattened data:', flattenedData);
+          setLendersData(flattenedData);
+        } else {
+          console.error('Unexpected data format:', data);
+        }
       } catch (error) {
         console.error('Error fetching lenders:', error);
       }
