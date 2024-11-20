@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import detectEthereumProvider from '@metamask/detect-provider';
 import { Layout, Button, Typography, Table, Modal, Input } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { ethers } from 'ethers';
-import detectEthereumProvider from '@metamask/detect-provider';
 import '../css/LenderAll.css';
 import logo from '../images/aift.png';
 
@@ -15,9 +15,13 @@ function LenderAll() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [transferAddress, setTransferAddress] = useState('');
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [walletAddress, setWalletAddress] = useState(null); // 用于存储钱包地址
+  const [name, setName] = useState(null); // 用于存储名字
+  const [provider, setProvider] = useState(null); // 用于存储provider
   const navigate = useNavigate();
   const location = useLocation();
-  const walletAddress = location.state?.walletAddress || 'No wallet address provided';
+  const initialWalletAddress = location.state?.walletAddress || 'No wallet address provided';
+  const initialProvider = location.state?.provider || null;
 
   useEffect(() => {
     async function fetchData(walletAddress) {
@@ -26,28 +30,58 @@ function LenderAll() {
           params: { lenderAddress: walletAddress }
         };
         const response = await axios.get('https://eurybia.xyz/api/test/lendersInfo', requestConfig);
+        const response_name = await axios.get('https://eurybia.xyz/api/test/getAccountByAddress', requestConfig);
         const data = await response.data;
-        
+        const data_name = await response_name.data[0]['addresskey'];       
         console.log(data);
+        console.log(data_name);
         setAssetsData(data);
+        setName(data_name);
       } catch (error) {
         console.error('Error fetching assets:', error);
       }
     }
 
-    if (walletAddress !== 'No wallet address provided') {
-      fetchData(walletAddress);
+    if (initialWalletAddress !== 'No wallet address provided') {
+      fetchData(initialWalletAddress);
     }
   }, [walletAddress]);
 
-  const handleTransferAll = async () => {
-    if (!ethers.utils.isAddress(transferAddress)) {
+  const handleTransferAll = async (record) => {
+    const detectedProvider = await detectEthereumProvider();
+
+    if (detectedProvider) {
+      try {
+        console.log('MetaMask detected');
+        await detectedProvider.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
+        await detectedProvider.request({ method: 'eth_requestAccounts' });
+        const ethersProvider = new ethers.providers.Web3Provider(detectedProvider);
+        const signer = ethersProvider.getSigner();
+        const address = await signer.getAddress();
+        setWalletAddress(address);
+        setProvider(detectedProvider);
+        console.log('Connected Wallet Address:', address);
+
+        // Set the selected record and show the modal
+        setSelectedRecord({ contractAddress: record.ContractAddress });
+        setIsModalVisible(true);
+      } catch (error) {
+        console.error('Error connecting wallet:', error);
+      }
+    } else {
+      console.error('MetaMask is not installed');
+      alert('MetaMask is not installed. Please install it to use this feature.');
+    }
+  };
+
+  const handleConfirmTransfer = async () => {
+    const address = parseKeyValue(transferAddress);
+    if (!ethers.utils.isAddress(address.value)) {
       alert('Invalid input format. Please use a valid Ethereum address.');
       return;
     }
 
     try {
-      const provider = await detectEthereumProvider();
       if (provider) {
         const ethersProvider = new ethers.providers.Web3Provider(provider);
         const signer = ethersProvider.getSigner();
@@ -56,12 +90,13 @@ function LenderAll() {
         // 获取合约的 ABI 和 bytecode
         const contractDataResponse = await axios.get('http://20.2.203.99:3002/api/contractData');
         const { abi } = contractDataResponse.data;
-
+        console.log('ABI:', abi);
         // 创建合约实例
-        const contract = new ethers.Contract(selectedRecord.ContractAddress, abi, signer);
-        console.log('to address:', transferAddress);
+        console.log('selectedRecord:', selectedRecord.contractAddress);
+        const contract = new ethers.Contract(selectedRecord.contractAddress, abi, signer);
+        console.log('to address:', address.value);
         console.log('from address:', fromAddress);
-        let tx = await contract.transferAllData(fromAddress, transferAddress, ethers.utils.formatBytes32String("transferAllData"), {
+        let tx = await contract.transferAllData(fromAddress, address.value, ethers.utils.formatBytes32String("transferAllData"), {
           gasLimit: 3000000,
           maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
           maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
@@ -81,7 +116,33 @@ function LenderAll() {
     }
   };
 
+  const formatData = (data) => {
+    if (data > 1000000000) {
+      return `${(data / 1000000000).toFixed(2)}B`;
+    } else if (data > 1000000) {
+      return `${(data / 1000000).toFixed(2)}M`;
+    }
+    return data;
+  }
+
+  const parseKeyValue = (input) => {
+    const [key, value] = input.split(':');
+    return { key, value };
+  };
+
   const columns = [
+    {
+      title: 'Issue Company',
+      dataIndex: 'company_name',
+      key: 'company_name',
+      align: 'center',
+    },
+    {
+      title: 'Type',
+      dataIndex: 'Type',
+      key: 'Type',
+      align: 'center',
+    },
     {
       title: 'Asset',
       render: (text, record) => (
@@ -96,24 +157,28 @@ function LenderAll() {
       dataIndex: 'allocated',
       key: 'allocated',
       align: 'center',
+      render: (text) => formatData(text),
     },
     {
       title: 'Lensed',
       dataIndex: 'lensed',
       key: 'lensed',
       align: 'center',
+      render: (text) => formatData(text),
     },
     {
       title: 'Principal',
       dataIndex: 'principal',
       key: 'principal',
       align: 'center',
+      render: (text) => formatData(text),
     },
     {
       title: 'Interest',
       dataIndex: 'interest',
       key: 'interest',
       align: 'center',
+      render: (text) => formatData(text),
     },
     {
       title: 'View Details',
@@ -126,8 +191,8 @@ function LenderAll() {
           borderRadius: '10px', // 设置按钮的圆角
           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
           fontSize: '18px', // 增大按钮的字体>
-          height: '40px', // 增加按钮的高度
-          width: '120px', // 增加按钮的宽度
+          height: '40px', // 墛大按钮的高度
+          width: '120px', // 墛大按钮的宽度
         }}>
           View Details
         </Button>
@@ -138,15 +203,15 @@ function LenderAll() {
       key: 'repay',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => navigate('/jetco', { state: { contractAddress: record.contractAddress } })}
+        <Button type="primary" onClick={() => navigate('/jetco', { state: { contractAddress: record.ContractAddress } })}
         style={{
           backgroundColor: '#6EA1EB', 
           color: '#000', // 字体颜色为黑色
           borderRadius: '10px', // 设置按钮的圆角
           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
-          fontSize: '18px', // 增大按钮的字体>
-          height: '40px', // 增加按钮的高度
-          width: '100px', // 增加按钮的宽度
+          fontSize: '18px', // 墛大按钮的字体>
+          height: '40px', // 墛大按钮的高度
+          width: '100px', // 墛大按钮的宽度
         }}>
           Repay
         </Button>
@@ -157,14 +222,14 @@ function LenderAll() {
       key: 'transferAll',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => { setSelectedRecord(record); setIsModalVisible(true); }} style={{
-          backgroundColor: '#6EA1EB', // 背景颜色为白色
+        <Button type="primary" onClick={() => handleTransferAll(record)} style={{
+          backgroundColor: '#6EA1EB',
           color: '#000', // 字体颜色为黑色
           borderRadius: '10px', // 设置按钮的圆角
           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
-          fontSize: '18px', // 增大按钮的字体>
-          height: '40px', // 增加按钮的高度
-          width: '120px', // 增加按钮的宽度
+          fontSize: '18px', // 墛大按钮的字体>
+          height: '40px', // 墛大按钮的高度
+          width: '120px', // 墛大按钮的宽度
         }}>
           Transfer All
         </Button>
@@ -177,7 +242,7 @@ function LenderAll() {
       <img src={logo} alt="Logo" className="aiftresponsive-logo" />
       <Content style={{ padding: '0 50px' }}>
         <Title level={2} className="lender-all-title">Lender Dashboard</Title>
-        <p className="wallet-address">Wallet Address: {walletAddress}</p>
+        <p className="wallet-address">{name}: {initialWalletAddress}</p>
         <Table
           columns={columns}
           dataSource={assetsData}
@@ -189,7 +254,7 @@ function LenderAll() {
         <Modal
           title="Transfer All"
           visible={isModalVisible}
-          onOk={handleTransferAll}
+          onOk={handleConfirmTransfer}
           onCancel={() => setIsModalVisible(false)}
         >
           <Input

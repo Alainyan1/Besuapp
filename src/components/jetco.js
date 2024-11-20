@@ -14,7 +14,7 @@ const { Title } = Typography;
 
 const Jetco = () => {
   const { accounts, addAccount } = useContext(AccountsContext);
-  const [paymentFrom, setPaymentFrom] = useState(localStorage.getItem('paymentFrom') || '');
+  const [paymentFrom, setPaymentFrom] = useState('');
   const [amount, setAmount] = useState(localStorage.getItem('amount') || 4000000000);
   const [contractAddress, setContractAddress] = useState(localStorage.getItem('contractAddress') || '');
   const [status, setStatus] = useState(null); // 用于存储请求的结果状态
@@ -24,7 +24,8 @@ const Jetco = () => {
   const [transactionHash, setTransactionHash] = useState(''); // 用于存储交易哈希
   const [selectedPaymentFromKey, setSelectedPaymentFromKey] = useState('');
   const [selectedLenderAddressKey, setSelectedLenderAddressKey] = useState('');
-  const [customAddress, setCustomAddress] = useState(''); // 用于存储用户输入的自定义地址
+  const [customPaymentFromAddress, setCustomPaymentFromAddress] = useState(''); // 用于存储用户输入的自定义地址 for paymentFrom
+  const [customPaymentToAddress, setCustomPaymentToAddress] = useState(''); // 用于存储用户输入的自定义地址 for paymentTo
 
   const location = useLocation();
 
@@ -102,13 +103,13 @@ const Jetco = () => {
 
         // Save transaction data to the database
         const transactionData = {
+          contractAddress: contractAddress,
           paymentFrom: paymentFrom ,
           paymentFromKey: selectedPaymentFromKey,
           paymentTo: lenderAddress,
           paymentToKey: selectedLenderAddressKey,
-          amount,
-          contractAddress,
-          operation
+          amount: amount,
+          operation: operation,
         };
         await saveTransactionData(transactionData);
       } else {
@@ -125,6 +126,7 @@ const Jetco = () => {
 
   const saveTransactionData = async (data) => {
     try {
+      console.log('Saving transaction data to database:', data);
       await axios.post('https://eurybia.xyz/api/test/saveTransaction', data);
       console.log('Transaction data saved to database successfully');
     } catch (error) {
@@ -176,21 +178,21 @@ const Jetco = () => {
     }
   };
 
-  const handleCustomAddressChange = (event) => {
-    setCustomAddress(event.target.value);
+  const handleCustomAddressChange = (setter) => (event) => {
+    setter(event.target.value);
   };
 
-  const handleAddCustomAddress = (setter, key, setSelectedKey) => {
+  const handleAddCustomAddress = (setter, key, setSelectedKey, customAddress) => {
     const [customKey, customValue] = customAddress.split(':');
     addAccount(customKey, customValue, 'borrower');
     setter(customValue);
     setSelectedKey(customKey);
     localStorage.setItem(key, customValue);
-    setCustomAddress('');
+    setter('');
   };
 
   return (
-   <div className='jetco-page-container'>
+    <div className='jetco-page-container'>
       <img src={logo} alt="Logo" className="responsive-logo" />
       <Button onClick={connectWallet} style={{
         backgroundColor: '#fff', // 背景颜色为白色
@@ -223,12 +225,12 @@ const Jetco = () => {
                 <div>
                   <Input
                     type="text"
-                    value={customAddress}
-                    onChange={handleCustomAddressChange}
+                    value={customPaymentFromAddress}
+                    onChange={handleCustomAddressChange(setCustomPaymentFromAddress)}
                     placeholder="Enter address in format Name:address"
                     style={{ width: '100%', marginTop: '10px' }}
                   />
-                  <Button color='white' type="button" onClick={() => handleAddCustomAddress(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)} style={{ marginTop: '10px', backgroundColor: 'white' }}>
+                  <Button color='white' type="button" onClick={() => handleAddCustomAddress(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey, customPaymentFromAddress)} style={{ marginTop: '10px', backgroundColor: 'white' }}>
                     Add Address
                   </Button>
                 </div>
@@ -253,12 +255,12 @@ const Jetco = () => {
                 <div>
                   <Input
                     type="text"
-                    value={customAddress}
-                    onChange={handleCustomAddressChange}
+                    value={customPaymentToAddress}
+                    onChange={handleCustomAddressChange(setCustomPaymentToAddress)}
                     placeholder="Enter address in format Name:address"
                     style={{ width: '100%', marginTop: '10px' }}
                   />
-                  <Button type="button" color='white' onClick={() => handleAddCustomAddress(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)} style={{ marginTop: '10px', backgroundColor: 'white'}}>
+                  <Button type="button" color='white' onClick={() => handleAddCustomAddress(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey, customPaymentToAddress)} style={{ marginTop: '10px', backgroundColor: 'white'}}>
                     Add Address
                   </Button>
                 </div>

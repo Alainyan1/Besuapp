@@ -34,7 +34,28 @@ function IssuerInfo() {
     }
   }, [walletAddress]);
 
+  const formatData = (data) => {
+    if (data > 1000000000) {
+      return `${(data / 1000000000).toFixed(2)}B`;
+    } else if (data > 1000000) {
+      return `${(data / 1000000).toFixed(2)}M`;
+    }
+    return data;
+  }
+
   const columns = [
+    {
+      title: 'Issue Company',
+      dataIndex: 'company_name',
+      key: 'company_name',
+      align: 'center',
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      align: 'center',
+    },
     {
       title: 'Asset',
       render: (text, record) => (
@@ -45,29 +66,25 @@ function IssuerInfo() {
       ),
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-      align: 'center',
-    },
-    {
-      title: 'Total Supply',
+      title: 'Principal + Interest',
       dataIndex: 'total_supply',
       key: 'total_supply',
       align: 'center',
+      render: (text) => formatData(text),
     },
     {
       title: 'Principal',
       dataIndex: 'principal',
       key: 'principal',
       align: 'center',
+      render: (text) => formatData(text),
     },
     {
       title: 'View Details',
       key: 'viewDetails',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => navigate('/asset', { state: { contractAddress: record.ContractAddress } })}
+        <Button type="primary" onClick={() => navigate('/asset', { state: { contractAddress: record.ContractAddress, assertName: record.asset_name } })}
         style={{
           backgroundColor: '#6EA1EB', // 背景颜色为白色
           color: '#000', // 字体颜色为黑色
@@ -86,7 +103,7 @@ function IssuerInfo() {
       key: 'configuration',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => navigate('/configuration', { state: { contractAddress: record.ContractAddress } })}
+        <Button type="primary" onClick={() => navigate('/configuration', { state: { walletAddress: record.walletAddress, contractAddress: record.ContractAddress } })}
         style={{
           backgroundColor: '#6EA1EB', // 背景颜色为白色
           color: '#000', // 字体颜色为黑色
@@ -107,7 +124,22 @@ function IssuerInfo() {
       <img src={logo} alt="Logo" className="aiftresponsive-logo" />
       <Content style={{ padding: '0 50px' }}>
         <Title level={2} className="issuer-info-title">Issuer Dashboard</Title>
-        <p className="wallet-address">Wallet Address: {walletAddress}</p>
+        <p className="wallet-address">CSPRO: {walletAddress}</p>
+        <Button type="primary" onClick={() => navigate('/')}
+          className="create-asset-button"
+          style={{
+            backgroundColor: 'white', // 背景颜色为白色
+            color: 'black', // 字体颜色为黑色
+            borderRadius: '10px', // 设置按钮的圆角
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
+            fontSize: '18px', // 墛大按钮的字体
+            height: '50px', // 墛大按钮的高度
+            width: '180px', // 墛大按钮的宽度
+            border: '1px solid black', // 边框颜色为黑色
+            fontSize: '20px', // 墛大按钮的字体
+          }}>
+          Create Asset
+        </Button>
         <Table
           columns={columns}
           dataSource={assetsData}

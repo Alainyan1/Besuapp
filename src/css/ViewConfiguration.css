@@ -1,0 +1,9 @@
+.custom-descriptions .ant-descriptions-item-label {
+  background-color: #6EA1EB !important; /* Blue background color */
+  color: white !important; /* White font color */
+  font-size: 20px; /* Increase font size */
+}
+
+.custom-descriptions .ant-descriptions-item-content {
+  font-size: 16px; /* Increase font size */
+}

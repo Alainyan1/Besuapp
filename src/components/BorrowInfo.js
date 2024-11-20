@@ -32,6 +32,7 @@ function BorrowInfo() {
             allocated: lender.allocated,
             lensed: lender.lensed,
             ContractAddress: lender.ContractAddress,
+            name: lender.name,
             key: lender.address // Use lender address as a unique key
           }))
         );
@@ -60,9 +61,12 @@ function BorrowInfo() {
     },
     {
       title: 'Lender',
-      dataIndex: 'lender_address',
-      key: 'lender_address',
-      align: 'center',
+      render : (text, record) => (
+        <div>
+          <div>{record.name}</div>
+          <div style={{ fontSize: '12px', color: 'gray' }}>{record.lender_address}</div>
+        </div>
+      ),
     },
     {
         title: 'Allocated',
