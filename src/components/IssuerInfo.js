@@ -84,7 +84,7 @@ function IssuerInfo() {
       key: 'viewDetails',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => navigate('/asset', { state: { contractAddress: record.ContractAddress, assertName: record.asset_name } })}
+        <Button type="primary" onClick={() => navigate('/asset', { state: { contractAddress: record.ContractAddress, assetName: record.asset_name } })}
         style={{
           backgroundColor: '#6EA1EB', // 背景颜色为白色
           color: '#000', // 字体颜色为黑色

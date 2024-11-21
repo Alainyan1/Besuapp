@@ -185,12 +185,13 @@ function LenderAll() {
       key: 'viewDetails',
       align: 'center',
       render: (text, record) => (
-        <Button type="primary" onClick={() => navigate(`/asset/${record.key}`)} style={{
+        <Button type="primary" onClick={() => navigate('/lender-details', { state: { contractAddress: record.ContractAddress, walletAddress: initialWalletAddress, assetName: record.asset_name } })} 
+        style={{
           backgroundColor: '#6EA1EB',
           color: '#000', // 字体颜色为黑色
           borderRadius: '10px', // 设置按钮的圆角
           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
-          fontSize: '18px', // 增大按钮的字体>
+          fontSize: '18px', // 墛大按钮的字体>
           height: '40px', // 墛大按钮的高度
           width: '120px', // 墛大按钮的宽度
         }}>
@@ -199,7 +200,7 @@ function LenderAll() {
       ),
     },
     {
-      title: 'Repay',
+      title: 'Drawdown',
       key: 'repay',
       align: 'center',
       render: (text, record) => (
@@ -213,7 +214,7 @@ function LenderAll() {
           height: '40px', // 墛大按钮的高度
           width: '100px', // 墛大按钮的宽度
         }}>
-          Repay
+          Drawdown
         </Button>
       ),
     },

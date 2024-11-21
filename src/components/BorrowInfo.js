@@ -26,28 +26,23 @@ function BorrowInfo() {
         console.log('Axios response data:', data);
 
         // Check if data is an array
-        if (Array.isArray(data)) {
-          // Flatten the nested list
-          const flattenedData = data.flatMap(asset => 
-            Array.isArray(asset) ? asset.map(lender => ({
-              asset_name: lender.asset_name,
-              lender_address: lender.lender,
-              lender_name: lender.lender_name,
-              borrower_name: lender.name,
-              company_name: lender.company_name,
-              principal: lender.principal,
-              interest: lender.interest,
-              ContractAddress: lender.ContractAddress,
-              type: lender.Type,
-              key: lender.ContractAddress,
-            })) : []
-          );
+        // Map over the data to extract necessary information
+        const mappedData = data.map(lender => ({
+          asset_name: lender.asset_name,
+          lender_address: lender.lender,
+          lender_name: lender.lender_name,
+          borrower_name: lender.name,
+          company_name: lender.company_name,
+          principal: lender.principal,
+          interest: lender.interest,
+          ContractAddress: lender.ContractAddress,
+          type: lender.Type,
+          time: lender.time_stamp,
+          key: lender.ContractAddress,
+        }));
 
-          console.log('Flattened data:', flattenedData);
-          setLendersData(flattenedData);
-        } else {
-          console.error('Unexpected data format:', data);
-        }
+        console.log('Mapped data:', mappedData);
+        setLendersData(mappedData);
       } catch (error) {
         console.error('Error fetching lenders:', error);
       }
@@ -59,6 +54,18 @@ function BorrowInfo() {
   }, [walletAddress]);
 
   const columns = [
+    {
+      title: 'Issue Company',
+      dataIndex: 'company_name',
+      key: 'company_name',
+      align: 'center',
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      align: 'center',
+    },
     {
       title: 'Asset',
       render: (text, record) => (
@@ -72,22 +79,10 @@ function BorrowInfo() {
       title: 'Lender',
       render : (text, record) => (
         <div>
-          <div>{record.name}</div>
+          <div>{record.lender_name}</div>
           <div style={{ fontSize: '12px', color: 'gray' }}>{record.lender_address}</div>
         </div>
       ),
-    },
-    {
-        title: 'Allocated',
-        dataIndex: 'allocated',
-        key: 'allocated',
-        align: 'center',
-    },
-    {
-        title: 'Lensed',
-        dataIndex: 'lensed',
-        key: 'lensed',
-        align: 'center',
     },
     {
       title: 'Principal',
@@ -99,6 +94,12 @@ function BorrowInfo() {
       title: 'Interest',
       dataIndex: 'interest',
       key: 'interest',
+      align: 'center',
+    },
+    {
+      title: 'Borrow Time',
+      dataIndex: 'time',
+      key: 'time',
       align: 'center',
     },
     {

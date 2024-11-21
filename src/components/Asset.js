@@ -12,7 +12,7 @@ function Asset() {
   const [balancesData, setBalancesData] = useState([]);
   const location = useLocation();
   const contractAddress = location.state?.contractAddress || 'No contract address provided';
-  const assertName = location.state?.assertName || 'No assert name provided';
+  const assetName = location.state?.assetName || 'No assert name provided';
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -91,8 +91,8 @@ function Asset() {
     <Layout className="asset-layout">
       <img src={logo} alt="Logo" className="aiftresponsive-logo" />
       <Content style={{ padding: '0 50px' }}>
-        <Title level={2} className="asset-title">{assertName}</Title>
-        <p className="contract-address">Contract Address: {contractAddress}</p>
+        <Title level={2} className="asset-title">{assetName}</Title>
+        <p className="contract-address">Asset Address: {contractAddress}</p>
         <div className="asset-page-container">
           <Button type="primary" onClick={() => navigate(-1)}
             className="create-asset-button"
