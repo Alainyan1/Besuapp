@@ -52,12 +52,20 @@ function LenderDetails() {
   const fetchBorrowDetails = async (borrowerAddress) => {
     try {
       const requestConfig = {
-        params: { 'borrowerAddress':borrowerAddress, 'contractAddress': contractAddress, lenderAddress: walletAddress },
+        params: { borrowerAddress, contractAddress, lenderAddress: walletAddress },
       };
       const response = await axios.get('https://eurybia.xyz/api/test/borrowDetails', requestConfig);
       const data = await response.data;
       console.log('Borrow details:', data);
-      setBorrowDetails(prevState => ({ ...prevState, [borrowerAddress]: data }));
+
+      // Combine the three arrays into one array of objects with a type field
+      const combinedData = [
+        ...data.drawdown.map(item => ({ ...item, type: 'Drawdown' })),
+        ...data.repayInterest.map(item => ({ ...item, type: 'Repay Interest' })),
+        ...data.repayPrincipal.map(item => ({ ...item, type: 'Repay Principal' })),
+      ];
+
+      setBorrowDetails(prevState => ({ ...prevState, [borrowerAddress]: combinedData }));
     } catch (error) {
       console.error('Error fetching borrow details:', error);
     }
@@ -75,8 +83,21 @@ function LenderDetails() {
   const expandedRowRender = (record) => {
     const details = borrowDetails[record.borrower_address] || [];
     const columns = [
-      { title: 'Detail Name', dataIndex: 'detailName', key: 'detailName' },
-      { title: 'Detail Value', dataIndex: 'detailValue', key: 'detailValue' },
+      { title: 'Type', dataIndex: 'operation', key: 'operation' },
+      { title: 'PaymentFrom', render: (text, record) => (
+        <div>
+          <div>{record.paymentFromKey}</div>
+          <div style={{ fontSize: '12px', color: 'gray' }}>{record.paymentFrom}</div>
+        </div>
+      ), },
+      { title: 'PaymentTo', render: (text, record) => (
+        <div>
+          <div>{record.paymentToKey}</div>
+          <div style={{ fontSize: '12px', color: 'gray' }}>{record.paymentTo}</div>
+        </div>
+      ), },
+      { title: 'Amount', dataIndex: 'amount', key: 'amount' },
+      { title: 'Date', dataIndex: 'time_stamp', key: 'time_stamp' },
     ];
 
     return (
