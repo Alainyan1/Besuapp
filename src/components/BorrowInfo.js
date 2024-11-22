@@ -38,6 +38,7 @@ function BorrowInfo() {
           ContractAddress: lender.ContractAddress,
           type: lender.Type,
           time: lender.time_stamp,
+          due_time: lender.due_time,
           key: lender.ContractAddress,
         }));
 
@@ -85,21 +86,52 @@ function BorrowInfo() {
       ),
     },
     {
-      title: 'Principal',
-      dataIndex: 'principal',
-      key: 'principal',
-      align: 'center',
+      title: (
+          <div>
+              <div className="parent-column-header">Balance</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              </div>
+          </div>
+      ),
+      children: [
+          {
+              title: 'Principal',
+              dataIndex: 'principal',
+              key: 'principal',
+              align: 'center',
+              className: 'sub-column-header',
+          },
+          {
+              title: 'Interest',
+              dataIndex: 'interest',
+              key: 'interest',
+              align: 'center',
+              className: 'sub-column-header',
+          },
+      ],
     },
+    // {
+    //   title: 'Principal',
+    //   dataIndex: 'principal',
+    //   key: 'principal',
+    //   align: 'center',
+    // },
+    // {
+    //   title: 'Interest',
+    //   dataIndex: 'interest',
+    //   key: 'interest',
+    //   align: 'center',
+    // },
     {
-      title: 'Interest',
-      dataIndex: 'interest',
-      key: 'interest',
-      align: 'center',
-    },
-    {
-      title: 'Borrow Time',
+      title: 'Borrow Date',
       dataIndex: 'time',
       key: 'time',
+      align: 'center',
+    },
+    {
+      title: 'Due Date',
+      dataIndex: 'due_time',
+      key: 'due_time',
       align: 'center',
     },
     {

@@ -117,6 +117,9 @@ const LoanDeployment = () => {
         });
         const { key: escrowKey, value: escrowValue } = parseKeyValue(loanData.escrow);
         addAccount(escrowKey, escrowValue, 'escrow');
+
+        let due_time = new Date();
+        due_time.setFullYear(due_time.getFullYear() + 3);
         // Save data to database
         const deploymentData = {
           contractAddress: contract.address,
@@ -135,7 +138,8 @@ const LoanDeployment = () => {
           escrowAddress: formattedLoanData.escrow,
           escrowKey: parseKeyValue(loanData.escrow).key,
           ancillaryInfo: loanData.ancillaryInfo,
-          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19)
+          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
+          due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
         };
         await saveToDatabase(deploymentData);
 

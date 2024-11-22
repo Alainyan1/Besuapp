@@ -52,3 +52,20 @@
 .action-buttons .ant-btn {
   margin: 0; /* Remove any default margin */
 }
+
+.parent-column-header {
+  height: 6px; /* 设置父列表头高度为70px */
+  line-height: 8px; /* 确保文字垂直居中 */
+}
+
+.sub-column-header {
+  height: 6px !important; /* 设置子列表头高度为60px */
+  line-height: 6px !important; /* 确保文字垂直居中 */
+  overflow: hidden; /* 隐藏超出部分 */
+}
+
+.ant-table-thead > tr > th {
+  height: 40px; /* 设置其他表头高度为50px */
+  line-height: 40px; /* 确保文字垂直居中 */
+  overflow: hidden; /* 隐藏超出部分 */
+}

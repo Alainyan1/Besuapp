@@ -8,6 +8,7 @@ import { WalletOutlined } from '@ant-design/icons'; // Import the Wallet icon
 import { useLocation } from 'react-router-dom';
 import '../css/jetco.css';
 import logo from '../images/jetco.png';
+import { devUseWarning } from 'antd/es/_util/warning';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -101,6 +102,9 @@ const Jetco = () => {
         setTransactionHash(receipt.transactionHash);
         alert('Transaction successful!');
 
+        let due_time = new Date();
+        due_time.setFullYear(due_time.getFullYear() + 3);
+
         // Save transaction data to the database
         const transactionData = {
           contractAddress: contractAddress,
@@ -110,7 +114,8 @@ const Jetco = () => {
           paymentToKey: selectedLenderAddressKey,
           amount: amount,
           operation: operation,
-          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19)
+          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
+          due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
         };
         await saveTransactionData(transactionData);
       } else {

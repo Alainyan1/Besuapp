@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Children } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Layout, Typography, Table, Button } from 'antd';
 import axios from 'axios';
@@ -34,6 +34,7 @@ function LenderDetails() {
           principal: borrower.principal,
           interest: borrower.interest,
           time: borrower.time_stamp,
+          due_time: borrower.due_time,
           key: borrower.borrowerAddress,
         }));
 
@@ -48,6 +49,15 @@ function LenderDetails() {
       fetchData();
     }
   }, [contractAddress]);
+
+  const formatData = (data) => {
+    if (data > 1000000000) {
+      return `${(data / 1000000000).toFixed(2)}B`;
+    } else if (data > 1000000) {
+      return `${(data / 1000000).toFixed(2)}M`;
+    }
+    return data;
+  }
 
   const fetchBorrowDetails = async (borrowerAddress) => {
     try {
@@ -83,7 +93,7 @@ function LenderDetails() {
   const expandedRowRender = (record) => {
     const details = borrowDetails[record.borrower_address] || [];
     const columns = [
-      { title: 'Type', dataIndex: 'operation', key: 'operation' },
+      { title: 'Opeartion', dataIndex: 'operation', key: 'operation' },
       { title: 'PaymentFrom', render: (text, record) => (
         <div>
           <div>{record.paymentFromKey}</div>
@@ -96,7 +106,7 @@ function LenderDetails() {
           <div style={{ fontSize: '12px', color: 'gray' }}>{record.paymentTo}</div>
         </div>
       ), },
-      { title: 'Amount', dataIndex: 'amount', key: 'amount' },
+      { title: 'Amount', dataIndex: 'amount', key: 'amount', align: 'center', render: (text) => formatData(text) },
       { title: 'Date', dataIndex: 'time_stamp', key: 'time_stamp' },
     ];
 
@@ -133,11 +143,17 @@ function LenderDetails() {
       align: 'center',
     },
     {
-      title: 'Borrow Time',
+      title: 'Borrow Date',
       dataIndex: 'time',
       key: 'time',
       align: 'center',
     },
+    {
+        title: 'Due Date',
+        dataIndex: 'due_time',
+        key: 'due_time',
+        align: 'center',
+    }
   ];
 
   return (
