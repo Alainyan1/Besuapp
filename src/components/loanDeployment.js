@@ -13,7 +13,8 @@ import '../css/loanDeployment.css';
 import logo from '../images/cspro.png';
 
 const { Option } = Select;
-
+const Web3 = require('web3');
+const web3 =  new Web3("http://20.2.203.99:8545");
 
 const LoanDeployment = () => {
   const [loanData, setLoanData] = useState({
@@ -64,96 +65,188 @@ const LoanDeployment = () => {
     }
   };
 
+  // const handleSubmit = async (values) => {
+  //   navigate('/deployment-status', { state: { status: 'deploying' } });
+
+  //   try {
+  //     console.log('Loan Data:', loanData);
+  //     const formattedLoanData = {
+  //       name: loanData.name,
+  //       symbol: loanData.symbol,
+  //       initialSupply: parseFloat(loanData.initialSupply),
+  //       interestRate: parseFloat(loanData.interestRate),
+  //       escrow: parseKeyValue(loanData.escrow).value,
+  //       ancillaryInfo: loanData.ancillaryInfo,
+  //       buyers: loanData.buyers.map(buyer => parseKeyValue(buyer).value),
+  //       amounts: loanData.amounts.filter(amount => amount !== 0)
+  //     };
+  //     console.log('Formatted Loan Data:', formattedLoanData);
+
+  //     const contractDataResponse = await axios.get('http://20.2.203.99:3002/api/contractData');
+  //     const { abi, bytecode } = contractDataResponse.data;
+  //     // console.log('Contract data:', abi, bytecode);
+
+  //     const provider = await detectEthereumProvider();
+  //     if (provider) {
+  //       await provider.request({ method: 'eth_requestAccounts' });
+  //       const ethersProvider = new ethers.providers.Web3Provider(provider);
+  //       const signer = ethersProvider.getSigner();
+  //       const deployerAddress = await signer.getAddress();
+
+  //       const factory = new ethers.ContractFactory(abi, bytecode, signer);
+  //       const contract = await factory.deploy(
+  //         formattedLoanData.name,
+  //         formattedLoanData.symbol,
+  //         formattedLoanData.initialSupply,
+  //         formattedLoanData.escrow,
+  //         formattedLoanData.buyers,
+  //         formattedLoanData.amounts,
+  //         formattedLoanData.interestRate * 1000,
+  //         formattedLoanData.ancillaryInfo
+  //       );
+
+  //       await contract.deployed();
+  //       console.log('Contract deployed at address:', contract.address);
+  //       setContractAddress(contract.address);
+  //       localStorage.setItem('contractAddress', contract.address);
+
+  //       clearAccounts();
+  //       addAccount('deployer', deployerAddress, 'deployer');
+  //       loanData.buyers.forEach((buyer) => {
+  //         const { key, value } = parseKeyValue(buyer);
+  //         addAccount(key, value, 'lender');
+  //       });
+  //       const { key: escrowKey, value: escrowValue } = parseKeyValue(loanData.escrow);
+  //       addAccount(escrowKey, escrowValue, 'escrow');
+
+  //       let due_time = new Date();
+  //       due_time.setFullYear(due_time.getFullYear() + 3);
+  //       // Save data to database
+  //       const deploymentData = {
+  //         contractAddress: contract.address,
+  //         deployerAddress,
+  //         assetType: assetType,
+  //         companyName: loanData.name,
+  //         symbol: loanData.symbol,
+  //         initialSupply: loanData.initialSupply,
+  //         interestRate: loanData.interestRate,
+  //         lender1Address: formattedLoanData.buyers[0],
+  //         lender1Key: parseKeyValue(loanData.buyers[0]).key,
+  //         lender1amount: loanData.amounts[0],
+  //         lender2Address: formattedLoanData.buyers[1],
+  //         lender2Key: parseKeyValue(loanData.buyers[1]).key,
+  //         lender2amount: loanData.amounts[1],
+  //         escrowAddress: formattedLoanData.escrow,
+  //         escrowKey: parseKeyValue(loanData.escrow).key,
+  //         ancillaryInfo: loanData.ancillaryInfo,
+  //         time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
+  //         due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
+  //       };
+  //       await saveToDatabase(deploymentData);
+
+  //       navigate('/deployment-status', { state: { status: 'success', address: contract.address } });
+  //     } else {
+  //       console.error('MetaMask is not installed');
+  //       alert('MetaMask is not installed. Please install it to use this feature.');
+  //       navigate('/deployment-status', { state: { status: 'error' } });
+  //     }
+  //   } catch (error) {
+  //     console.error('Error deploying loan:', error);
+  //     navigate('/deployment-status', { state: { status: 'error' } });
+  //   }
+  // };
+
   const handleSubmit = async (values) => {
-    navigate('/deployment-status', { state: { status: 'deploying' } });
-
-    try {
-      console.log('Loan Data:', loanData);
-      const formattedLoanData = {
-        name: loanData.name,
-        symbol: loanData.symbol,
-        initialSupply: parseFloat(loanData.initialSupply),
-        interestRate: parseFloat(loanData.interestRate),
-        escrow: parseKeyValue(loanData.escrow).value,
-        ancillaryInfo: loanData.ancillaryInfo,
-        buyers: loanData.buyers.map(buyer => parseKeyValue(buyer).value),
-        amounts: loanData.amounts.filter(amount => amount !== 0)
-      };
-      console.log('Formatted Loan Data:', formattedLoanData);
-
-      const contractDataResponse = await axios.get('http://20.2.203.99:3002/api/contractData');
-      const { abi, bytecode } = contractDataResponse.data;
-      // console.log('Contract data:', abi, bytecode);
-
-      const provider = await detectEthereumProvider();
-      if (provider) {
-        await provider.request({ method: 'eth_requestAccounts' });
-        const ethersProvider = new ethers.providers.Web3Provider(provider);
-        const signer = ethersProvider.getSigner();
-        const deployerAddress = await signer.getAddress();
-
-        const factory = new ethers.ContractFactory(abi, bytecode, signer);
-        const contract = await factory.deploy(
-          formattedLoanData.name,
-          formattedLoanData.symbol,
-          formattedLoanData.initialSupply,
-          formattedLoanData.escrow,
-          formattedLoanData.buyers,
-          formattedLoanData.amounts,
-          formattedLoanData.interestRate * 1000,
-          formattedLoanData.ancillaryInfo
-        );
-
-        await contract.deployed();
-        console.log('Contract deployed at address:', contract.address);
-        setContractAddress(contract.address);
-        localStorage.setItem('contractAddress', contract.address);
-
-        clearAccounts();
-        addAccount('deployer', deployerAddress, 'deployer');
-        loanData.buyers.forEach((buyer) => {
-          const { key, value } = parseKeyValue(buyer);
-          addAccount(key, value, 'lender');
-        });
-        const { key: escrowKey, value: escrowValue } = parseKeyValue(loanData.escrow);
-        addAccount(escrowKey, escrowValue, 'escrow');
-
-        let due_time = new Date();
-        due_time.setFullYear(due_time.getFullYear() + 3);
-        // Save data to database
-        const deploymentData = {
-          contractAddress: contract.address,
-          deployerAddress,
-          assetType: assetType,
-          companyName: loanData.name,
+      navigate('/deployment-status', { state: { status: 'deploying' } });
+      try {
+        console.log('Loan Data:', loanData);
+        const formattedLoanData = {
+          name: loanData.name,
           symbol: loanData.symbol,
-          initialSupply: loanData.initialSupply,
-          interestRate: loanData.interestRate,
-          lender1Address: formattedLoanData.buyers[0],
-          lender1Key: parseKeyValue(loanData.buyers[0]).key,
-          lender1amount: loanData.amounts[0],
-          lender2Address: formattedLoanData.buyers[1],
-          lender2Key: parseKeyValue(loanData.buyers[1]).key,
-          lender2amount: loanData.amounts[1],
-          escrowAddress: formattedLoanData.escrow,
-          escrowKey: parseKeyValue(loanData.escrow).key,
+          initialSupply: parseFloat(loanData.initialSupply),
+          interestRate: parseFloat(loanData.interestRate),
+          escrow: parseKeyValue(loanData.escrow).value,
           ancillaryInfo: loanData.ancillaryInfo,
-          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
-          due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
+          buyers: loanData.buyers.map(buyer => parseKeyValue(buyer).value),
+          amounts: loanData.amounts.filter(amount => amount !== 0)
         };
-        await saveToDatabase(deploymentData);
+        console.log('Formatted Loan Data:', formattedLoanData);
 
-        navigate('/deployment-status', { state: { status: 'success', address: contract.address } });
-      } else {
-        console.error('MetaMask is not installed');
-        alert('MetaMask is not installed. Please install it to use this feature.');
+        const provider = await detectEthereumProvider();
+
+        if (provider) {
+          await provider.request({ method: 'eth_requestAccounts' });
+          const ethersProvider = new ethers.providers.Web3Provider(provider);
+          const signer = ethersProvider.getSigner();
+          const deployerAddress = await signer.getAddress();
+        
+          const requestConfig = {
+            params: { 
+              name: formattedLoanData.name,
+              Symbol: formattedLoanData.symbol,
+              InitialSupply: formattedLoanData.initialSupply,
+              Escrow: formattedLoanData.escrow,
+              Buyers: formattedLoanData.buyers,
+              Amounts: formattedLoanData.amounts,
+              InterestRate: formattedLoanData.interestRate * 1000,
+              AncillaryInfo: formattedLoanData.ancillaryInfo }
+            };
+
+            console.log('Request Config:', requestConfig);
+
+            const contractDataResponse = await axios.post('http://20.2.203.99:3002/api/deployContract', requestConfig);
+            const deployData = await contractDataResponse.data;
+            console.log('Contract deployed at address:', deployData);
+            setContractAddress(deployData);
+            localStorage.setItem('contractAddress', deployData);
+    
+            clearAccounts();
+            addAccount('deployer', deployerAddress, 'deployer');
+            loanData.buyers.forEach((buyer) => {
+              const { key, value } = parseKeyValue(buyer);
+              addAccount(key, value, 'lender');
+            });
+            const { key: escrowKey, value: escrowValue } = parseKeyValue(loanData.escrow);
+            addAccount(escrowKey, escrowValue, 'escrow');
+    
+            let due_time = new Date();
+            due_time.setFullYear(due_time.getFullYear() + 3);
+            // Save data to database
+            const deploymentData = {
+              contractAddress: deployData,
+              deployerAddress,
+              assetType: assetType,
+              companyName: loanData.name,
+              symbol: loanData.symbol,
+              initialSupply: loanData.initialSupply,
+              interestRate: loanData.interestRate,
+              lender1Address: formattedLoanData.buyers[0],
+              lender1Key: parseKeyValue(loanData.buyers[0]).key,
+              lender1amount: loanData.amounts[0],
+              lender2Address: formattedLoanData.buyers[1],
+              lender2Key: parseKeyValue(loanData.buyers[1]).key,
+              lender2amount: loanData.amounts[1],
+              escrowAddress: formattedLoanData.escrow,
+              escrowKey: parseKeyValue(loanData.escrow).key,
+              ancillaryInfo: loanData.ancillaryInfo,
+              time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
+              due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
+            };
+            await saveToDatabase(deploymentData);
+
+            navigate('/deployment-status', { state: { status: 'success', address: deployData} });
+
+          }
+          else {
+            console.error('MetaMask is not installed');
+            alert('MetaMask is not installed. Please install it to use this feature.');
+            navigate('/deployment-status', { state: { status: 'error' } });
+          }
+      } catch (error) {
+        console.error('Error deploying loan:', error);
         navigate('/deployment-status', { state: { status: 'error' } });
       }
-    } catch (error) {
-      console.error('Error deploying loan:', error);
-      navigate('/deployment-status', { state: { status: 'error' } });
-    }
-  };
+    };
 
   const connectWallet = async () => {
     const provider = await detectEthereumProvider();
