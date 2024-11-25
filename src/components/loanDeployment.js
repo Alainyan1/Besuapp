@@ -22,7 +22,7 @@ const LoanDeployment = () => {
     symbol: "FOS",
     initialSupply: 10000000000,
     interestRate: 4.5,
-    escrow: "Jetco:0x8adD025FBd37A46c5af45798cc94ec4e97A49698",
+    escrow: "Jetco:0xcA843569e3427144cEad5e4d5999a3D0cCF92B8e",
     ancillaryInfo: "Loan Term: 3 years (36 months)\nRepayment: Bullet at maturity\nInterest Period: 1 month\nFinal Maturity: 3 years",
     buyers: ["Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732", "CCA(Asia):0x627306090abaB3A6e1400e9345bC60c78a8BEf57"],
     amounts: [4000000000, 6000000000]

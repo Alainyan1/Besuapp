@@ -61,158 +61,65 @@ const Jetco = () => {
 
   
 
-  const handleConfirm = async () => {
-    try {
-      const provider = await detectEthereumProvider();
-      if (provider) {
-        const ethersProvider = new ethers.providers.Web3Provider(provider);
-        const signer = ethersProvider.getSigner();
-        const escrowAddress = await signer.getAddress();
-
-        // 获取合约的 ABI 和 bytecode
-        const contractDataResponse = await axios.get('http://20.2.203.99:3002/api/contractData');
-        const { abi } = contractDataResponse.data;
-
-        // 创建合约实例
-        const contract = new ethers.Contract(contractAddress, abi, signer);
-
-        let tx;
-        if (operation === 'interestRepay') {
-          tx = await contract.repayInterest(lenderAddress, paymentFrom, parseInt(amount, 10), ethers.utils.formatBytes32String("Interest"), {
-            gasLimit: 3000000,
-            maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
-            maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
-          });
-          console.log('tx:', tx);
-        } else if (operation === 'principalRepay') {
-          tx = await contract.myredeemFrom(lenderAddress, paymentFrom, parseInt(amount, 10), ethers.utils.formatBytes32String("Principal"));
-        } else if (operation === 'drawdown') {
-          const allowance = await contract.getEscrowAllowance(escrowAddress);
-          console.log('escrow allowance from owner:', allowance);
-
-          tx = await contract.drawdown(paymentFrom, lenderAddress, parseInt(amount, 10), {
-            gasLimit: 3000000,
-            maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
-            maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
-        });
-        }
-
-        // 等待交易被矿工打包
-        const receipt = await tx.wait();
-        console.log('Transaction successful:', receipt);
-        setStatus('success');
-        setTransactionHash(receipt.transactionHash);
-        alert('Transaction successful!');
-
-        let due_time = new Date();
-        due_time.setFullYear(due_time.getFullYear() + 3);
-
-        // Save transaction data to the database
-        const transactionData = {
-          contractAddress: contractAddress,
-          paymentFrom: paymentFrom ,
-          paymentFromKey: selectedPaymentFromKey,
-          paymentTo: lenderAddress,
-          paymentToKey: selectedLenderAddressKey,
-          amount: amount,
-          operation: operation,
-          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
-          due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
-        };
-        await saveTransactionData(transactionData);
-      } else {
-        console.error('MetaMask is not installed');
-        setStatus('error');
-        alert('MetaMask is not installed. Please install it to use this feature.');
-      }
-    } catch (error) {
-      console.error('Error during transaction:', error);
-      setStatus('error');
-      alert('Transaction failed. Please try again.');
-    }
-  };
-
   // const handleConfirm = async () => {
   //   try {
   //     const provider = await detectEthereumProvider();
   //     if (provider) {
-  //       await provider.request({ method: 'eth_requestAccounts' });
-  //       const accounts = await web3.eth.getAccounts();
-  //       const escrowAddress = accounts[0];
-  
+  //       const ethersProvider = new ethers.providers.Web3Provider(provider);
+  //       const signer = ethersProvider.getSigner();
+  //       const escrowAddress = await signer.getAddress();
+
   //       // 获取合约的 ABI 和 bytecode
   //       const contractDataResponse = await axios.get('http://20.2.203.99:3002/api/contractData');
   //       const { abi } = contractDataResponse.data;
-  
+
   //       // 创建合约实例
-  //       const contract = new web3.eth.Contract(abi, contractAddress);
-  
-  //       let txData;
+  //       const contract = new ethers.Contract(contractAddress, abi, signer);
+
+  //       let tx;
   //       if (operation === 'interestRepay') {
-  //         txData = contract.methods.repayInterest(lenderAddress, paymentFrom, parseInt(amount, 10), web3.utils.asciiToHex("Interest")).encodeABI();
+  //         tx = await contract.repayInterest(lenderAddress, paymentFrom, parseInt(amount, 10), ethers.utils.formatBytes32String("Interest"), {
+  //           gasLimit: 3000000,
+  //           maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
+  //           maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
+  //         });
+  //         console.log('tx:', tx);
   //       } else if (operation === 'principalRepay') {
-  //         txData = contract.methods.myredeemFrom(lenderAddress, paymentFrom, parseInt(amount, 10), web3.utils.asciiToHex("Principal")).encodeABI();
+  //         tx = await contract.myredeemFrom(lenderAddress, paymentFrom, parseInt(amount, 10), ethers.utils.formatBytes32String("Principal"));
   //       } else if (operation === 'drawdown') {
-  //         const allowance = await contract.methods.getEscrowAllowance(escrowAddress).call();
+  //         const allowance = await contract.getEscrowAllowance(escrowAddress);
   //         console.log('escrow allowance from owner:', allowance);
-  //         txData = contract.methods.drawdown(paymentFrom, lenderAddress, parseInt(amount, 10)).encodeABI();
+
+  //         tx = await contract.drawdown(paymentFrom, lenderAddress, parseInt(amount, 10), {
+  //           gasLimit: 3000000,
+  //           maxFeePerGas: ethers.utils.parseUnits('0', 'gwei'),
+  //           maxPriorityFeePerGas: ethers.utils.parseUnits('0', 'gwei')
+  //       });
   //       }
 
-  //       console.log('txData:', txData);
-  
-  //       const privateTransaction = {
-  //         from: escrowAddress, // MetaMask钱包地址
-  //         data: txData,
-  //         to: contractAddress,
-  //         // privateFrom: 'BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=', // 发起交易的Tessera节点公钥m1
-  //         privateFor: ['QfeDAys9MPDs2XHExtc84jKGHxZg/aj52DTh0vtA3Xc=', '1iTZde/ndBHvzhcl7V68x44Vx7pl8nwx9LqnM/AfJUg='], // 接收交易的Tessera节点公钥列表m2m3
+  //       // 等待交易被矿工打包
+  //       const receipt = await tx.wait();
+  //       console.log('Transaction successful:', receipt);
+  //       setStatus('success');
+  //       setTransactionHash(receipt.transactionHash);
+  //       alert('Transaction successful!');
+
+  //       let due_time = new Date();
+  //       due_time.setFullYear(due_time.getFullYear() + 3);
+
+  //       // Save transaction data to the database
+  //       const transactionData = {
+  //         contractAddress: contractAddress,
+  //         paymentFrom: paymentFrom ,
+  //         paymentFromKey: selectedPaymentFromKey,
+  //         paymentTo: lenderAddress,
+  //         paymentToKey: selectedLenderAddressKey,
+  //         amount: amount,
+  //         operation: operation,
+  //         time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
+  //         due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
   //       };
-  
-  //       web3.currentProvider.send({
-  //         jsonrpc: '2.0',
-  //         method: 'eea_sendRawTransaction',
-  //         params: [privateTransaction],
-  //         id: new Date().getTime()
-  //       }, async (error, result) => {
-  //         if (error) {
-  //           console.error('Error sending private transaction:', error);
-  //           setStatus('error');
-  //           alert('Transaction failed. Please try again.');
-  //         } else {
-  //           console.log('Transaction Hash:', result.result);
-  //           const txHash = result.result;
-  
-  //           // 获取交易回执
-  //           const receipt = await web3.eth.getTransactionReceipt(txHash);
-  //           if (receipt && receipt.contractAddress) {
-  //             console.log('Transaction successful:', receipt);
-  //             setStatus('success');
-  //             setTransactionHash(receipt.transactionHash);
-  //             alert('Transaction successful!');
-  
-  //             let due_time = new Date();
-  //             due_time.setFullYear(due_time.getFullYear() + 3);
-  
-  //             // Save transaction data to the database
-  //             const transactionData = {
-  //               contractAddress: contractAddress,
-  //               paymentFrom: paymentFrom,
-  //               paymentFromKey: selectedPaymentFromKey,
-  //               paymentTo: lenderAddress,
-  //               paymentToKey: selectedLenderAddressKey,
-  //               amount: amount,
-  //               operation: operation,
-  //               time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
-  //               due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
-  //             };
-  //             await saveTransactionData(transactionData);
-  //           } else {
-  //             console.error('Failed to get transaction receipt');
-  //             setStatus('error');
-  //             alert('Transaction failed. Please try again.');
-  //           }
-  //         }
-  //       });
+  //       await saveTransactionData(transactionData);
   //     } else {
   //       console.error('MetaMask is not installed');
   //       setStatus('error');
@@ -224,6 +131,81 @@ const Jetco = () => {
   //     alert('Transaction failed. Please try again.');
   //   }
   // };
+
+  const handleConfirm = async () => {
+    try {
+      const provider = await detectEthereumProvider();
+      if (provider) {
+        await provider.request({ method: 'eth_requestAccounts' });
+        const accounts = await web3.eth.getAccounts();
+        const escrowAddress = accounts[0];
+        console.log('Connected Wallet Address:', escrowAddress);
+  
+        let txData;
+        if (operation === 'interestRepay') {          
+          const requestConfig = {
+            contractAddress: contractAddress,
+            lender: lenderAddress,
+            borrower: paymentFrom,
+            amount: parseInt(amount, 10),
+            operation: ethers.utils.formatBytes32String("Interest")
+          };
+
+          txData = await axios.post('http://20.2.203.99:3002/api/repayInterest', requestConfig);
+        } else if (operation === 'principalRepay') {
+          const requestConfig = {
+            contractAddress: contractAddress,
+            lender: lenderAddress,
+            borrower: paymentFrom,
+            amount: parseInt(amount, 10),
+            operation: ethers.utils.formatBytes32String("Principal")
+          };
+
+          txData = await axios.post('http://20.2.203.99:3002/api/repayPrincipal', requestConfig);
+        } else if (operation === 'drawdown') {
+          const requestConfig = {
+            contractAddress: contractAddress,
+            borrower: lenderAddress,
+            lender: paymentFrom,
+            amount: parseInt(amount, 10)
+          };
+
+          txData = await axios.post('http://20.2.203.99:3002/api/drawdown', requestConfig);
+        }
+
+        console.log('Transaction successful:', txData);
+        setStatus('success');
+        setTransactionHash(txData.transactionHash);
+        alert('Transaction successful!');
+  
+        let due_time = new Date();
+        due_time.setFullYear(due_time.getFullYear() + 3);
+
+        // Save transaction data to the database
+        const transactionData = {
+          contractAddress: contractAddress,
+          paymentFrom: paymentFrom,
+          paymentFromKey: selectedPaymentFromKey,
+          paymentTo: lenderAddress,
+          paymentToKey: selectedLenderAddressKey,
+          amount: amount,
+          operation: operation,
+          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
+          due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
+        };
+        await saveTransactionData(transactionData);
+
+      } else {
+        console.error('MetaMask is not installed');
+        setStatus('error');
+        alert('MetaMask is not installed. Please install it to use this feature.');
+      }
+    } catch (error) {
+      console.error('Error during transaction:', error);
+      setStatus('error');
+      alert('Transaction failed. Please try again.');
+    }
+  };
 
   const saveTransactionData = async (data) => {
     try {
