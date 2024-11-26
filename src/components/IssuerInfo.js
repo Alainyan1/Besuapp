@@ -112,6 +112,17 @@ function IssuerInfo() {
     },
   ];
 
+  // Sort assetsData to put rows with type 'Loan' at the top
+  const sortedAssetsData = [...assetsData].sort((a, b) => {
+    if (a.type === 'Loan' && b.type !== 'Loan') {
+      return -1;
+    }
+    if (a.type !== 'Loan' && b.type === 'Loan') {
+      return 1;
+    }
+    return 0;
+  });
+
   return (
     <Layout className="issuer-info-layout">
       <img src={logo} alt="Logo" className="aiftresponsive-logo" />
@@ -135,7 +146,7 @@ function IssuerInfo() {
         </Button>
         <Table
           columns={columns}
-          dataSource={assetsData}
+          dataSource={sortedAssetsData}
           rowKey="key"
           bordered
           pagination={{ pageSize: 8 }}
