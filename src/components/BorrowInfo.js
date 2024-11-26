@@ -55,20 +55,14 @@ function BorrowInfo() {
   }, [walletAddress]);
 
   const columns = [
+    // {
+    //   title: 'Issue Company',
+    //   dataIndex: 'company_name',
+    //   key: 'company_name',
+    //   align: 'center',
+    // },
     {
-      title: 'Issue Company',
-      dataIndex: 'company_name',
-      key: 'company_name',
-      align: 'center',
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-      align: 'center',
-    },
-    {
-      title: 'Asset',
+      title: 'Smart Contract Address',
       render: (text, record) => (
         <div>
           <div>{record.asset_name}</div>
@@ -188,14 +182,14 @@ function BorrowInfo() {
     <Layout className="borrow-info-layout">
       <img src={logo} alt="Logo" className="aiftresponsive-logo" />
       <Content style={{ padding: '0 50px' }}>
-        <Title level={2} className="borrow-info-title">Borrower Dashboard</Title>
+        <Title level={2} className="borrow-info-title">Syndicated Loan Dashboard (Borrower)</Title>
         <p className="wallet-address">Wallet Address: {walletAddress}</p>
         <Table
           columns={columns}
           dataSource={lendersData}
           rowKey="key"
           bordered
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 8 }}
           className="assets-table"
         />
       </Content>

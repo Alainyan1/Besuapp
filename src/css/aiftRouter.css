@@ -51,6 +51,12 @@ body, html {
   margin-top: -3rem; /* Adjust the margin to control the gap between the logo and the title */
 }
 
+.subtitle {
+  text-align: center;
+  font-size: 35px;
+  margin-top: -1rem; /* Adjust the margin to control the gap between the logo and the title */
+}
+
 .description {
   text-align: center;
   font-size: 20px;

@@ -130,21 +130,24 @@ function LenderAll() {
     return { key, value };
   };
 
+  // Filter assetsData to only include items where Type is 'loan'
+  const filteredAssetsData = assetsData.filter(asset => asset.Type === 'Loan');
+
   const columns = [
     {
-      title: 'Issue Company',
+      title: 'Borrower',
       dataIndex: 'company_name',
       key: 'company_name',
       align: 'center',
     },
+    // {
+    //   title: 'Type',
+    //   dataIndex: 'Type',
+    //   key: 'Type',
+    //   align: 'center',
+    // },
     {
-      title: 'Type',
-      dataIndex: 'Type',
-      key: 'Type',
-      align: 'center',
-    },
-    {
-      title: 'Asset',
+      title: 'Smart Contract Address',
       render: (text, record) => (
         <div>
           <div>{record.asset_name}</div>
@@ -181,7 +184,7 @@ function LenderAll() {
       render: (text) => formatData(text),
     },
     {
-      title: 'View Details',
+      title: 'Drawdown History',
       key: 'viewDetails',
       align: 'center',
       render: (text, record) => (
@@ -203,23 +206,30 @@ function LenderAll() {
       title: 'Drawdown',
       key: 'repay',
       align: 'center',
-      render: (text, record) => (
-        <Button type="primary" onClick={() => navigate('/jetco', { state: { contractAddress: record.ContractAddress } })}
-        style={{
-          backgroundColor: '#6EA1EB', 
-          color: '#000', // 字体颜色为黑色
-          borderRadius: '10px', // 设置按钮的圆角
-          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
-          fontSize: '18px', // 墛大按钮的字体>
-          height: '40px', // 墛大按钮的高度
-          width: '100px', // 墛大按钮的宽度
-        }}>
-          Drawdown
-        </Button>
-      ),
+      render: (text, record) => {
+        const isDrawdownDisabled = record.lensed === record.allocated;
+        return (
+          <Button type="primary"
+            onClick={() => navigate('/jetco', { state: { contractAddress: record.ContractAddress } })}
+            style={{
+              backgroundColor: isDrawdownDisabled ? '#D3D3D3' : '#6EA1EB', // Gray if disabled, otherwise blue
+              color: '#000', // 字体颜色为黑色
+              borderRadius: '10px', // 设置按钮的圆角
+              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
+              fontSize: '18px', // 墛大按钮的字体>
+              height: '40px', // 墛大按钮的高度
+              width: '120px', // 墛大按钮的宽度
+              cursor: isDrawdownDisabled ? 'not-allowed' : 'pointer', // Change cursor if disabled
+            }}
+            disabled={isDrawdownDisabled} // Disable button if condition is met
+          >
+            Drawdown
+          </Button>
+        );
+      },
     },
     {
-      title: 'Transfer All',
+      title: 'Novate',
       key: 'transferAll',
       align: 'center',
       render: (text, record) => (
@@ -232,7 +242,7 @@ function LenderAll() {
           height: '40px', // 墛大按钮的高度
           width: '120px', // 墛大按钮的宽度
         }}>
-          Transfer All
+          Novate
         </Button>
       ),
     },
@@ -242,14 +252,14 @@ function LenderAll() {
     <Layout className="lender-all-layout">
       <img src={logo} alt="Logo" className="aiftresponsive-logo" />
       <Content style={{ padding: '0 50px' }}>
-        <Title level={2} className="lender-all-title">Lender Dashboard</Title>
+        <Title level={2} className="lender-all-title">Syndicated Loan Dashboard (Lender)</Title>
         <p className="wallet-address">{name}: {initialWalletAddress}</p>
         <Table
           columns={columns}
-          dataSource={assetsData}
+          dataSource={filteredAssetsData}
           rowKey="key"
           bordered
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 8 }}
           className="assets-table"
         />
         <Modal

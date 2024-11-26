@@ -45,19 +45,19 @@ function IssuerInfo() {
 
   const columns = [
     {
-      title: 'Issue Company',
-      dataIndex: 'company_name',
-      key: 'company_name',
-      align: 'center',
-    },
-    {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
       align: 'center',
     },
     {
-      title: 'Asset',
+      title: 'Issue Company',
+      dataIndex: 'company_name',
+      key: 'company_name',
+      align: 'center',
+    },
+    {
+      title: 'Smart Contract Address',
       render: (text, record) => (
         <div>
           <div>{record.asset_name}</div>
@@ -66,16 +66,9 @@ function IssuerInfo() {
       ),
     },
     {
-      title: 'Principal + Interest',
-      dataIndex: 'total_supply',
-      key: 'total_supply',
-      align: 'center',
-      render: (text) => formatData(text),
-    },
-    {
-      title: 'Principal',
-      dataIndex: 'principal',
-      key: 'principal',
+      title: 'Total Supply',
+      dataIndex: 'initial_supply',
+      key: 'initial_supply',
       align: 'center',
       render: (text) => formatData(text),
     },
@@ -123,7 +116,7 @@ function IssuerInfo() {
     <Layout className="issuer-info-layout">
       <img src={logo} alt="Logo" className="aiftresponsive-logo" />
       <Content style={{ padding: '0 50px' }}>
-        <Title level={2} className="issuer-info-title">Issuer Dashboard</Title>
+        <Title level={2} className="issuer-info-title">Tokenization Adivsor Dashboard</Title>
         <p className="wallet-address">CSPRO: {walletAddress}</p>
         <Button type="primary" onClick={() => navigate('/')}
           className="create-asset-button"
@@ -145,7 +138,7 @@ function IssuerInfo() {
           dataSource={assetsData}
           rowKey="key"
           bordered
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 8 }}
           className="assets-table"
         />
       </Content>

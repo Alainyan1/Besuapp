@@ -114,8 +114,8 @@ const Jetco = () => {
           paymentToKey: selectedLenderAddressKey,
           amount: amount,
           operation: operation,
-          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
-          due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
+          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 10),
+          due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 10)
         };
         await saveTransactionData(transactionData);
       } else {

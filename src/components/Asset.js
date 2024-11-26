@@ -18,7 +18,7 @@ function Asset() {
   useEffect(() => {
     async function fetchData(contractAddress) {
       try {
-        const response = await axios.get(`https://eurybia.xyz/api/test/getAllBalances?contractAddress=${contractAddress}`);
+        const response = await axios.get(`https://eurybia.xyz/api/test/getAllLenders?contractAddress=${contractAddress}`);
         const data = await response.data;
         console.log(data);
         setBalancesData(data);
@@ -43,19 +43,13 @@ function Asset() {
 
   const columns = [
     {
-      title: 'Account',
+      title: 'Lender',
       render: (text, record) => (
         <div>
           <div>{record.name}</div>
           <div style={{ fontSize: '12px', color: 'gray' }}>{record.address}</div>
         </div>
       ),
-    },
-    {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
-      align: 'center',
     },
     {
       title: 'Allocated',

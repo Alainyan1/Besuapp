@@ -58,6 +58,7 @@ const AiftRouter = () => {
       <div className="content-container">
         <img src={logo} alt="Logo" className="responsive-logo" />
         <h1 className="title">AIFT Aequitas Tokenized Asset Management Platform</h1>
+        <h1 className="subtitle">(Syndicated Loan)</h1>
         <p className="description">
           This is an introduction about the platform and its features.
         </p>
@@ -70,7 +71,7 @@ const AiftRouter = () => {
             dropdownStyle={{ textAlign: 'center' }}
             className="custom-select"
           >
-            <Option value="issuer" style={{ textAlign: 'center', fontSize: '18px' }}>Issuer</Option>
+            <Option value="issuer" style={{ textAlign: 'center', fontSize: '18px' }}>Tokenization Adivsor</Option>
             <Option value="lender" style={{ textAlign: 'center', fontSize: '18px' }}>Lender</Option>
             <Option value="borrower" style={{ textAlign: 'center', fontSize: '18px' }}>Borrower</Option>
           </Select>

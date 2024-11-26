@@ -8,12 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Button, Select, Typography } from 'antd';
 import { WalletOutlined } from '@ant-design/icons'; // Import the Wallet icon
 import LoanForm from './LoanForm';
-import BondForm from './BondForm';
 import '../css/loanDeployment.css';
 import logo from '../images/cspro.png';
 
 const { Option } = Select;
-
 
 const LoanDeployment = () => {
   const [loanData, setLoanData] = useState({
@@ -27,7 +25,7 @@ const LoanDeployment = () => {
     amounts: [4000000000, 6000000000]
   });
   const [walletAddress, setWalletAddress] = useState(null);
-  const [assetType, setAssetType] = useState('loan'); // New state for asset type
+  const [assetType, setAssetType] = useState('Loan'); // New state for asset type
   const { setContractAddress } = useContext(ContractContext);
   const { clearAccounts, addAccount } = useContext(AccountsContext);
   const navigate = useNavigate();
@@ -138,8 +136,8 @@ const LoanDeployment = () => {
           escrowAddress: formattedLoanData.escrow,
           escrowKey: parseKeyValue(loanData.escrow).key,
           ancillaryInfo: loanData.ancillaryInfo,
-          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 19),
-          due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 19)
+          time_stamp: new Date().toISOString().replace(/T/, ' ').substring(0, 10),
+          due_time: due_time.toISOString().replace(/T/, ' ').substring(0, 10)
         };
         await saveToDatabase(deploymentData);
 
@@ -179,13 +177,10 @@ const LoanDeployment = () => {
 
   const renderForm = () => {
     switch (assetType) {
-      case 'loan':
-        return <LoanForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
-      case 'bond':
-        //return <BondForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
+      case 'Loan':
         return <LoanForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
       default:
-        return null;
+        return <LoanForm loanData={loanData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />;
     }
   };
 
@@ -210,8 +205,13 @@ const LoanDeployment = () => {
             <Select placeholder="Loan" value={assetType} onChange={(value) => setAssetType(value)} 
             style={{ width: '200px', color: '#fff' }}
             className="loan-custom-select">
-              <Option value="loan">Loan</Option>
-              <Option value="bond">Bond</Option>
+              <Option value="Loan">Loan</Option>
+              <Option value="Bond">Bond</Option>
+              <Option value="Artworks">Art and Collection</Option>
+              <Option value="Luxury">Luxury</Option>
+              <Option value="Commodity">Commodity</Option>
+              <Option value="RealEstate">Real Estate</Option>
+              <Option value="Gaming">Gaming</Option>
               {/* Add more asset types as needed */}
             </Select>
           </Form.Item>

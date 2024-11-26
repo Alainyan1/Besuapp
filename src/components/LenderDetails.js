@@ -1,17 +1,16 @@
-import React, { useState, useEffect, Children } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Layout, Typography, Table, Button } from 'antd';
 import axios from 'axios';
 import '../css/LenderDetails.css';
 import logo from '../images/aift.png';
+// import { ANT_MARK } from 'antd/es/locale';
 
 const { Content } = Layout;
 const { Title } = Typography;
 
 function LenderDetails() {
   const [borrowersData, setBorrowersData] = useState([]);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-  const [borrowDetails, setBorrowDetails] = useState({});
   const location = useLocation();
   const { contractAddress, walletAddress } = location.state || {};
   const assetName = location.state?.assetName || 'No asset name provided';
@@ -23,22 +22,25 @@ function LenderDetails() {
         const requestConfig = {
           params: { contractAddress, lenderAddress: walletAddress },
         };
-        const response = await axios.get('https://eurybia.xyz/api/test/getAllBorrowers', requestConfig);
+        const response = await axios.get('https://eurybia.xyz/api/test/borrowDetails', requestConfig);
         const data = await response.data;
-        console.log('Axios response data:', data);
+        // console.log('Axios response data:', data);
 
+        // Check if data is an array
         // Map over the data to extract necessary information
         const mappedData = data.map(borrower => ({
-          borrower_name: borrower.name,
-          borrower_address: borrower.borrowerAddress,
-          principal: borrower.principal,
-          interest: borrower.interest,
-          time: borrower.time_stamp,
+          contractAddress: borrower.contractAddress,
+          paymentFrom: borrower.paymentFrom,
+          paymentFromKey: borrower.paymentFromKey,
+          paymentTo: borrower.paymentTo,
+          paymentToKey: borrower.paymentToKey,
+          amount: borrower.amount,
+          time_stamp: borrower.time_stamp,
           due_time: borrower.due_time,
-          key: borrower.borrowerAddress,
-        }));
+          key: borrower.paymentFromKey,
+     }));
 
-        console.log('Mapped data:', mappedData);
+        // console.log('Mapped data:', mappedData);
         setBorrowersData(mappedData);
       } catch (error) {
         console.error('Error fetching borrowers:', error);
@@ -59,101 +61,44 @@ function LenderDetails() {
     return data;
   }
 
-  const fetchBorrowDetails = async (borrowerAddress) => {
-    try {
-      const requestConfig = {
-        params: { borrowerAddress, contractAddress, lenderAddress: walletAddress },
-      };
-      const response = await axios.get('https://eurybia.xyz/api/test/borrowDetails', requestConfig);
-      const data = await response.data;
-      console.log('Borrow details:', data);
-
-      // Combine the three arrays into one array of objects with a type field
-      const combinedData = [
-        ...data.drawdown.map(item => ({ ...item, type: 'Drawdown' })),
-        ...data.repayInterest.map(item => ({ ...item, type: 'Repay Interest' })),
-        ...data.repayPrincipal.map(item => ({ ...item, type: 'Repay Principal' })),
-      ];
-
-      setBorrowDetails(prevState => ({ ...prevState, [borrowerAddress]: combinedData }));
-    } catch (error) {
-      console.error('Error fetching borrow details:', error);
-    }
-  };
-
-  const handleExpand = (expanded, record) => {
-    if (expanded) {
-      fetchBorrowDetails(record.borrower_address);
-      setExpandedRowKeys([record.key]);
-    } else {
-      setExpandedRowKeys([]);
-    }
-  };
-
-  const expandedRowRender = (record) => {
-    const details = borrowDetails[record.borrower_address] || [];
-    const columns = [
-      { title: 'Opeartion', dataIndex: 'operation', key: 'operation' },
-      { title: 'PaymentFrom', render: (text, record) => (
+  const columns = [
+    {
+      title: 'Payment From',
+      render: (text, record) => (
         <div>
           <div>{record.paymentFromKey}</div>
           <div style={{ fontSize: '12px', color: 'gray' }}>{record.paymentFrom}</div>
         </div>
-      ), },
-      { title: 'PaymentTo', render: (text, record) => (
+      ),
+    },
+    {
+      title: 'Payment To',
+      render: (text, record) => (
         <div>
           <div>{record.paymentToKey}</div>
           <div style={{ fontSize: '12px', color: 'gray' }}>{record.paymentTo}</div>
         </div>
-      ), },
-      { title: 'Amount', dataIndex: 'amount', key: 'amount', align: 'center', render: (text) => formatData(text) },
-      { title: 'Date', dataIndex: 'time_stamp', key: 'time_stamp' },
-    ];
-
-    return (
-      <Table
-        columns={columns}
-        dataSource={details}
-        pagination={false}
-        rowKey="detailName"
-      />
-    );
-  };
-
-  const columns = [
-    {
-      title: 'Borrower',
-      render: (text, record) => (
-        <div>
-          <div>{record.borrower_name}</div>
-          <div style={{ fontSize: '12px', color: 'gray' }}>{record.borrower_address}</div>
-        </div>
       ),
     },
     {
-      title: 'Principal',
-      dataIndex: 'principal',
-      key: 'principal',
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+      align: 'center',
+      render: (text) => formatData(text),
+    },
+    {
+      title: 'Date',
+      dataIndex: 'time_stamp',
+      key: 'time_stamp',
       align: 'center',
     },
     {
-      title: 'Interest',
-      dataIndex: 'interest',
-      key: 'interest',
+      title: 'Due Date',
+      dataIndex: 'due_time',
+      key: 'due_time',
       align: 'center',
     },
-    {
-      title: 'Borrow Date',
-      dataIndex: 'time',
-      key: 'time',
-      align: 'center',
-    },
-    {
-        title: 'Due Date',
-        dataIndex: 'due_time',
-        key: 'due_time',
-        align: 'center',
-    }
   ];
 
   return (
@@ -161,7 +106,7 @@ function LenderDetails() {
       <img src={logo} alt="Logo" className="aiftresponsive-logo" />
       <Content style={{ padding: '0 50px' }}>
         <Title level={2} className="lender-details-title">{assetName}</Title>
-        <p className="wallet-address">Asset Address: {contractAddress}</p>
+        <p className="wallet-address">Smart Contract Address: {contractAddress}</p>
         <div className="asset-page-container">
           <Button type="primary" onClick={() => navigate(-1)}
             className="create-asset-button"
@@ -170,29 +115,22 @@ function LenderDetails() {
               color: 'black', // 字体颜色为黑色
               borderRadius: '10px', // 设置按钮的圆角
               boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
-              fontSize: '18px', // 墛大按钮的字体
+              fontSize: '20px', // 墛大按钮的字体
               height: '40px', // 墛大按钮的高度
               width: '150px', // 墛大按钮的宽度
               border: '1px solid black', // 边框颜色为黑色
-              fontSize: '20px', // 墛大按钮的字体
             }}>
             Back
           </Button>
-        </div>
-        <Table
+          <Table
           columns={columns}
           dataSource={borrowersData}
           rowKey="key"
           bordered
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 8 }}
           className="assets-table"
-          expandable={{
-            expandedRowRender,
-            rowExpandable: record => true,
-            expandedRowKeys,
-            onExpand: handleExpand,
-          }}
         />
+        </div>
       </Content>
     </Layout>
   );
