@@ -207,11 +207,6 @@ const LoanDeployment = () => {
             className="loan-custom-select">
               <Option value="Loan">Loan</Option>
               <Option value="Bond">Bond</Option>
-              <Option value="Artworks">Art and Collection</Option>
-              <Option value="Luxury">Luxury</Option>
-              <Option value="Commodity">Commodity</Option>
-              <Option value="RealEstate">Real Estate</Option>
-              <Option value="Gaming">Gaming</Option>
               {/* Add more asset types as needed */}
             </Select>
           </Form.Item>
