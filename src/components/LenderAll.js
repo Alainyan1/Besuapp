@@ -20,7 +20,7 @@ function LenderAll() {
   const [provider, setProvider] = useState(null); // 用于存储provider
   const navigate = useNavigate();
   const location = useLocation();
-  const initialWalletAddress = location.state?.walletAddress || 'No wallet address provided';
+  const initialWalletAddress = location.state?.walletAddress || '0xf17f52151EbEF6C7334FAD080c5704D77216b732';
   const initialProvider = location.state?.provider || null;
 
   useEffect(() => {

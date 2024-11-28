@@ -12,7 +12,7 @@ function IssuerInfo() {
   const [assetsData, setAssetsData] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const walletAddress = location.state?.walletAddress || 'No wallet address provided';
+  const walletAddress = location.state?.walletAddress || '0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73';
 
   useEffect(() => {
     async function fetchData(walletAddress) {

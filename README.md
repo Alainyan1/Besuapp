@@ -2,9 +2,6 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-// aift@frontend.eastasia.cloudapp.azure.com
-// aift@vmc3gosyy.eastasia.cloudapp.azure.com
-
 ## Available Scripts
 
 In the project directory, you can run:

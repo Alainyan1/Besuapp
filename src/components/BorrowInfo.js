@@ -13,7 +13,7 @@ function BorrowInfo() {
   const [lendersData, setLendersData] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const walletAddress = location.state?.walletAddress || 'No wallet address provided';
+  const walletAddress = location.state?.walletAddress || '0x995F7AfEd2BC12a4523b16292731c80a501EA5d1';
 
   useEffect(() => {
     async function fetchData(walletAddress) {
