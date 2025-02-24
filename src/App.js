@@ -17,6 +17,8 @@ import DeploymentStatus from './components/DeploymentStatus'; // 引入Deploymen
 import { ContractProvider } from './components/ContractContext'; // 引入ContractProvider
 import { AccountsProvider } from './components/AccountsContext'; // 引入AccountsProvider
 
+import TdToken from './components/tdtoken'; // 引入TdToken组件
+
 function App() {
   return (
     <ContractProvider>
@@ -56,6 +58,7 @@ function App() {
               <Route path="/borrower" element={<BorrowInfo />} />
               <Route path="/asset" element={<Asset />} />
               <Route path="/lender-details" element={<LenderDetails />} />
+              <Route path="/tdtoken" element={<TdToken />} />
             </Routes>
           </div>
         </Router>
