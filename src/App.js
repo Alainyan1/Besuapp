@@ -18,6 +18,7 @@ import { ContractProvider } from './components/ContractContext'; // 引入Contra
 import { AccountsProvider } from './components/AccountsContext'; // 引入AccountsProvider
 
 import TdToken from './components/tdtoken'; // 引入TdToken组件
+import TokenSelector from './components/TokenSelector'; // 引入TokenSelector组件
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
               <Route path="/asset" element={<Asset />} />
               <Route path="/lender-details" element={<LenderDetails />} />
               <Route path="/tdtoken" element={<TdToken />} />
+              <Route path="/token" element={<TokenSelector/>} />
             </Routes>
           </div>
         </Router>
