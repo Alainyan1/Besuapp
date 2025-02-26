@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Form, Input, Button, Row, Col, Typography, Modal, Alert } from 'antd';
-import { LoginOutlined } from '@ant-design/icons';
+import { LoginOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { AccountsContext } from './AccountsContext';
 import { useLocation } from 'react-router-dom';
 import '../css/jetco.css';
@@ -10,6 +11,8 @@ import logo from '../images/jetco.png';
 const { Title } = Typography;
 
 const TdToken = () => {
+  const navigate = useNavigate();
+
   const { accounts, addAccount } = useContext(AccountsContext);
   const [customer, setCustomer] = useState('');
   const [userName, setUserName] = useState('');
@@ -203,34 +206,46 @@ const TdToken = () => {
     setter(event.target.value);
   };
 
+  const handleBack = () => {
+    navigate('/token');
+  };
+
   return (
     <div className='jetco-page-container'>
+      <div className="top-bar"></div>
       <img src={logo} alt="Logo" className="responsive-logo" />
-      <Button 
-        onClick={isLoggedIn ? handleLogout : showLoginModal} 
-        style={{
-          backgroundColor: '#fff',
-          color: 'red',
-          borderRadius: '10px',
-          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-          fontSize: '18px',
-          height: '50px',
-          position: 'fixed', top: 20, right: 10
-        }} 
-        icon={<LoginOutlined />}
-      >
-        {isLoggedIn ? `Logged in: ${walletAddress ? walletAddress.substring(0, 8) + '...' : ''}` : 'Login'}
-      </Button>
+
+      {/* Grouped buttons in the right corner */}
+      <div className="button-container">
+        <Button 
+          onClick={isLoggedIn ? handleLogout : showLoginModal}
+          className="login-button"
+          icon={<LoginOutlined />}
+        >
+          {isLoggedIn ? `Logged in: ${walletAddress ? walletAddress.substring(0, 8) + '...' : ''}` : 'Login'}
+        </Button>
+        
+        <Button 
+          icon={<ArrowLeftOutlined />}
+          onClick={handleBack}
+          className="back-button"
+        >
+          Back to Selection
+        </Button>
+      </div>
 
       <Modal
-        title="Login"
+        title={<div style={{ textAlign: 'center', fontSize: '20px' }}>Login</div>}
         visible={isLoginModalVisible}
         onCancel={handleLoginCancel}
+        centered
+        bodyStyle={{ padding: '24px' }}
+        className="custom-modal"
         footer={[
-          <Button key="back" onClick={handleLoginCancel}>
+          <Button key="back" onClick={handleLoginCancel} className="modal-button cancel-button">
             Cancel
           </Button>,
-          <Button key="submit" type="primary" onClick={handleLogin}>
+          <Button key="submit" type="primary" onClick={handleLogin} className="modal-button submit-button">
             Login
           </Button>
         ]}
@@ -241,6 +256,7 @@ const TdToken = () => {
               value={loginUserName}
               onChange={(e) => setLoginUserName(e.target.value)}
               placeholder="Enter your username"
+              className="custom-input"
             />
           </Form.Item>
           <Form.Item label="Password" required>
@@ -248,6 +264,7 @@ const TdToken = () => {
               value={loginPassword}
               onChange={(e) => setLoginPassword(e.target.value)}
               placeholder="Enter your password"
+              className="custom-input"
             />
           </Form.Item>
           <Form.Item label="BIC Code" required>
@@ -255,6 +272,7 @@ const TdToken = () => {
               value={loginBicCode}
               onChange={(e) => setLoginBicCode(e.target.value)}
               placeholder="Enter your BIC code"
+              className="custom-input"
             />
           </Form.Item>
           
@@ -276,129 +294,124 @@ const TdToken = () => {
         </Form>
       </Modal>
 
-      <div style={{ marginTop: '120px'}}>
-        <div style={{ backgroundColor: '#1a1a1a', borderRadius: '10px', padding: '20px', color: 'white', width: 'auto', maxWidth: '500px', margin: '20px auto' }}>
-        <Title level={2} style={{ color: 'white', textAlign: 'center', marginTop: '1px' }}>Payment Confirmation</Title>
-          <Form layout='vertical' onFinish={handleConfirm} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Row gutter={16} style={{ width: '100%' }}>
+      <div className="main-content form-page-content">
+        <div className="card-container payment-card">
+          <div className="title-container">
+            <Title level={2}>TD Token Payment</Title>
+          </div>
+          <Form layout='vertical' onFinish={handleConfirm} className="payment-form">
+            <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
-                <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Customer</label>} required>
+                <Form.Item label="Customer" required className="form-item">
                   <Input
                     type="text"
                     value={customer}
                     onChange={handleInputChange(setCustomer)}
-                    style={{ width: '100%' }}
+                    className="custom-input"
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>User Name</label>} required>
+                <Form.Item label="User Name" required className="form-item">
                   <Input
                     type="text"
                     value={userName}
                     onChange={handleInputChange(setUserName)}
-                    style={{ width: '100%' }}
+                    className="custom-input"
                   />
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={16} style={{ width: '100%' }}>
+            <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
-                <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Customer Wallet</label>} required>
+                <Form.Item label="Customer Wallet" required className="form-item">
                   <Input
                     type="text"
                     value={customerWallet}
                     onChange={handleInputChange(setCustomerWallet)}
-                    style={{ width: '100%' }}
+                    className="custom-input"
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Recipient Bank Name</label>} required>
+                <Form.Item label="Recipient Bank Name" required className="form-item">
                   <Input
                     type="text"
                     value={recipientBankName}
                     onChange={handleInputChange(setRecipientBankName)}
-                    style={{ width: '100%' }}
+                    className="custom-input"
                   />
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={16} style={{ width: '100%' }}>
+            <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
-                <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Recipient Wallet Address</label>} required>
+                <Form.Item label="Recipient Wallet Address" required className="form-item">
                   <Input
                     type="text"
                     value={recipientWalletAddress}
                     onChange={handleInputChange(setRecipientWalletAddress)}
-                    style={{ width: '100%' }}
+                    className="custom-input"
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Currency</label>} required>
+                <Form.Item label="Currency" required className="form-item">
                   <Input
                     type="text"
                     value={currency}
                     onChange={handleInputChange(setCurrency)}
-                    style={{ width: '100%' }}
+                    className="custom-input"
                   />
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={16} style={{ width: '100%' }}>
+            <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
-                <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Transfer Amount</label>} required>
+                <Form.Item label="Transfer Amount" required className="form-item">
                   <Input
                     type="number"
                     value={transferAmount}
                     onChange={handleInputChange(setTransferAmount)}
-                    style={{ width: '100%' }}
+                    className="custom-input"
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Receive Bank BIC Code</label>} required>
+                <Form.Item label="Receive Bank BIC Code" required className="form-item">
                   <Input
                     type="text"
                     value={receiveBankBicCode}
                     onChange={handleInputChange(setReceiveBankBicCode)}
-                    style={{ width: '100%' }}
+                    className="custom-input"
                   />
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={16} style={{ width: '100%' }}>
+            <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
-                <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Send User Name</label>} required>
+                <Form.Item label="Send User Name" required className="form-item">
                   <Input
                     type="text"
                     value={sendUserName}
                     onChange={handleInputChange(setSendUserName)}
-                    style={{ width: '100%' }}
+                    className="custom-input"
                   />
                 </Form.Item>
               </Col>
             </Row>
-            <Form.Item style={{ textAlign: 'center' }}>
-              <Button type="primary" htmlType="submit" style={{
-                backgroundColor: 'white',
-                color: '#000',
-                padding: '15px 30px',
-                fontSize: '24px',
-                height: '40px',
-                borderRadius: '15px',
-                width: '150px'
-               }}>Confirm</Button>
+            <Form.Item className="submit-container">
+              <Button type="primary" htmlType="submit" className="submit-button">Confirm</Button>
             </Form.Item>
           </Form>
           {status === 'success' && (
-            <div>
-              <p style={{ color: 'green' }}>Payment confirmed!</p>
+            <div className="status-success">
+              <p>Payment confirmed!</p>
               <p>Transaction Hash: {transactionHash}</p>
             </div>
           )}
-          {status === 'error' && <p style={{ color: 'red' }}>Payment failed. Please try again.</p>}
+          {status === 'error' && <p className="status-error">Payment failed. Please try again.</p>}
+          {status === 'pending' && <p className="status-pending">Transaction in progress...</p>}
         </div>
       </div>
     </div>

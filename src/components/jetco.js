@@ -4,8 +4,9 @@ import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { AccountsContext } from './AccountsContext';
 import { Form, Input, Button, Select, Typography } from 'antd';
-import { WalletOutlined } from '@ant-design/icons'; // Import the Wallet icon
+import { WalletOutlined, ArrowLeftOutlined } from '@ant-design/icons'; // Import the Wallet icon
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../css/jetco.css';
 import logo from '../images/jetco.png';
 import { devUseWarning } from 'antd/es/_util/warning';
@@ -29,6 +30,7 @@ const Jetco = () => {
   const [customPaymentToAddress, setCustomPaymentToAddress] = useState(''); // 用于存储用户输入的自定义地址 for paymentTo
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedWalletAddress = localStorage.getItem('walletAddress');
@@ -197,29 +199,45 @@ const Jetco = () => {
     setter('');
   };
 
+  const handleBack = () => {
+    navigate('/token');
+  };
+
   return (
     <div className='jetco-page-container'>
+      <div className="top-bar"></div>
       <img src={logo} alt="Logo" className="responsive-logo" />
-      <Button onClick={connectWallet} style={{
-        backgroundColor: '#fff', // 背景颜色为白色
-        color: 'red', // 字体颜色为红色
-        borderRadius: '10px', // 设置按钮的圆角
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // 添加阴影效果
-        fontSize: '18px', // 增大按钮的字体
-        height: '50px', // 增加按钮的高度
-        position: 'fixed', top: 20, right: 10
-      }} icon={<WalletOutlined />}>
-        {walletAddress ? `Connected: ${walletAddress}` : 'Connect Wallet'}
-      </Button>
-      <div style={{ marginTop: '120px'}}> {/* Move the form down */}
-        <div style={{ backgroundColor: '#1a1a1a', borderRadius: '10px', padding: '20px', color: 'white', width: 'auto', maxWidth: '500px', margin: '20px auto' }}>
-        <Title level={2} style={{ color: 'white', textAlign: 'center', marginTop: '1px' }}>Payment Confirmation</Title>
-          <Form layout='vertical' onFinish={handleConfirm} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Payment From</label>} required style={{ width: '100%' }}>
+
+      {/* Grouped buttons in the right corner */}
+      <div className="button-container">
+        <Button 
+          onClick={connectWallet} 
+          className="wallet-button" 
+          icon={<WalletOutlined />}
+        >
+          {walletAddress ? `Connected: ${walletAddress.substring(0, 8) + '...'}` : 'Connect Wallet'}
+        </Button>
+        
+        <Button 
+          icon={<ArrowLeftOutlined />}
+          onClick={handleBack}
+          className="back-button"
+        >
+          Back to Selection
+        </Button>
+      </div>
+      
+      <div className="main-content form-page-content">
+        <div className="card-container payment-card">
+          <div className="title-container">
+            <Title level={2}>CD Token Payment</Title>
+          </div>
+          <Form layout='vertical' onFinish={handleConfirm} className="payment-form">
+            <Form.Item label="Payment From" required className="form-item">
               <Select
                 value={selectedPaymentFromKey}
                 onChange={handleSelectChange(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey)}
-                style={{ width: '100%'}}
+                className="custom-select"
               >
                 <Option value="">Select an account</Option>
                 {Object.entries(accounts).map(([key, value]) => (
@@ -228,28 +246,33 @@ const Jetco = () => {
                 <Option value="custom">Enter custom address</Option>
               </Select>
               {selectedPaymentFromKey === 'custom' && (
-                <div>
+                <div className="custom-address-container">
                   <Input
                     type="text"
                     value={customPaymentFromAddress}
                     onChange={handleCustomAddressChange(setCustomPaymentFromAddress)}
                     placeholder="Enter address in format Name:address"
-                    style={{ width: '100%', marginTop: '10px' }}
+                    className="custom-input"
                   />
-                  <Button color='white' type="button" onClick={() => handleAddCustomAddress(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey, customPaymentFromAddress)} style={{ marginTop: '10px', backgroundColor: 'white' }}>
+                  <Button 
+                    type="button" 
+                    onClick={() => handleAddCustomAddress(setPaymentFrom, 'paymentFrom', setSelectedPaymentFromKey, customPaymentFromAddress)}
+                    className="add-address-button"
+                  >
                     Add Address
                   </Button>
                 </div>
               )}
               {selectedPaymentFromKey && selectedPaymentFromKey !== 'custom' && (
-                <p style={{ color: 'white', marginTop: '10px' }}>Address: {accounts[selectedPaymentFromKey].address}</p>
+                <p className="address-display">Address: {accounts[selectedPaymentFromKey].address}</p>
               )}
             </Form.Item>
-            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Payment To</label>} required style={{ width: '100%' }}>
+            
+            <Form.Item label="Payment To" required className="form-item">
               <Select
                 value={selectedLenderAddressKey}
                 onChange={handleSelectChange(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey)}
-                style={{ width: '100%' }}
+                className="custom-select"
               >
                 <Option value="">Select an account</Option>
                 {Object.entries(accounts).map(([key, value]) => (
@@ -258,44 +281,51 @@ const Jetco = () => {
                 <Option value="custom">Enter custom address</Option>
               </Select>
               {selectedLenderAddressKey === 'custom' && (
-                <div>
+                <div className="custom-address-container">
                   <Input
                     type="text"
                     value={customPaymentToAddress}
                     onChange={handleCustomAddressChange(setCustomPaymentToAddress)}
                     placeholder="Enter address in format Name:address"
-                    style={{ width: '100%', marginTop: '10px' }}
+                    className="custom-input"
                   />
-                  <Button type="button" color='white' onClick={() => handleAddCustomAddress(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey, customPaymentToAddress)} style={{ marginTop: '10px', backgroundColor: 'white'}}>
+                  <Button 
+                    type="button"
+                    onClick={() => handleAddCustomAddress(setLenderAddress, 'lenderAddress', setSelectedLenderAddressKey, customPaymentToAddress)}
+                    className="add-address-button"
+                  >
                     Add Address
                   </Button>
                 </div>
               )}
               {selectedLenderAddressKey && selectedLenderAddressKey !== 'custom' && (
-                <p style={{ color: 'white', marginTop: '10px' }}>Address: {accounts[selectedLenderAddressKey].address}</p>
+                <p className="address-display">Address: {accounts[selectedLenderAddressKey].address}</p>
               )}
             </Form.Item>
-            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Amount</label>} required style={{ width: '100%' }}>
+            
+            <Form.Item label="Amount" required className="form-item">
               <Input
                 type="number"
                 value={amount}
                 onChange={handleInputChange(setAmount, 'amount')}
-                style={{ width: '100%' }}
+                className="custom-input"
               />
             </Form.Item>
-            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Contract Address</label>} required style={{ width: '100%' }}>
+            
+            <Form.Item label="Contract Address" required className="form-item">
               <Input
                 type="text"
                 value={contractAddress}
                 onChange={handleInputChange(setContractAddress, 'contractAddress')}
-                style={{ width: '100%' }}
+                className="custom-input"
               />
             </Form.Item>
-            <Form.Item label={<label style={{ color: 'white', fontSize: '18px' }}>Function</label>} required style={{ width: '100%' }}>
+            
+            <Form.Item label="Function" required className="form-item">
               <Select
                 value={operation}
                 onChange={handleOperationChange}
-                style={{ width: '100%' }}
+                className="custom-select"
               >
                 <Option value="">Select an operation</Option>
                 <Option value="interestRepay">Repay Interest</Option>
@@ -303,25 +333,19 @@ const Jetco = () => {
                 <Option value="drawdown">Drawdown</Option>
               </Select>
             </Form.Item>
-            <Form.Item style={{ textAlign: 'center' }}>
-              <Button type="primary" htmlType="submit" style={{
-                backgroundColor: 'white', // 背景颜色设为白色
-                color: '#000', // 字体颜色设为黑色
-                padding: '15px 30px', // 增大内边距，使按钮整体变大
-                fontSize: '24px', // 墛大按钮的字体
-                height: '40px', // 增加按钮的高度
-                borderRadius: '15px', // 设置按钮的圆角
-                width: '150px'
-               }}>Confirm</Button>
+            
+            <Form.Item className="submit-container">
+              <Button type="primary" htmlType="submit" className="submit-button">Confirm</Button>
             </Form.Item>
           </Form>
+          
           {status === 'success' && (
-            <div>
-              <p style={{ color: 'green' }}>Payment confirmed!</p>
+            <div className="status-success">
+              <p>Payment confirmed!</p>
               <p>Transaction Hash: {transactionHash}</p>
             </div>
           )}
-          {status === 'error' && <p style={{ color: 'red' }}>Payment failed. Please try again.</p>}
+          {status === 'error' && <p className="status-error">Payment failed. Please try again.</p>}
         </div>
       </div>
     </div>

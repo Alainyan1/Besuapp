@@ -2,62 +2,349 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
   
 .container {
-display: flex;
-flex-direction: column;
-min-height: 100vh; /* Ensure the container takes up the full viewport height */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .jetco-page-container {
-background-color: white; /* Set the background color */
-padding: 20px;
-flex: 1; /* Allow the page-container to grow and fill the remaining space */
-display: flex;
-flex-direction: column;
-justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 40px;
 }
 
-.jetco-page-container::before {
-    content: ""; /* 创建一个空内容 */
-    position: relative; /* 相对定位 */
-    top: 60px; /* 距离顶部100像素 */
-    left: 0; /* 左边距为0 */
-    width: 100%; /* 宽度为100% */
-    height: 30px; /* 总高度为35像素，包含红线和黑线 */
-    background: 
-        linear-gradient(to bottom, 
-            red 0%, 
-            red 10px, 
-            transparent 10px, 
-            transparent 30px), /* 红线 */
-        linear-gradient(to bottom, 
-            black 0%, 
-            black 25px, 
-            transparent 20px, 
-            transparent 30px); /* 黑线 */
-}
-
-.jetco-page-container::before {
-    background-size: 50% 100%, 100% 100%; /* 红线宽度为50%，黑线宽度为100% */
-    background-position: right top, left 10px; /* 调整位置 */
-    background-repeat: no-repeat; /* 不重复 */
-}
-
-
-.ant-btn {
-color: black; /* 你可以根据需要调整颜色 */
+/* Top decorative bar */
+.top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #e63946 0%, #e63946 50%, #1d3557 50%, #1d3557 100%);
 }
 
 .responsive-logo {
-    width: auto; /* 根据需要调整百分比 */
-    height: 100%; /* 保持宽高比 */
-    position: relative; /* 相对定位 */
-    left: 1%; /* 左边距为25% */
-    top: 10%; /* 顶部距离为10% */
+    max-height: 80px;
+    width: auto;
+    margin: 20px 0 10px 20px;
+    top: 0;
+    left: 0;
+    position: absolute;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    padding: 0 20px;
+}
+
+.card-container {
+    background: rgba(0, 0, 0, 0.9) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.payment-card {
+    background: linear-gradient(145deg, #121212 0%, #1e1e1e 100%);
+}
+
+.title-container {
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+}
+
+.title-container:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #e63946, #1d3557);
+    border-radius: 2px;
+}
+/* Update the title styles for dark background */
+.title-container h2 {
+    color: #ffffff;
+    margin: 0;
+}
+
+.payment-form {
+    margin-top: 20px;
+}
+
+.form-item {
+    margin-bottom: 20px;
+}
+
+/* Update form label color */
+.form-item label {
+    color: #ffffff !important;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.form-page-content {
+    margin-top: 120px !important; /* Increased top margin for forms only */
+}
+
+.custom-input {
+    border-radius: 8px;
+    border: 1px solid #d1d9e6;
+    height: 40px;
+    transition: all 0.3s;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.custom-input:hover, .custom-input:focus {
+    border-color: #4a6fa5;
+    box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+}
+
+.custom-select {
+    border-radius: 8px;
+    height: 40px;
+}
+
+.custom-select .ant-select-selector {
+    border: 1px solid #d1d9e6 !important;
+    border-radius: 8px !important;
+    height: 40px !important;
+    background-color: #ffffff !important;
 }
 
 .custom-select .ant-select-selection-placeholder {
-    color: black !important; /* Change the placeholder color */
+    color: #6c757d !important;
+    line-height: 38px !important;
+}
+
+.custom-select .ant-select-selection-item {
+    line-height: 38px !important;
+    color: #000000;
+}
+
+.custom-address-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.add-address-button {
+    background: #f8f9fa;
+    border: 1px solid #d1d9e6;
+    color: #1d3557;
+    border-radius: 8px;
+    height: 40px;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.add-address-button:hover {
+    background: #e9ecef;
+    border-color: #4a6fa5;
+    color: #1d3557;
+}
+
+/* Change address display background */
+.address-display {
+    margin-top: 6px;
+    color: #a8dadc;
+    font-size: 14px;
+    background: rgba(168, 218, 220, 0.1);
+    padding: 6px 10px;
+    border-radius: 4px;
+    word-break: break-all;
+}
+
+.submit-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.submit-button {
+    background: linear-gradient(90deg, #1d3557, #457b9d);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    height: 45px;
+    padding: 0 30px;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(29, 53, 87, 0.2);
+    transition: all 0.3s;
+}
+
+.submit-button:hover {
+    background: linear-gradient(90deg, #15253d, #3d6e8d);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(29, 53, 87, 0.3);
+}
+
+.login-button, .wallet-button {
+    background: white;
+    color: #1d3557;
+    border: 1px solid #d1d9e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    height: 45px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+/* Create right-side button container */
+.button-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+}
+
+/* Update button styling */
+.login-button, .wallet-button {
+    background: white;
+    color: #1d3557;
+    border: 1px solid #d1d9e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    height: 45px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+    width: auto;
+}
+
+/* Update back button - remove fixed positioning as it will be in the container */
+.back-button {
+    background: white;
+    color: #1d3557;
+    border: 1px solid #d1d9e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: 40px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+    padding: 0 20px;
+}
+
+/* Hover effects */
+.login-button:hover, .wallet-button:hover, .back-button:hover {
+    background: #f8f9fa;
+    border-color: #4a6fa5;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Update status message colors for better visibility */
+.status-success {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(72, 187, 120, 0.2);
+    border-left: 4px solid #48bb78;
+    border-radius: 4px;
+    color: #9ae6b4;
+}
+
+.status-error {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(229, 62, 62, 0.2);
+    border-left: 4px solid #e53e3e;
+    border-radius: 4px;
+    color: #feb2b2;
+}
+
+.status-pending {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(237, 137, 54, 0.2);
+    border-left: 4px solid #ed8936;
+    border-radius: 4px;
+    color: #fed7aa;
+}
+
+/* Modal styling */
+.custom-modal .ant-modal-content {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.custom-modal .ant-modal-header {
+    background: linear-gradient(90deg, #1d3557, #457b9d);
+    padding: 16px 24px;
+    border-bottom: none;
+}
+
+.custom-modal .ant-modal-title {
+    color: white;
+}
+
+.custom-modal .ant-modal-close {
+    color: white;
+}
+
+.custom-modal .modal-button {
+    height: 40px;
+    border-radius: 8px;
+    min-width: 100px;
+}
+
+.custom-modal .submit-button {
+    background: linear-gradient(90deg, #1d3557, #457b9d);
+    color: white;
+    border: none;
+}
+
+.custom-modal .cancel-button {
+    background: #f8f9fa;
+    color: #4a5568;
+    border: 1px solid #d1d9e6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .button-container {
+        top: 10px;
+        right: 10px;
+        gap: 8px;
+    }
+    
+    .responsive-logo {
+        max-height: 60px;
+    }
+    
+    .login-button, .wallet-button, .back-button {
+        height: 36px;
+        font-size: 13px;
+        padding: 0 12px;
+    }
 }
