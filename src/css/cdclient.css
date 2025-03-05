@@ -1,0 +1,90 @@
+.cd-client-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.wallet-connection {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 30px;
+}
+
+.wallet-button {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  border-radius: 8px;
+  height: 44px;
+  font-size: 16px;
+}
+
+.cd-offers-container {
+  margin-top: 20px;
+}
+
+.cd-card {
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.cd-card:hover {
+  transform: translateY(-5px);
+}
+
+.cd-card-title {
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.cd-card-content {
+  position: relative;
+  min-height: 240px;
+}
+
+.cd-info-item {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cd-terms {
+  margin-top: 10px;
+}
+
+.term-option {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.term-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+  flex-wrap: wrap;
+}
+
+.purchase-summary {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.summary-value {
+  font-weight: 500;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}

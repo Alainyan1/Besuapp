@@ -14,7 +14,7 @@ const TokenSelector = () => {
     if (token === 'td') {
       navigate('/tdtoken');
     } else {
-      navigate('/jetco');
+      navigate('/cdtoken');
     }
   };
 

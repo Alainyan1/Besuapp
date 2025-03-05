@@ -65,13 +65,14 @@ const TdToken = () => {
       setLoginError('');
       setLoginSuccess('');
       
-      const response = await axios.post('https://poc-portal.xxx.com/api/login', {
+      const response = await axios.post('https://eurybia.xyz/api/test/jetcoLogin', {
         username: loginUserName,
         password: loginPassword,
         bicCode: loginBicCode
       });
 
       const { data, succ } = response.data;
+      console.log('Login response:', data, succ);
       
       if (succ === 0) {
         localStorage.setItem('authToken', data.token);
@@ -117,7 +118,7 @@ const TdToken = () => {
       }
   
       // Check balance before proceeding with transfer
-      const balanceResponse = await axios.post('https://poc-portal.xxx.com/api/checkBalance', 
+      const balanceResponse = await axios.post('https://eurybia.xyz/api/test/jetcoBalance', 
         { address: customerWallet },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -140,7 +141,7 @@ const TdToken = () => {
       }
       
       // If balance is sufficient, proceed with the transfer
-      const response = await axios.post('https://poc-portal.xxx.com/api/transfer', 
+      const response = await axios.post('https://eurybia.xyz/api/test/jetcoTransfer', 
         {
           customer,
           userName,
@@ -177,7 +178,7 @@ const TdToken = () => {
     try {
       const token = localStorage.getItem('authToken');
       
-      const response = await axios.post('https://poc-portal.xxx.com/api/enquiryTransaction', 
+      const response = await axios.post('https://eurybia.xyz/api/test/jetcoTransaction', 
         { txnId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

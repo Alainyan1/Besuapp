@@ -1,0 +1,64 @@
+.cdbank-page-container {
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.cd-form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.cd-form .ant-form-item {
+  margin-bottom: 20px;
+}
+
+.cd-form .ant-form-item-label > label {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.cd-submit-button:hover {
+  background-color: #5A81BB !important;
+  color: #000 !important;
+}
+
+.client-row {
+  border: 1px solid #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  background-color: #fafafa;
+}
+
+.deposit-term-row {
+  border: 1px solid #e8e8e8;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  position: relative;
+}
+
+.deposit-term-row h4 {
+  color: #1890ff;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.cd-custom-select .ant-select-selector {
+  border-radius: 8px !important;
+  height: 40px !important;
+  padding-top: 4px !important;
+  background-color: #6EA1EB !important;
+  color: white !important;
+}
+
+.cd-custom-select .ant-select-selection-item {
+  color: black !important;
+  font-weight: 500;
+}

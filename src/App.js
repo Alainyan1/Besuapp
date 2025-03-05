@@ -19,6 +19,9 @@ import { AccountsProvider } from './components/AccountsContext'; // 引入Accoun
 
 import TdToken from './components/tdtoken'; // 引入TdToken组件
 import TokenSelector from './components/TokenSelector'; // 引入TokenSelector组件
+import CDDeployment from './components/CdDeployment'; // 引入CDDeployment组件
+import CDClient from './components/CdClient';
+import CdToken from './components/cdtoken';
 
 function App() {
   return (
@@ -61,6 +64,9 @@ function App() {
               <Route path="/lender-details" element={<LenderDetails />} />
               <Route path="/tdtoken" element={<TdToken />} />
               <Route path="/token" element={<TokenSelector/>} />
+              <Route path="/cd" element={<CDDeployment />} />
+              <Route path="/cdclient" element={<CDClient />} />
+              <Route path="/cdtoken" element={<CdToken />} />
             </Routes>
           </div>
         </Router>
