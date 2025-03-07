@@ -106,6 +106,7 @@ const CDToken = () => {
         }
 
         // Call the issueCertificate function
+        console.log('Issuing certificate:', clientAddress, termId, amount);
         const tx = await contract.issueCertificate(
           clientAddress,
           termId,
@@ -327,9 +328,8 @@ const CDToken = () => {
             htmlType="submit" 
             className="submit-button" 
             loading={loading}
-            disabled={!walletAddress}
           >
-            Issue Certificate
+            Issue
           </Button>
         </Form.Item>
       </Form>

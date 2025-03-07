@@ -7,7 +7,15 @@
 .wallet-connection {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+}
+
+.contract-info {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  text-align: center;
 }
 
 .wallet-button {
@@ -18,58 +26,35 @@
   font-size: 16px;
 }
 
-.cd-offers-container {
-  margin-top: 20px;
+.cd-content-container {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.cd-card {
-  height: 100%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.3s ease;
+.cd-tabs .ant-tabs-nav {
+  margin-bottom: 20px;
 }
 
-.cd-card:hover {
-  transform: translateY(-5px);
-}
-
-.cd-card-title {
-  font-size: 18px;
-  font-weight: 500;
+.loading-container {
   display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.no-terms-container, .no-deposits-container, .connect-wallet-prompt {
+  text-align: center;
+  padding: 40px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
-.cd-card-content {
-  position: relative;
-  min-height: 240px;
-}
-
-.cd-info-item {
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.cd-terms {
-  margin-top: 10px;
-}
-
-.term-option {
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 10px;
-  margin-top: 8px;
-}
-
-.term-details {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 5px;
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.65);
-  flex-wrap: wrap;
+.terms-table-container, .user-deposits-container {
+  overflow-x: auto;
 }
 
 .purchase-summary {
@@ -87,4 +72,22 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 24px;
+}
+
+.ant-table-thead > tr > th {
+  background-color: #f0f7ff;
+  font-weight: 500;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background-color: #f0f7ff;
+}
+
+.contract-selector {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 8px;
 }

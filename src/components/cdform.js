@@ -25,7 +25,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
   // };
 
   const addDepositTerm = () => {
-    const newTermId = `ethers.utils.formatBytes32String('TERM${termCount + 1}')`;
+    const newTermId = `TERM${termCount + 1}`;
     const newTerm = {
       termId: newTermId,
       duration: 2629800, // 1 month in seconds
@@ -145,7 +145,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
             <Input
               value={term.termId}
               onChange={(e) => handleDepositTermChange(index, 'termId', e.target.value)}
-              placeholder="ethers.utils.formatBytes32String('TERMID')"
+              placeholder="TERMID"
             />
           </Form.Item>
           
