@@ -91,3 +91,36 @@
   padding: 12px;
   border-radius: 8px;
 }
+
+.maturity-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maturity-status.matured {
+  color: #f5222d;
+  font-weight: 500;
+}
+
+.maturity-status.not-matured {
+  color: #52c41a;
+}
+
+.auto-redemption-status {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
+
+.auto-redemption-status.checking {
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+}
+
+.auto-redemption-status.matured {
+  background-color: #fff7e6;
+  border: 1px solid #ffd591;
+}

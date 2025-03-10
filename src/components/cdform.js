@@ -48,6 +48,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
   };
 
   const durationOptions = [
+    { label: '5 min', value: 300 },
     { label: '1 month', value: 2629800 },
     { label: '3 months', value: 7889400 },
     { label: '6 months', value: 15778800 },

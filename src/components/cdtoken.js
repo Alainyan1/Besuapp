@@ -105,11 +105,15 @@ const CDToken = () => {
           throw new Error('Only the Trusted Third Party can issue certificates');
         }
 
+        const bytes32TermId = ethers.utils.formatBytes32String(termId);
+        console.log('TermID:', termId);
+        console.log('Bytes32 Term ID:', bytes32TermId);
+
         // Call the issueCertificate function
         console.log('Issuing certificate:', clientAddress, termId, amount);
         const tx = await contract.issueCertificate(
           clientAddress,
-          termId,
+          bytes32TermId,
           amount,
           {
             gasLimit: 3000000,
@@ -125,22 +129,22 @@ const CDToken = () => {
         setTransactionHash(receipt.transactionHash);
 
         // Calculate maturity date based on term duration
-        const termInfo = await contract.depositTerms(termId);
-        const durationInSeconds = termInfo.duration.toNumber();
-        const maturityDate = new Date();
-        maturityDate.setSeconds(maturityDate.getSeconds() + durationInSeconds);
+        // const termInfo = await contract.depositTerms(termId);
+        // const durationInSeconds = termInfo.duration.toNumber();
+        // const maturityDate = new Date();
+        // maturityDate.setSeconds(maturityDate.getSeconds() + durationInSeconds);
 
-        // Save the certificate data to the database
-        const certificateData = {
-          contractAddress,
-          clientAddress,
-          clientKey: selectedClientKey,
-          termId: ethers.utils.parseBytes32String(termId),
-          amount,
-          issueDate: new Date().toISOString().substring(0, 10),
-          maturityDate: maturityDate.toISOString().substring(0, 10),
-          transactionHash: receipt.transactionHash
-        };
+        // // Save the certificate data to the database
+        // const certificateData = {
+        //   contractAddress,
+        //   clientAddress,
+        //   clientKey: selectedClientKey,
+        //   termId: ethers.utils.parseBytes32String(termId),
+        //   amount,
+        //   issueDate: new Date().toISOString().substring(0, 10),
+        //   maturityDate: maturityDate.toISOString().substring(0, 10),
+        //   transactionHash: receipt.transactionHash
+        // };
         //await saveCertificateData(certificateData);
         setPurchaseComplete(true);
       } else {
@@ -300,7 +304,7 @@ const CDToken = () => {
             value={termId}
             onChange={handleInputChange(setTermId, 'termId')}
             className="custom-input"
-            placeholder="Enter Term ID (bytes32 hex format)"
+            placeholder="Enter Term ID (e.g. 3MONTH, 6MONTH)"
           />
         </Form.Item>
         

@@ -6,7 +6,7 @@ import { ContractContext } from './ContractContext';
 import { AccountsContext } from './AccountsContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, Button, Spin, Typography, Input, Modal, Form, InputNumber, Row, Col, Divider, Tag, Tooltip, Table, Tabs, Select } from 'antd';
-import { WalletOutlined, BankOutlined, CalendarOutlined, PercentageOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { WalletOutlined, BankOutlined, CalendarOutlined, PercentageOutlined, InfoCircleOutlined, LoadingOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import '../css/cdclient.css';
 import logo from '../images/aift.png';
 
@@ -36,6 +36,16 @@ const CDClient = () => {
   const [contractAddress, setContractAddress] = useState(localStorage.getItem('contractAddress') || '');
   const location = useLocation();
 
+  // Add state for auto-redemption status
+  const [autoRedeemInProgress, setAutoRedeemInProgress] = useState(false);
+  const [autoRedemptionStatus, setAutoRedemptionStatus] = useState({
+    checking: false,
+    maturedCount: 0,
+    redeemedCount: 0,
+    errors: []
+  });
+
+
   useEffect(() => {
     // Set contract address from navigation state
     if (location.state?.contractAddress) {
@@ -60,51 +70,160 @@ const CDClient = () => {
     }
   }, [walletAddress, allContractAddresses]);
 
-  // New function to fetch all contract addresses and bank info in one call
-    const fetchAllContractAddresses = async () => {
+  useEffect(() => {
+    if (walletAddress && userDeposits && userDeposits.length > 0 && !autoRedeemInProgress) {
+      checkAndRedeemMaturedDeposits();
+    }
+  }, [userDeposits, walletAddress]);
+
+  // Add this function to check for matured deposits and automatically redeem them
+  const checkAndRedeemMaturedDeposits = async () => {
+    // Only proceed if we have a connected wallet and deposits
+    if (!walletAddress || !userDeposits || userDeposits.length === 0) {
+      return;
+    }
+  
+    setAutoRedemptionStatus(prev => ({ ...prev, checking: true }));
+    
+    // Find deposits that have matured but haven't been redeemed
+    const now = new Date();
+    const maturedDeposits = userDeposits.filter(deposit => 
+      !deposit.isRedeemed && 
+      new Date(deposit.maturityDate) <= now
+    );
+    
+    // Update status with count of matured deposits
+    setAutoRedemptionStatus(prev => ({ 
+      ...prev, 
+      maturedCount: maturedDeposits.length 
+    }));
+    
+    if (maturedDeposits.length === 0) {
+      setAutoRedemptionStatus(prev => ({ ...prev, checking: false }));
+      return;
+    }
+    
+    // Start the auto-redemption process
+    setAutoRedeemInProgress(true);
+    const errors = [];
+    let redeemedCount = 0;
+    
+    try {
+      // Process each matured deposit using the backend API
+      for (const deposit of maturedDeposits) {
         try {
-            setLoading(true);
-            const response = await axios.get('https://eurybia.xyz/api/test/getCdDeployment');
-            
-            if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-            console.log('Deployment data:', response.data);
-            
-            // Extract addresses
-            const addresses = response.data.map(item => item.contract_address);
-            setAllContractAddresses(addresses);
-            
-            // Extract bank information
-            const bankInfoMap = {};
-            response.data.forEach(item => {
-                if (item.contract_address) {
-                bankInfoMap[item.contract_address] = {
-                    bankName: item.bank_name || 'Unknown Bank',
-                    // Add any other bank properties from the API response
-                    bankCode: item.bankCode,
-                    bankId: item.bankId,
-                    // Add any other properties as needed
-                };
-                }
-            });
-            
-            console.log('Extracted bank info:', bankInfoMap);
-            setBankInfo(bankInfoMap);
-            
-            // If no contract address is selected yet, select the first one
-            if (!contractAddress && addresses.length > 0) {
-                setContractAddress(addresses[0]);
-                localStorage.setItem('contractAddress', addresses[0]);
-            }
-            } else {
-            console.warn('No contract addresses found.');
-            }
-            
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching contract addresses:', error);
-            setLoading(false);
+          console.log(`Automatically redeeming matured deposit ID: ${deposit.depositId}`);
+          
+          // Call the backend API to redeem the certificate
+          const response = await axios.post('http://20.2.203.99:3002/api/redeembyttp', {
+            certificateIndex: deposit.depositId,
+            clientAddress: walletAddress,
+            contractAddress: deposit.contractAddress
+          });
+          
+          if (response.data && response.data.success) {
+            console.log(`Auto-redemption successful for deposit ID: ${deposit.depositId}`);
+            redeemedCount++;
+            setAutoRedemptionStatus(prev => ({ ...prev, redeemedCount: prev.redeemedCount + 1 }));
+          } else {
+            throw new Error(response.data?.message || 'Unknown error from redemption API');
+          }
+        } catch (err) {
+          console.error(`Error auto-redeeming deposit ID ${deposit.depositId}:`, err);
+          errors.push(`Deposit ${deposit.depositId}: ${err.message || 'Unknown error'}`);
         }
-    };
+      }
+      
+      // If any deposits were redeemed successfully, refresh the list
+      if (redeemedCount > 0) {
+        // Small delay to ensure backend state is updated
+        setTimeout(() => {
+          fetchUserDeposits();
+          
+          // Show a success message
+          Modal.success({
+            title: 'Automatic Redemption',
+            content: `Successfully redeemed ${redeemedCount} matured certificate${redeemedCount !== 1 ? 's' : ''}.\n Informed Bank and TTP to transfer the Tokenized Depoist.`,
+          });
+        }, 2000);
+      }
+      
+      // If there were errors, show them
+      if (errors.length > 0) {
+        Modal.warning({
+          title: 'Some Automatic Redemptions Failed',
+          content: (
+            <div>
+              <p>Successfully redeemed: {redeemedCount}/{maturedDeposits.length}</p>
+              <p>The following errors occurred:</p>
+              <ul>
+                {errors.map((err, idx) => <li key={idx}>{err}</li>)}
+              </ul>
+            </div>
+          )
+        });
+      }
+    } catch (error) {
+      console.error('Error in auto-redemption process:', error);
+      Modal.error({
+        title: 'Auto-Redemption Error',
+        content: `There was an error in the automatic redemption process: ${error.message || 'Unknown error'}`
+      });
+    } finally {
+      setAutoRedeemInProgress(false);
+      setAutoRedemptionStatus(prev => ({ 
+        ...prev, 
+        checking: false,
+        errors: errors 
+      }));
+    }
+  };
+
+  // New function to fetch all contract addresses and bank info in one call
+  const fetchAllContractAddresses = async () => {
+      try {
+          setLoading(true);
+          const response = await axios.get('https://eurybia.xyz/api/test/getCdDeployment');
+          
+          if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          console.log('Deployment data:', response.data);
+          
+          // Extract addresses
+          const addresses = response.data.map(item => item.contract_address);
+          setAllContractAddresses(addresses);
+          
+          // Extract bank information
+          const bankInfoMap = {};
+          response.data.forEach(item => {
+              if (item.contract_address) {
+              bankInfoMap[item.contract_address] = {
+                  bankName: item.bank_name || 'Unknown Bank',
+                  // Add any other bank properties from the API response
+                  bankCode: item.bankCode,
+                  bankId: item.bankId,
+                  // Add any other properties as needed
+              };
+              }
+          });
+          
+          console.log('Extracted bank info:', bankInfoMap);
+          setBankInfo(bankInfoMap);
+          
+          // If no contract address is selected yet, select the first one
+          if (!contractAddress && addresses.length > 0) {
+              setContractAddress(addresses[0]);
+              localStorage.setItem('contractAddress', addresses[0]);
+          }
+          } else {
+          console.warn('No contract addresses found.');
+          }
+          
+          setLoading(false);
+      } catch (error) {
+          console.error('Error fetching contract addresses:', error);
+          setLoading(false);
+      }
+  };
 
   const fetchAvailableDeposits = async () => {
     try {
@@ -587,7 +706,20 @@ const CDClient = () => {
         title: 'Maturity Date',
         dataIndex: 'maturityDate',
         key: 'maturityDate',
-        render: (date) => formatDate(date)
+        render: (date, record) => {
+          const maturityDate = new Date(date);
+          const now = new Date();
+          const isMatured = maturityDate <= now;
+          
+          return (
+            <div className={`maturity-status ${isMatured ? 'matured' : 'not-matured'}`}>
+              {isMatured && !record.isRedeemed ? <ClockCircleOutlined /> : null}
+              <span>{formatDate(date)}</span>
+              {isMatured && !record.isRedeemed ? 
+                <Tag color="volcano">Matured</Tag> : null}
+            </div>
+          );
+        }
       },
       {
         title: 'Expected Interest',
@@ -625,6 +757,36 @@ const CDClient = () => {
       }
     ];
 
+    const renderAutoRedemptionStatus = () => {
+      if (!autoRedemptionStatus.checking && autoRedemptionStatus.maturedCount === 0) {
+        return null;
+      }
+      
+      if (autoRedemptionStatus.checking || autoRedeemInProgress) {
+        return (
+          <div className="auto-redemption-status checking">
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+            <Text style={{ marginLeft: 12 }}>
+              Checking for matured certificates...
+            </Text>
+          </div>
+        );
+      }
+      
+      if (autoRedemptionStatus.maturedCount > 0) {
+        return (
+          <div className="auto-redemption-status matured">
+            <InfoCircleOutlined style={{ fontSize: 24, color: '#1890ff' }} />
+            <Text style={{ marginLeft: 12 }}>
+              {autoRedemptionStatus.maturedCount} matured certificate(s) ready for redemption.
+            </Text>
+          </div>
+        );
+      }
+      
+      return null;
+    };
+
     return (
       <div className="user-deposits-container">
         <div className="contract-selector">
@@ -642,6 +804,7 @@ const CDClient = () => {
             ))}
           </Select>
         </div>
+        {renderAutoRedemptionStatus()}
         <Table 
           dataSource={
             contractAddress === 'all' || !contractAddress

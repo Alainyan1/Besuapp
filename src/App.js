@@ -22,6 +22,7 @@ import TokenSelector from './components/TokenSelector'; // 引入TokenSelector�
 import CDDeployment from './components/CdDeployment'; // 引入CDDeployment组件
 import CDClient from './components/CdClient';
 import CdToken from './components/cdtoken';
+import Cdstatus from './components/cdStatus';
 
 function App() {
   return (
@@ -67,6 +68,7 @@ function App() {
               <Route path="/cd" element={<CDDeployment />} />
               <Route path="/cdclient" element={<CDClient />} />
               <Route path="/cdtoken" element={<CdToken />} />
+              <Route path="/cdstatus" element={<Cdstatus />} />
             </Routes>
           </div>
         </Router>

@@ -18,13 +18,13 @@ const CDDeployment = () => {
     name: "Certificate of Deposit",
     symbol: "CD",
     initialSupply: 100000000,
-    bankAddress: "fuson:0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73",
+    bankAddress: "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
     trustedThirdParty: "jetco:0x8adD025FBd37A46c5af45798cc94ec4e97A49698",
     ancillaryInfo: "Certificate of Deposit\nEarly Withdrawal: Demand rate applies",
     depositTerms: [
       {
-        termId: "3MONTH", // Simplified termId
-        duration: 7889400, // 3 months in seconds
+        termId: "5MINTEST", // Simplified termId
+        duration: 300, // 5 min in seconds
         fixedRate: 375, // 3.75% (stored as basis points)
         demandRate: 100, // 1% (stored as basis points)
         isActive: true
@@ -94,7 +94,7 @@ const CDDeployment = () => {
   };
 
   const handleSubmit = async (values) => {
-    navigate('/deployment-status', { state: { status: 'deploying' } });
+    navigate('/cdstatus', { state: { status: 'deploying' } });
 
     try {
       console.log('CD Data:', cdData);
@@ -179,16 +179,16 @@ const CDDeployment = () => {
         };
         await saveToDatabase(deploymentData);
 
-        navigate('/deployment-status', { state: { status: 'success', address: contract.address } });
+        navigate('/cdstatus', { state: { status: 'success', address: contract.address } });
         setContractAddress(contract.address);
       } else {
         console.error('MetaMask is not installed');
         alert('MetaMask is not installed. Please install it to use this feature.');
-        navigate('/deployment-status', { state: { status: 'error' } });
+        navigate('/cdstatus', { state: { status: 'error' } });
       }
     } catch (error) {
       console.error('Error deploying CD:', error);
-      navigate('/deployment-status', { state: { status: 'error' } });
+      navigate('/cdstatus', { state: { status: 'error' } });
     }
   };
 
