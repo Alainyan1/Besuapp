@@ -58,6 +58,16 @@ const TdToken = () => {
   const [loginBicCode, setLoginBicCode] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const [loginCredentials] = useState([
+    { username: 'jetcocus04', password: 'AQ+xT7Voj/dbfLlvE+x5sml4sP8GRzT3LUU54crODrUip0E2Dn4=', bicCode: 'JETCHKHH' },
+    { username: 'ap1_client01', password: 'qEJYDF9O3oDrPJGKIqrmw52gnJOH27EqUvInTztDm4fLMiz2HsA=', bicCode: 'JETCHKHH' },
+    { username: 'ap1_bank01', password: '+6jTntd0ORoKB/PQ6YOQjCXGHTXgpN+j4Ce3YMfDaITwy6iA4dI=', bicCode: 'JETCHKHH' },
+    { username: 'fuboncus03', password: '3FwCwphZrdBhqX0iKakbb4Y/csf4yuyIt0n9xVsAPTTaa74W54o=', bicCode: 'IBALHKHH' },
+    { username: 'fuboncus04', password: 'y+MNQvNlsQ45GOkl3RTwMwg7tqxDzyjwYehyuKG9ZETuJXHNScM=', bicCode: 'IBALHKHH' },
+  ]);
+  const [isCustomLogin, setIsCustomLogin] = useState(false);
+  
+
   const location = useLocation();
 
   useEffect(() => {
@@ -116,6 +126,27 @@ const TdToken = () => {
     setRecipientBankOptions(['JETCHKHH', 'IBALHKHH']);
   }, [location.state, accounts]);
 
+  // Add this function to handle username selection
+  const handleUsernameChange = (selectedUsername) => {
+    if (selectedUsername === 'custom') {
+      setIsCustomLogin(true);
+      setLoginUserName('');
+      setLoginPassword('');
+      setLoginBicCode('');
+    } else {
+      setIsCustomLogin(false);
+      setLoginUserName(selectedUsername);
+      
+      // Find the matching credentials
+      const credentials = loginCredentials.find(cred => cred.username === selectedUsername);
+      if (credentials) {
+        setLoginPassword(credentials.password);
+        setLoginBicCode(credentials.bicCode);
+      }
+    }
+  };
+
+  // Modify handleLogin function to use these new values
   const handleLogin = async () => {
     try {
       setLoginError('');
@@ -133,7 +164,8 @@ const TdToken = () => {
       if (succ === 0) {
         localStorage.setItem('authToken', data);
         setWalletAddress(data.address);
-        setLoginSuccess(`Login successful! Token address: ${data.address}`);
+        // setLoginSuccess(`Login successful! Token address: ${data.address}`);
+        setLoginSuccess(`Login successful!`);
         
         // Don't close the modal immediately, let user see the address
         setTimeout(() => {
@@ -362,12 +394,26 @@ const TdToken = () => {
       >
         <Form layout="vertical">
           <Form.Item label="Username" required>
-            <Input 
+            <Select
               value={loginUserName}
-              onChange={(e) => setLoginUserName(e.target.value)}
-              placeholder="Enter your username"
-              className="custom-input"
-            />
+              onChange={handleUsernameChange}
+              placeholder="Select a username"
+              className="custom-select"
+            >
+              {loginCredentials.map(cred => (
+                <Option key={cred.username} value={cred.username}>{cred.username}</Option>
+              ))}
+              <Option value="custom">Enter custom credentials</Option>
+            </Select>
+            {isCustomLogin && (
+              <Input 
+                value={loginUserName}
+                onChange={(e) => setLoginUserName(e.target.value)}
+                placeholder="Enter your username"
+                className="custom-input"
+                style={{ marginTop: '8px' }}
+              />
+            )}
           </Form.Item>
           <Form.Item label="Password" required>
             <Input.Password 
@@ -375,6 +421,7 @@ const TdToken = () => {
               onChange={(e) => setLoginPassword(e.target.value)}
               placeholder="Enter your password"
               className="custom-input"
+              // disabled={!isCustomLogin && loginUserName !== ''}
             />
           </Form.Item>
           <Form.Item label="BIC Code" required>
@@ -383,6 +430,7 @@ const TdToken = () => {
               onChange={(e) => setLoginBicCode(e.target.value)}
               placeholder="Enter your BIC code"
               className="custom-input"
+              // disabled={!isCustomLogin && loginUserName !== ''}
             />
           </Form.Item>
           
