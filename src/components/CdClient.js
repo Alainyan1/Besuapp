@@ -514,7 +514,7 @@ const CDClient = () => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 2
+      minimumFractionDigits: 3
     }).format(amount);
   };
 
@@ -917,7 +917,7 @@ const CDClient = () => {
                 <Col span={12}><Text strong>Maturity Value (Estimated):</Text></Col>
                 <Col span={12}>
                   <Text className="summary-value">
-                    $ {(purchaseAmount * (1 + (selectedTerm.fixedRate / 10000) * (selectedTerm.duration / 31536000))).toFixed(2)}
+                    $ {(purchaseAmount * (1 + (selectedTerm.fixedRate / 10000) * (selectedTerm.duration / 31536000))).toFixed(3)}
                   </Text>
                 </Col>
               </Row>
@@ -925,7 +925,7 @@ const CDClient = () => {
                 <Col span={12}><Text strong>Interest Earned:</Text></Col>
                 <Col span={12}>
                   <Text className="summary-value">
-                    $ {(purchaseAmount * (selectedTerm.fixedRate / 10000) * (selectedTerm.duration / 31536000)).toFixed(2)}
+                    $ {(purchaseAmount * (selectedTerm.fixedRate / 10000) * (selectedTerm.duration / 31536000)).toFixed(3)}
                   </Text>
                 </Col>
               </Row>
