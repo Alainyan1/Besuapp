@@ -42,14 +42,14 @@ const TdToken = () => {
   const [customSendUserName, setCustomSendUserName] = useState(false);
   
   // Preset options for dropdown menus
-  const [customerOptions, setCustomerOptions] = useState(['jetcocus04', 'ap1_client01', 'ap1_bank01', 'fuboncus03', 'fuboncus04']);
-  const [userNameOptions, setUserNameOptions] = useState(['Asset Platform C1 Customer B','Asset Platform 1 Client 01', 'Asset Platform 1 Bank 01','Asset Platform C1', 'Asset Platform C1 Customer']);
+  const [customerOptions, setCustomerOptions] = useState(['jetcocus04', 'ap1_client01', 'ap1_bank01']);
+  const [userNameOptions, setUserNameOptions] = useState(['Asset Platform C1 Customer B','Asset Platform 1 Client 01', 'Asset Platform 1 Bank 01']);
   const [customerWalletOptions, setCustomerWalletOptions] = useState([]);
   const [recipientBankOptions, setRecipientBankOptions] = useState([]);
   const [recipientWalletOptions, setRecipientWalletOptions] = useState([]);
   const [currencyOptions, setCurrencyOptions] = useState(['HKD']);
   const [bicCodeOptions, setBicCodeOptions] = useState(['JETCHKHH', 'IBALHKHH']);
-  const [sendUserNameOptions, setSendUserNameOptions] = useState(['jetcocus04', 'ap1_client01', 'ap1_bank01', 'fuboncus03', 'fuboncus04']);
+  const [sendUserNameOptions, setSendUserNameOptions] = useState(['jetcocus04', 'ap1_client01', 'ap1_bank01']);
   //9B5234D1-FF22-4C4E-AA23-95A9A2D47C40
   // Login related states
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
@@ -62,11 +62,16 @@ const TdToken = () => {
     { username: 'jetcocus04', password: 'AQ+xT7Voj/dbfLlvE+x5sml4sP8GRzT3LUU54crODrUip0E2Dn4=', bicCode: 'JETCHKHH' },
     { username: 'ap1_client01', password: 'qEJYDF9O3oDrPJGKIqrmw52gnJOH27EqUvInTztDm4fLMiz2HsA=', bicCode: 'JETCHKHH' },
     { username: 'ap1_bank01', password: '+6jTntd0ORoKB/PQ6YOQjCXGHTXgpN+j4Ce3YMfDaITwy6iA4dI=', bicCode: 'JETCHKHH' },
-    { username: 'fuboncus03', password: '3FwCwphZrdBhqX0iKakbb4Y/csf4yuyIt0n9xVsAPTTaa74W54o=', bicCode: 'IBALHKHH' },
-    { username: 'fuboncus04', password: 'y+MNQvNlsQ45GOkl3RTwMwg7tqxDzyjwYehyuKG9ZETuJXHNScM=', bicCode: 'IBALHKHH' },
+    // { username: 'fuboncus03', password: '3FwCwphZrdBhqX0iKakbb4Y/csf4yuyIt0n9xVsAPTTaa74W54o=', bicCode: 'IBALHKHH' },
+    // { username: 'fuboncus04', password: 'y+MNQvNlsQ45GOkl3RTwMwg7tqxDzyjwYehyuKG9ZETuJXHNScM=', bicCode: 'IBALHKHH' },
   ]);
   const [isCustomLogin, setIsCustomLogin] = useState(false);
   
+  const [paymentDetails, setPaymentDetails] = useState([
+    { customer: 'jetcocus04', userName: 'Asset Platform C1 Customer B', customerWallet: '0x6ef628f08cbe6bc2dc1df23a63ddea4c1d6c71e6', recipientBankName: 'JETCHKHH', recipientWalletAddress: '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc', currency: 'HKD', receiveBankBicCode: 'JETCHKHH', sendUserName: 'jetcocus04' },
+    { customer: 'ap1_client01', userName: 'Asset Platform 1 Client 01', customerWallet: '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc', recipientBankName: 'JETCHKHH', recipientWalletAddress: '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca', currency: 'HKD', receiveBankBicCode: 'JETCHKHH', sendUserName: 'ap1_client01' },
+    { customer: 'ap1_bank01', userName: 'Asset Platform 1 Bank 01', customerWallet: '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca', recipientBankName: 'JETCHKHH', recipientWalletAddress: '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc', currency: 'HKD', receiveBankBicCode: 'JETCHKHH', sendUserName: 'ap1_bank01' },
+  ]);
 
   const location = useLocation();
 
@@ -78,49 +83,37 @@ const TdToken = () => {
     }
   
     // Check if we have purchase details from location state
+    // Check if we have purchase details from location state
     if (location.state?.action === 'purchase' && location.state?.purchaseDetails) {
-      const { 
-        clientAddress, 
-        purchaseAmount,
-        formattedTermId,
-        contractAddress
-      } = location.state.purchaseDetails;
+      const { purchaseDetails } = location.state;
+      console.log('Received purchase details:', purchaseDetails);
       
-      // Pre-fill the form with the purchase details
-      setCustomerWallet(clientAddress);
-      setTransferAmount(purchaseAmount.toString());
-      setCustomer(`CD Purchase: ${formattedTermId}`);
-      setRecipientWalletAddress(contractAddress);
+      // Set form fields with values from purchase details
+      setCustomer(purchaseDetails.customer || '');
+      setUserName(purchaseDetails.userName || '');
+      setCustomerWallet(purchaseDetails.customerWallet || '');
+      setRecipientBankName(purchaseDetails.recipientBankName || '');
+      setRecipientWalletAddress(purchaseDetails.recipientWalletAddress || '');
+      setCurrency(purchaseDetails.currency || '');
+      setTransferAmount(purchaseDetails.transferAmount || '');
+      setReceiveBankBicCode(purchaseDetails.receiveBankBicCode || '');
+      setSendUserName(purchaseDetails.sendUserName || '');
       
-      // Find matching customer from options
-      for (const key in accounts) {
-        if (accounts[key].address === clientAddress) {
-          setUserName(key.split(':')[0] || key);
-          setSendUserName(key.split(':')[0] || key);
-          break;
-        }
-      }
-      
-      setCurrency('HKD');
-      setRecipientBankName('Certificate Issuer');
-      setReceiveBankBicCode('CDHKCD');
+      // Optionally show a notification that data was filled automatically
+      // Remove location state after processing to prevent duplicate fills on refresh
+      window.history.replaceState({}, document.title);
     }
-    
     // Add some example wallet addresses to the options
     setCustomerWalletOptions([
       '0x6ef628f08cbe6bc2dc1df23a63ddea4c1d6c71e6',
       '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc',
       '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca',
-      '0x3359d12abf811e8812876b6b43e22d7c4f940c87',
-      '0x763b99e09b600827f878723946f2b4ee7343be71'
     ]);
     
     setRecipientWalletOptions([
       '0x6ef628f08cbe6bc2dc1df23a63ddea4c1d6c71e6',
       '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc',
       '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca',
-      '0x3359d12abf811e8812876b6b43e22d7c4f940c87',
-      '0x763b99e09b600827f878723946f2b4ee7343be71'
     ]);
     
     setRecipientBankOptions(['JETCHKHH', 'IBALHKHH']);
@@ -144,6 +137,54 @@ const TdToken = () => {
         setLoginBicCode(credentials.bicCode);
       }
     }
+  };
+
+  // Add a special handler for customer selection
+  const handleCustomerSelect = (value) => {
+    if (value === 'custom') {
+      setCustomCustomer(true);
+      setCustomer('');
+      // Reset other fields
+      resetFormFields();
+    } else {
+      setCustomCustomer(false);
+      setCustomer(value);
+      
+      // Find matching customer details in paymentDetails
+      const customerDetails = paymentDetails.find(pd => pd.customer === value);
+      if (customerDetails) {
+        // Auto-populate all fields
+        setUserName(customerDetails.userName);
+        setCustomerWallet(customerDetails.customerWallet);
+        setRecipientBankName(customerDetails.recipientBankName);
+        setRecipientWalletAddress(customerDetails.recipientWalletAddress);
+        setCurrency(customerDetails.currency);
+        setTransferAmount(customerDetails.transferAmount);
+        setReceiveBankBicCode(customerDetails.receiveBankBicCode);
+        setSendUserName(customerDetails.sendUserName);
+        
+        // Reset all custom flags
+        setCustomUserName(false);
+        setCustomCustomerWallet(false);
+        setCustomRecipientBank(false);
+        setCustomRecipientWallet(false);
+        setCustomCurrency(false);
+        setCustomBicCode(false);
+        setCustomSendUserName(false);
+      }
+    }
+  };
+
+  // Helper function to reset all form fields
+  const resetFormFields = () => {
+    setUserName('');
+    setCustomerWallet('');
+    setRecipientBankName('');
+    setRecipientWalletAddress('');
+    setCurrency('');
+    setTransferAmount('');
+    setReceiveBankBicCode('');
+    setSendUserName('');
   };
 
   // Modify handleLogin function to use these new values
@@ -460,37 +501,37 @@ const TdToken = () => {
           <Form layout='vertical' onFinish={handleConfirm} className="payment-form">
             <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
-                <Form.Item label="Customer" required className="form-item">
-                  {!customCustomer ? (
-                    <Select
-                      value={customer}
-                      onChange={handleSelectChange(setCustomer, setCustomCustomer)}
-                      className="custom-select"
-                    >
-                      {customerOptions.map(opt => (
-                        <Option key={opt} value={opt}>{opt}</Option>
-                      ))}
-                      <Option value="custom">Enter custom customer</Option>
-                    </Select>
-                  ) : (
-                    <Input
-                      value={customer}
-                      onChange={handleCustomInputChange(setCustomer)}
-                      placeholder="Enter customer"
-                      className="custom-input"
-                      addonAfter={
-                        <Button 
-                          type="link" 
-                          size="small" 
-                          onClick={() => setCustomCustomer(false)}
-                          style={{ padding: 0 }}
-                        >
-                          Back
-                        </Button>
-                      }
-                    />
-                  )}
-                </Form.Item>
+              <Form.Item label="Customer" required className="form-item">
+                {!customCustomer ? (
+                  <Select
+                    value={customer}
+                    onChange={handleCustomerSelect}  // Use new handler here
+                    className="custom-select"
+                  >
+                    {customerOptions.map(opt => (
+                      <Option key={opt} value={opt}>{opt}</Option>
+                    ))}
+                    <Option value="custom">Enter custom customer</Option>
+                  </Select>
+                ) : (
+                  <Input
+                    value={customer}
+                    onChange={handleCustomInputChange(setCustomer)}
+                    placeholder="Enter customer"
+                    className="custom-input"
+                    addonAfter={
+                      <Button 
+                        type="link" 
+                        size="small" 
+                        onClick={() => setCustomCustomer(false)}
+                        style={{ padding: 0 }}
+                      >
+                        Back
+                      </Button>
+                    }
+                  />
+                )}
+              </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="User Name" required className="form-item">

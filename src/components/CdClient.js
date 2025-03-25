@@ -374,18 +374,29 @@ const CDClient = () => {
     setPurchaseModalVisible(true);
   };
 
-  const handlePurchase = async () => {
+    const handlePurchase = async () => {
     if (!selectedTerm || !walletAddress) {
       alert('Missing required information for purchase');
       return;
     }
-
+  
     try {
-      // Prepare purchase data to pass to the tdtoken page
+      // Prepare purchase data to pass to the tdtoken page with specific values
       const purchaseDetails = {
-        contractAddress: selectedTerm.contractAddress, // Use the contract address of the selected term
+        // Use specified values instead of dynamic values
+        customer: 'ap1_client01',
+        userName: 'Asset Platform 1 Client 01',
+        customerWallet: '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc',
+        recipientBankName: 'JETCHKHH',
+        recipientWalletAddress: '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca',
+        currency: 'HKD',
+        transferAmount: purchaseAmount.toString(),
+        receiveBankBicCode: 'JETCHKHH',
+        sendUserName: 'ap1_client01',
+        
+        // Keep these values for reference/additional info
+        contractAddress: selectedTerm.contractAddress,
         clientAddress: walletAddress,
-        purchaseAmount: purchaseAmount,
         termId: selectedTerm.termId,
         termDuration: selectedTerm.duration,
         fixedRate: selectedTerm.fixedRate,
@@ -514,7 +525,7 @@ const CDClient = () => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 3
+      minimumFractionDigits: 2
     }).format(amount);
   };
 
@@ -917,7 +928,7 @@ const CDClient = () => {
                 <Col span={12}><Text strong>Maturity Value (Estimated):</Text></Col>
                 <Col span={12}>
                   <Text className="summary-value">
-                    $ {(purchaseAmount * (1 + (selectedTerm.fixedRate / 10000) * (selectedTerm.duration / 31536000))).toFixed(3)}
+                    $ {(purchaseAmount * (1 + (selectedTerm.fixedRate / 10000) * (selectedTerm.duration / 31536000))).toFixed(2)}
                   </Text>
                 </Col>
               </Row>
@@ -925,7 +936,7 @@ const CDClient = () => {
                 <Col span={12}><Text strong>Interest Earned:</Text></Col>
                 <Col span={12}>
                   <Text className="summary-value">
-                    $ {(purchaseAmount * (selectedTerm.fixedRate / 10000) * (selectedTerm.duration / 31536000)).toFixed(3)}
+                    $ {(purchaseAmount * (selectedTerm.fixedRate / 10000) * (selectedTerm.duration / 31536000)).toFixed(2)}
                   </Text>
                 </Col>
               </Row>

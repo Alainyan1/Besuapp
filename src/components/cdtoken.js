@@ -260,7 +260,7 @@ const CDToken = () => {
   const renderForm = () => (
     <div className="card-container cdtoken-card">
       <div className="title-container">
-        <Title level={2}>Issue Certificate of Deposit</Title>
+        <Title level={2}>Certificate of Deposit</Title>
       </div>
       <Form layout="vertical" onFinish={handleIssueCertificate} className="cdtoken-form">
         <Form.Item label="Client Address" required className="form-item">
@@ -333,7 +333,7 @@ const CDToken = () => {
             className="submit-button" 
             loading={loading}
           >
-            Issue
+            Confirm
           </Button>
         </Form.Item>
       </Form>

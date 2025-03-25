@@ -125,7 +125,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
         />
       </Form.Item>
 
-      <Form.Item
+      {/* <Form.Item
         label="Trusted Third Party"
         rules={[{ required: true }]}
       >
@@ -135,7 +135,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
           onChange={handleInputChange}
           placeholder="TTPName:0xAddress"
         />
-      </Form.Item>
+      </Form.Item> */}
 
       <Divider orientation="left">Deposit Terms</Divider>
       {cdData.depositTerms && cdData.depositTerms.map((term, index) => (

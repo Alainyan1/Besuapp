@@ -19,7 +19,7 @@ const CDDeployment = () => {
     symbol: "CD",
     initialSupply: 100000000,
     bankAddress: "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
-    trustedThirdParty: "jetco:0x8adD025FBd37A46c5af45798cc94ec4e97A49698",
+    trustedThirdParty: "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
     ancillaryInfo: "Certificate of Deposit\nEarly Withdrawal: Demand rate applies",
     depositTerms: [
       {
@@ -103,7 +103,8 @@ const CDDeployment = () => {
         symbol: cdData.symbol,
         initialSupply: parseFloat(cdData.initialSupply),
         bankAddress: parseKeyValue(cdData.bankAddress).value,
-        trustedThirdParty: parseKeyValue(cdData.trustedThirdParty).value,
+        // trustedThirdParty: parseKeyValue(cdData.trustedThirdParty).value,
+        trustedThirdParty: parseKeyValue(cdData.bankAddress).value,
         ancillaryInfo: cdData.ancillaryInfo,
         depositTerms: cdData.depositTerms.map(term => ({
           ...term,
