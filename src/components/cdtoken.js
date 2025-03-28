@@ -7,7 +7,7 @@ import { Form, Input, Button, Select, Typography, Spin, Alert } from 'antd';
 import { WalletOutlined, ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/cdtoken.css';
-import logo from '../images/jetco.png';
+import logo from '../images/aift.png';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
