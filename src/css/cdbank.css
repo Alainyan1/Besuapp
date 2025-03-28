@@ -1,0 +1,107 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+  
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.token-page-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%); /* Subtle gradient background */
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Top decorative bar */
+.cdbank-top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #6EA1EB 0%, #6EA1EB 50%, #0569C8 50%, #0569C8 100%);
+}
+
+.responsive-logo {
+    max-height: 80px;
+    width: auto;
+    margin: 20px 0 10px 20px;
+}
+
+.select-card-container {
+    margin-top: 40px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+.token-card {
+    background: linear-gradient(145deg, #2c3e50 0%, #1a2533 100%);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    height: 400px;
+    width: 400px;
+    padding: 20px;
+    border: none;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    display: flex; /* Use flexbox for better content arrangement */
+    flex-direction: column;
+}
+
+.token-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.token-button {
+    background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #212529;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    height: 50px;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.token-button:hover {
+    background: linear-gradient(90deg, #e9ecef 0%, #dee2e6 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.title-container {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.title-container:after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #e63946, #1d3557);
+    border-radius: 2px;
+}
+
+.custom-select .ant-select-selection-placeholder {
+    color: black !important;
+}

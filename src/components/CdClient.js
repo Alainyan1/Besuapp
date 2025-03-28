@@ -45,6 +45,16 @@ const CDClient = () => {
     errors: []
   });
 
+  useEffect(() => {
+      if (location.state && location.state.walletAddress) {
+        setWalletAddress(location.state.walletAddress);
+        console.log('Using wallet address from previous page:', location.state.walletAddress);
+      } else {
+        console.warn('No wallet address provided. Redirecting to platform page');
+        // Optional: redirect to platform page if no wallet is connected
+        // navigate('/cdplatform');
+      }
+  }, [location.state, navigate]);
 
   useEffect(() => {
     // Set contract address from navigation state
@@ -341,28 +351,28 @@ const CDClient = () => {
     }
 };
 
-  const connectWallet = async () => {
-    const provider = await detectEthereumProvider();
+  // const connectWallet = async () => {
+  //   const provider = await detectEthereumProvider();
 
-    if (provider) {
-      try {
-        console.log('MetaMask detected');
-        await provider.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
-        await provider.request({ method: 'eth_requestAccounts' });
-        const ethersProvider = new ethers.providers.Web3Provider(provider);
-        const signer = ethersProvider.getSigner();
-        const address = await signer.getAddress();
-        setWalletAddress(address);
-        localStorage.setItem('walletAddress', address);
-        console.log('Connected Wallet Address:', address);
-      } catch (error) {
-        console.error('Error connecting wallet:', error);
-      }
-    } else {
-      console.error('MetaMask is not installed');
-      alert('MetaMask is not installed. Please install it to use this feature.');
-    }
-  };
+  //   if (provider) {
+  //     try {
+  //       console.log('MetaMask detected');
+  //       await provider.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
+  //       await provider.request({ method: 'eth_requestAccounts' });
+  //       const ethersProvider = new ethers.providers.Web3Provider(provider);
+  //       const signer = ethersProvider.getSigner();
+  //       const address = await signer.getAddress();
+  //       setWalletAddress(address);
+  //       localStorage.setItem('walletAddress', address);
+  //       console.log('Connected Wallet Address:', address);
+  //     } catch (error) {
+  //       console.error('Error connecting wallet:', error);
+  //     }
+  //   } else {
+  //     console.error('MetaMask is not installed');
+  //     alert('MetaMask is not installed. Please install it to use this feature.');
+  //   }
+  // };
 
   const showPurchaseModal = (term) => {
     if (!walletAddress) {
@@ -410,7 +420,7 @@ const CDClient = () => {
       setPurchaseModalVisible(false);
       
       // Navigate to tdtoken page with purchase details
-      navigate('/tdtoken', { 
+      navigate('/tdplatform', { 
         state: { 
           action: 'purchase',
           purchaseDetails: purchaseDetails
@@ -652,14 +662,6 @@ const CDClient = () => {
       return (
         <div className="connect-wallet-prompt">
           <Text>Please connect your wallet to view your deposits.</Text>
-          <Button 
-            onClick={connectWallet}
-            type="primary"
-            icon={<WalletOutlined />}
-            style={{ marginTop: 16 }}
-          >
-            Connect Wallet
-          </Button>
         </div>
       );
     }
@@ -834,8 +836,23 @@ const CDClient = () => {
     <div className="cd-client-container">
       <img src={logo} alt="Logo" style={{ position: 'absolute', top: '20px', left: '20px', height: '80px' }} />
       <Title level={1} style={{ textAlign: 'center', margin: '20px 0 40px' }}>Certificate of Deposit Marketplace</Title>
+
+      {/* Welcome message with wallet address */}
+      {walletAddress && (
+        <div className="welcome-message" style={{
+          textAlign: 'center',
+          color: '#1d3557'
+        }}>
+          <Typography.Text style={{ fontSize: '18px', fontWeight: '500' }}>
+            Welcome: <span style={{ color: '#457b9d', fontWeight: 'bold' }}></span>
+            <span style={{ fontFamily: 'monospace', backgroundColor: '#f8f9fa', padding: '3px 8px', borderRadius: '4px', marginLeft: '8px' }}>
+              {`${walletAddress}`}
+            </span>
+          </Typography.Text>
+        </div>
+      )}
       
-      <div className="wallet-connection">
+      {/* <div className="wallet-connection">
         <Button 
           onClick={connectWallet} 
           type="primary"
@@ -845,7 +862,7 @@ const CDClient = () => {
         >
           {walletAddress ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(38)}` : 'Connect Wallet'}
         </Button>
-      </div>
+      </div> */}
       
       <div className="cd-content-container">
         <Tabs 

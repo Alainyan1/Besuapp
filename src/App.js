@@ -17,12 +17,16 @@ import DeploymentStatus from './components/DeploymentStatus'; // 引入Deploymen
 import { ContractProvider } from './components/ContractContext'; // 引入ContractProvider
 import { AccountsProvider } from './components/AccountsContext'; // 引入AccountsProvider
 
+// deposit相关组件
 import TdToken from './components/tdtoken'; // 引入TdToken组件
 import TokenSelector from './components/TokenSelector'; // 引入TokenSelector组件
 import CDDeployment from './components/CdDeployment'; // 引入CDDeployment组件
 import CDClient from './components/CdClient';
 import CdToken from './components/cdtoken';
 import Cdstatus from './components/cdStatus';
+import CdPlatform from './components/CdPlatform';
+import Cdbank from './components/cdbank';
+import TdPlatform from './components/tdplatform';
 
 function App() {
   return (
@@ -69,6 +73,9 @@ function App() {
               <Route path="/cdclient" element={<CDClient />} />
               <Route path="/cdtoken" element={<CdToken />} />
               <Route path="/cdstatus" element={<Cdstatus />} />
+              <Route path="/cdplatform" element={<CdPlatform />} />
+              <Route path="/cdbank" element={<Cdbank />} />
+              <Route path="/tdplatform" element={<TdPlatform />} />
             </Routes>
           </div>
         </Router>

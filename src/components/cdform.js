@@ -48,8 +48,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
   };
 
   const durationOptions = [
-    { label: '5 min', value: 300 },
-    { label: '1 month', value: 2629800 },
+    { label: '1 min', value: 60 },
     { label: '3 months', value: 7889400 },
     { label: '6 months', value: 15778800 },
     { label: '12 months', value: 31557600 },
@@ -113,7 +112,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
         />
       </Form.Item>
 
-      <Form.Item
+      {/* <Form.Item
         label="Bank Address"
         rules={[{ required: true }]}
       >
@@ -123,7 +122,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
           onChange={handleInputChange}
           placeholder="BankName:0xAddress"
         />
-      </Form.Item>
+      </Form.Item> */}
 
       {/* <Form.Item
         label="Trusted Third Party"
@@ -171,7 +170,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
               placeholder="Enter fixed rate in basis points (100 = 1%)"
               style={{ width: '100%' }}
               min={0}
-              max={2000}
+              max={100000}
             />
             <div style={{ marginTop: '5px', fontSize: '12px', color: 'gray' }}>
               {term.fixedRate / 100}% (Maturity rate)
@@ -185,7 +184,7 @@ const CDForm = ({ cdData, handleInputChange, handleDepositTermChange, handleSubm
               placeholder="Enter demand rate in basis points (100 = 1%)"
               style={{ width: '100%' }}
               min={0}
-              max={2000}
+              max={100000}
             />
             <div style={{ marginTop: '5px', fontSize: '12px', color: 'gray' }}>
               {term.demandRate / 100}% (Early withdrawal rate)

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Form, Input, Button, Row, Col, Typography, Modal, Alert, Select } from 'antd';
-import { LoginOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+// import { LoginOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { AccountsContext } from './AccountsContext';
 import { useLocation } from 'react-router-dom';
@@ -51,21 +51,23 @@ const TdToken = () => {
   const [bicCodeOptions, setBicCodeOptions] = useState(['JETCHKHH', 'IBALHKHH']);
   const [sendUserNameOptions, setSendUserNameOptions] = useState(['jetcocus04', 'ap1_client01', 'ap1_bank01']);
   //9B5234D1-FF22-4C4E-AA23-95A9A2D47C40
-  // Login related states
-  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
-  const [loginUserName, setLoginUserName] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginBicCode, setLoginBicCode] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const [loginCredentials] = useState([
-    { username: 'jetcocus04', password: 'AQ+xT7Voj/dbfLlvE+x5sml4sP8GRzT3LUU54crODrUip0E2Dn4=', bicCode: 'JETCHKHH' },
-    { username: 'ap1_client01', password: 'qEJYDF9O3oDrPJGKIqrmw52gnJOH27EqUvInTztDm4fLMiz2HsA=', bicCode: 'JETCHKHH' },
-    { username: 'ap1_bank01', password: '+6jTntd0ORoKB/PQ6YOQjCXGHTXgpN+j4Ce3YMfDaITwy6iA4dI=', bicCode: 'JETCHKHH' },
-    // { username: 'fuboncus03', password: '3FwCwphZrdBhqX0iKakbb4Y/csf4yuyIt0n9xVsAPTTaa74W54o=', bicCode: 'IBALHKHH' },
-    // { username: 'fuboncus04', password: 'y+MNQvNlsQ45GOkl3RTwMwg7tqxDzyjwYehyuKG9ZETuJXHNScM=', bicCode: 'IBALHKHH' },
-  ]);
+  // Login related states
+  // const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
+  // const [loginUserName, setLoginUserName] = useState('');
+  // const [loginPassword, setLoginPassword] = useState('');
+  // const [loginBicCode, setLoginBicCode] = useState('');
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // const [loginCredentials] = useState([
+  //   { username: 'jetcocus04', password: 'AQ+xT7Voj/dbfLlvE+x5sml4sP8GRzT3LUU54crODrUip0E2Dn4=', bicCode: 'JETCHKHH' },
+  //   { username: 'ap1_client01', password: 'qEJYDF9O3oDrPJGKIqrmw52gnJOH27EqUvInTztDm4fLMiz2HsA=', bicCode: 'JETCHKHH' },
+  //   { username: 'ap1_bank01', password: '+6jTntd0ORoKB/PQ6YOQjCXGHTXgpN+j4Ce3YMfDaITwy6iA4dI=', bicCode: 'JETCHKHH' },
+  //   // { username: 'fuboncus03', password: '3FwCwphZrdBhqX0iKakbb4Y/csf4yuyIt0n9xVsAPTTaa74W54o=', bicCode: 'IBALHKHH' },
+  //   // { username: 'fuboncus04', password: 'y+MNQvNlsQ45GOkl3RTwMwg7tqxDzyjwYehyuKG9ZETuJXHNScM=', bicCode: 'IBALHKHH' },
+  // ]);
   const [isCustomLogin, setIsCustomLogin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   const [paymentDetails, setPaymentDetails] = useState([
     { customer: 'jetcocus04', userName: 'Asset Platform C1 Customer B', customerWallet: '0x6ef628f08cbe6bc2dc1df23a63ddea4c1d6c71e6', recipientBankName: 'JETCHKHH', recipientWalletAddress: '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc', currency: 'HKD', receiveBankBicCode: 'JETCHKHH', sendUserName: 'jetcocus04' },
@@ -80,6 +82,15 @@ const TdToken = () => {
     const token = localStorage.getItem('authToken');
     if (token) {
       setIsLoggedIn(true);
+      try {
+        // Try to extract wallet address from token if available
+        const tokenData = JSON.parse(atob(token.split('.')[1]));
+        if (tokenData.address) {
+          setWalletAddress(tokenData.address);
+        }
+      } catch (error) {
+        console.error("Error parsing JWT token:", error);
+      }
     }
   
     // Check if we have purchase details from location state
@@ -118,26 +129,6 @@ const TdToken = () => {
     
     setRecipientBankOptions(['JETCHKHH', 'IBALHKHH']);
   }, [location.state, accounts]);
-
-  // Add this function to handle username selection
-  const handleUsernameChange = (selectedUsername) => {
-    if (selectedUsername === 'custom') {
-      setIsCustomLogin(true);
-      setLoginUserName('');
-      setLoginPassword('');
-      setLoginBicCode('');
-    } else {
-      setIsCustomLogin(false);
-      setLoginUserName(selectedUsername);
-      
-      // Find the matching credentials
-      const credentials = loginCredentials.find(cred => cred.username === selectedUsername);
-      if (credentials) {
-        setLoginPassword(credentials.password);
-        setLoginBicCode(credentials.bicCode);
-      }
-    }
-  };
 
   // Add a special handler for customer selection
   const handleCustomerSelect = (value) => {
@@ -187,62 +178,12 @@ const TdToken = () => {
     setSendUserName('');
   };
 
-  // Modify handleLogin function to use these new values
-  const handleLogin = async () => {
-    try {
-      setLoginError('');
-      setLoginSuccess('');
-      
-      const response = await axios.post('https://eurybia.xyz/api/test/jetcoLogin', {
-        username: loginUserName,
-        password: loginPassword,
-        bicCode: loginBicCode
-      });
-
-      const { data, succ } = response.data;
-      console.log('Login response:', data, succ);
-      
-      if (succ === 0) {
-        localStorage.setItem('authToken', data);
-        setWalletAddress(data.address);
-        // setLoginSuccess(`Login successful! Token address: ${data.address}`);
-        setLoginSuccess(`Login successful!`);
-        
-        // Don't close the modal immediately, let user see the address
-        setTimeout(() => {
-          setIsLoginModalVisible(false);
-          setIsLoggedIn(true);
-        }, 2000);
-      } else {
-        setLoginError('Login failed. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error during login:', error);
-      setLoginError('Login failed. Please try again.');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    setIsLoggedIn(false);
-    setWalletAddress(null);
-  };
-
-  const showLoginModal = () => {
-    setIsLoginModalVisible(true);
-  };
-
-  const handleLoginCancel = () => {
-    setIsLoginModalVisible(false);
-  };
-
   const handleConfirm = async () => {
     try {
       // First check the user's balance
       const token = localStorage.getItem('authToken');
       if (!token) {
         alert('You are not logged in. Please login first.');
-        showLoginModal();
         return;
       }
   
@@ -397,101 +338,6 @@ const TdToken = () => {
     <div className='jetco-page-container'>
       <div className="top-bar"></div>
       <img src={logo} alt="Logo" className="responsive-logo" />
-
-      {/* Grouped buttons in the right corner */}
-      <div className="button-container">
-        <Button 
-          onClick={isLoggedIn ? handleLogout : showLoginModal}
-          className="login-button"
-          icon={<LoginOutlined />}
-        >
-          {isLoggedIn ? `Logged in: ${walletAddress ? walletAddress.substring(0, 8) + '...' : ''}` : 'Login'}
-        </Button>
-        
-        <Button 
-          icon={<ArrowLeftOutlined />}
-          onClick={handleBack}
-          className="back-button"
-        >
-          Back to Selection
-        </Button>
-      </div>
-
-      <Modal
-        title={<div style={{ textAlign: 'center', fontSize: '20px' }}>Login</div>}
-        visible={isLoginModalVisible}
-        onCancel={handleLoginCancel}
-        centered
-        bodyStyle={{ padding: '24px' }}
-        className="custom-modal"
-        footer={[
-          <Button key="back" onClick={handleLoginCancel} className="modal-button cancel-button">
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleLogin} className="modal-button submit-button">
-            Login
-          </Button>
-        ]}
-      >
-        <Form layout="vertical">
-          <Form.Item label="Username" required>
-            <Select
-              value={loginUserName}
-              onChange={handleUsernameChange}
-              placeholder="Select a username"
-              className="custom-select"
-            >
-              {loginCredentials.map(cred => (
-                <Option key={cred.username} value={cred.username}>{cred.username}</Option>
-              ))}
-              <Option value="custom">Enter custom credentials</Option>
-            </Select>
-            {isCustomLogin && (
-              <Input 
-                value={loginUserName}
-                onChange={(e) => setLoginUserName(e.target.value)}
-                placeholder="Enter your username"
-                className="custom-input"
-                style={{ marginTop: '8px' }}
-              />
-            )}
-          </Form.Item>
-          <Form.Item label="Password" required>
-            <Input.Password 
-              value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
-              placeholder="Enter your password"
-              className="custom-input"
-              // disabled={!isCustomLogin && loginUserName !== ''}
-            />
-          </Form.Item>
-          <Form.Item label="BIC Code" required>
-            <Input 
-              value={loginBicCode}
-              onChange={(e) => setLoginBicCode(e.target.value)}
-              placeholder="Enter your BIC code"
-              className="custom-input"
-              // disabled={!isCustomLogin && loginUserName !== ''}
-            />
-          </Form.Item>
-          
-          {loginError && (
-            <Alert 
-              message={loginError} 
-              type="error" 
-              style={{ marginBottom: '10px' }} 
-            />
-          )}
-          
-          {loginSuccess && (
-            <Alert 
-              message={loginSuccess} 
-              type="success" 
-              style={{ marginBottom: '10px' }} 
-            />
-          )}
-        </Form>
-      </Modal>
 
       <div className="main-content form-page-content">
         <div className="card-container payment-card">

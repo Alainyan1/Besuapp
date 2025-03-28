@@ -171,28 +171,28 @@ const CDToken = () => {
 //     }
 //   };
 
-  const connectWallet = async () => {
-    const provider = await detectEthereumProvider();
+  // const connectWallet = async () => {
+  //   const provider = await detectEthereumProvider();
 
-    if (provider) {
-      try {
-        console.log('MetaMask detected');
-        await provider.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
-        await provider.request({ method: 'eth_requestAccounts' });
-        const ethersProvider = new ethers.providers.Web3Provider(provider);
-        const signer = ethersProvider.getSigner();
-        const address = await signer.getAddress();
-        setWalletAddress(address);
-        localStorage.setItem('walletAddress', address);
-        console.log('Connected Wallet Address:', address);
-      } catch (error) {
-        console.error('Error connecting wallet:', error);
-      }
-    } else {
-      console.error('MetaMask is not installed');
-      alert('MetaMask is not installed. Please install it to use this feature.');
-    }
-  };
+  //   if (provider) {
+  //     try {
+  //       console.log('MetaMask detected');
+  //       await provider.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
+  //       await provider.request({ method: 'eth_requestAccounts' });
+  //       const ethersProvider = new ethers.providers.Web3Provider(provider);
+  //       const signer = ethersProvider.getSigner();
+  //       const address = await signer.getAddress();
+  //       setWalletAddress(address);
+  //       localStorage.setItem('walletAddress', address);
+  //       console.log('Connected Wallet Address:', address);
+  //     } catch (error) {
+  //       console.error('Error connecting wallet:', error);
+  //     }
+  //   } else {
+  //     console.error('MetaMask is not installed');
+  //     alert('MetaMask is not installed. Please install it to use this feature.');
+  //   }
+  // };
 
   const handleInputChange = (setter, key) => (event) => {
     const value = event.target.value;
@@ -225,8 +225,16 @@ const CDToken = () => {
   };
 
   const handleBack = () => {
-    navigate('/token');
+    navigate('/cdbank', { state: { walletAddress } });
   };
+
+  const handleBankName = (address) => {
+    if (address === '0xf17f52151EbEF6C7334FAD080c5704D77216b732') { 
+      return 'Fubon';
+    } else {
+      return 'Bank';
+    }
+  }
 
   const renderPurchaseComplete = () => (
     <div className="success-container">
@@ -263,6 +271,26 @@ const CDToken = () => {
         <Title level={2}>Certificate of Deposit</Title>
       </div>
       <Form layout="vertical" onFinish={handleIssueCertificate} className="cdtoken-form">
+
+        <Form.Item label="Contract Address" required className="form-item">
+          <Input
+            type="text"
+            value={contractAddress}
+            onChange={handleInputChange(setContractAddress, 'contractAddress')}
+            className="custom-input"
+          />
+        </Form.Item>
+
+        <Form.Item label="Term ID" required className="form-item">
+          <Input
+            type="text"
+            value={termId}
+            onChange={handleInputChange(setTermId, 'termId')}
+            className="custom-input"
+            placeholder="Enter Term ID (e.g. 3MONTH, 6MONTH)"
+          />
+        </Form.Item>
+
         <Form.Item label="Client Address" required className="form-item">
           <Select
             value={selectedClientKey}
@@ -298,30 +326,11 @@ const CDToken = () => {
           )}
         </Form.Item>
         
-        <Form.Item label="Term ID" required className="form-item">
-          <Input
-            type="text"
-            value={termId}
-            onChange={handleInputChange(setTermId, 'termId')}
-            className="custom-input"
-            placeholder="Enter Term ID (e.g. 3MONTH, 6MONTH)"
-          />
-        </Form.Item>
-        
         <Form.Item label="Amount" required className="form-item">
           <Input
             type="number"
             value={amount}
             onChange={handleInputChange(setAmount, 'amount')}
-            className="custom-input"
-          />
-        </Form.Item>
-        
-        <Form.Item label="Contract Address" required className="form-item">
-          <Input
-            type="text"
-            value={contractAddress}
-            onChange={handleInputChange(setContractAddress, 'contractAddress')}
             className="custom-input"
           />
         </Form.Item>
@@ -369,24 +378,43 @@ const CDToken = () => {
 
   return (
     <div className="cdtoken-page-container">
-      <div className="top-bar"></div>
+      <div className="cd-top-bar"></div>
       <img src={logo} alt="Logo" className="responsive-logo" />
-
-      <div className="button-container">
+      
+      <Typography.Title 
+        level={1} 
+        className="page-title"
+        style={{ 
+          color: '#000', 
+          textAlign: 'center', 
+          fontSize: '40px' 
+        }}
+      >
+        Transfer Certificate of Deposit
+      </Typography.Title>
+  
+      {/* Welcome message with wallet address */}
+      {walletAddress && (
+        <div className="welcome-message" style={{
+          textAlign: 'center',
+          color: '#1d3557'
+        }}>
+          <Typography.Text style={{ fontSize: '18px', fontWeight: '500' }}>
+            Welcome: <span style={{ color: '#457b9d', fontWeight: 'bold' }}> {handleBankName(walletAddress)} </span> -
+            <span style={{ fontFamily: 'monospace', backgroundColor: '#f8f9fa', padding: '3px 8px', borderRadius: '4px', marginLeft: '8px' }}>
+              {`${walletAddress}`}
+            </span>
+          </Typography.Text>
+        </div>
+      )}
+  
+      <div className="button-container">       
         <Button 
-          onClick={connectWallet} 
-          className="wallet-button" 
-          icon={<WalletOutlined />}
+          icon={<ArrowLeftOutlined />}
+          onClick={handleBack}
+          className="back-button"
         >
-          {walletAddress ? `Connected: ${walletAddress.substring(0, 8) + '...'}` : 'Connect Wallet'}
-        </Button>
-        
-       <Button 
-        icon={<ArrowLeftOutlined />}
-        onClick={handleBack}
-        className="back-button"
-        >
-            Back to Selection
+          Back to Selection
         </Button>
       </div>
       
