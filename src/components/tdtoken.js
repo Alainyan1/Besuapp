@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Input, Button, Row, Col, Typography, Modal, Alert, Select } from 'antd';
-// import { LoginOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { AccountsContext } from './AccountsContext';
-import { useLocation } from 'react-router-dom';
-import '../css/jetco.css';
+import { Form, Input, Button, Row, Col, Typography, Select } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useNavigate, useLocation } from 'react-router-dom';
+import '../css/tdtoken.css';
 import logo from '../images/jetco.png';
 
 const { Title } = Typography;
@@ -13,235 +11,150 @@ const { Option } = Select;
 
 const TdToken = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const { accounts, addAccount } = useContext(AccountsContext);
+  // Essential form fields
   const [customer, setCustomer] = useState('');
   const [userName, setUserName] = useState('');
   const [customerWallet, setCustomerWallet] = useState('');
   const [recipientBankName, setRecipientBankName] = useState('');
   const [recipientWalletAddress, setRecipientWalletAddress] = useState('');
-  const [currency, setCurrency] = useState('');
+  const [currency, setCurrency] = useState('HKD');
   const [transferAmount, setTransferAmount] = useState('');
   const [receiveBankBicCode, setReceiveBankBicCode] = useState('');
   const [sendUserName, setSendUserName] = useState('');
+  
+  // Transaction status tracking
   const [status, setStatus] = useState(null);
-  const [walletAddress, setWalletAddress] = useState(null);
   const [transactionHash, setTransactionHash] = useState('');
   const [txnId, setTxnId] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [loginSuccess, setLoginSuccess] = useState('');
   
-  // Custom input flags for each field
-  const [customCustomer, setCustomCustomer] = useState(false);
-  const [customUserName, setCustomUserName] = useState(false);
-  const [customCustomerWallet, setCustomCustomerWallet] = useState(false);
+  // Custom input flags for editable fields only
   const [customRecipientBank, setCustomRecipientBank] = useState(false);
   const [customRecipientWallet, setCustomRecipientWallet] = useState(false);
   const [customCurrency, setCustomCurrency] = useState(false);
   const [customBicCode, setCustomBicCode] = useState(false);
-  const [customSendUserName, setCustomSendUserName] = useState(false);
   
-  // Preset options for dropdown menus
-  const [customerOptions, setCustomerOptions] = useState(['jetcocus04', 'ap1_client01', 'ap1_bank01']);
-  const [userNameOptions, setUserNameOptions] = useState(['Asset Platform C1 Customer B','Asset Platform 1 Client 01', 'Asset Platform 1 Bank 01']);
-  const [customerWalletOptions, setCustomerWalletOptions] = useState([]);
-  const [recipientBankOptions, setRecipientBankOptions] = useState([]);
-  const [recipientWalletOptions, setRecipientWalletOptions] = useState([]);
-  const [currencyOptions, setCurrencyOptions] = useState(['HKD']);
-  const [bicCodeOptions, setBicCodeOptions] = useState(['JETCHKHH', 'IBALHKHH']);
-  const [sendUserNameOptions, setSendUserNameOptions] = useState(['jetcocus04', 'ap1_client01', 'ap1_bank01']);
-  //9B5234D1-FF22-4C4E-AA23-95A9A2D47C40
+  // Options for dropdown menus
+  const [recipientBankOptions] = useState(['JETCHKHH', 'IBALHKHH']);
+  const [recipientWalletOptions] = useState([
+    '0x6ef628f08cbe6bc2dc1df23a63ddea4c1d6c71e6',
+    '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc',
+    '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca',
+  ]);
+  const [currencyOptions] = useState(['HKD']);
+  const [bicCodeOptions] = useState(['JETCHKHH', 'IBALHKHH']);
 
-  // Login related states
-  // const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
-  // const [loginUserName, setLoginUserName] = useState('');
-  // const [loginPassword, setLoginPassword] = useState('');
-  // const [loginBicCode, setLoginBicCode] = useState('');
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // const [loginCredentials] = useState([
-  //   { username: 'jetcocus04', password: 'AQ+xT7Voj/dbfLlvE+x5sml4sP8GRzT3LUU54crODrUip0E2Dn4=', bicCode: 'JETCHKHH' },
-  //   { username: 'ap1_client01', password: 'qEJYDF9O3oDrPJGKIqrmw52gnJOH27EqUvInTztDm4fLMiz2HsA=', bicCode: 'JETCHKHH' },
-  //   { username: 'ap1_bank01', password: '+6jTntd0ORoKB/PQ6YOQjCXGHTXgpN+j4Ce3YMfDaITwy6iA4dI=', bicCode: 'JETCHKHH' },
-  //   // { username: 'fuboncus03', password: '3FwCwphZrdBhqX0iKakbb4Y/csf4yuyIt0n9xVsAPTTaa74W54o=', bicCode: 'IBALHKHH' },
-  //   // { username: 'fuboncus04', password: 'y+MNQvNlsQ45GOkl3RTwMwg7tqxDzyjwYehyuKG9ZETuJXHNScM=', bicCode: 'IBALHKHH' },
-  // ]);
-  const [isCustomLogin, setIsCustomLogin] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
-  const [paymentDetails, setPaymentDetails] = useState([
+  // Customer payment mapping
+  const [paymentDetails] = useState([
     { customer: 'jetcocus04', userName: 'Asset Platform C1 Customer B', customerWallet: '0x6ef628f08cbe6bc2dc1df23a63ddea4c1d6c71e6', recipientBankName: 'JETCHKHH', recipientWalletAddress: '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc', currency: 'HKD', receiveBankBicCode: 'JETCHKHH', sendUserName: 'jetcocus04' },
     { customer: 'ap1_client01', userName: 'Asset Platform 1 Client 01', customerWallet: '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc', recipientBankName: 'JETCHKHH', recipientWalletAddress: '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca', currency: 'HKD', receiveBankBicCode: 'JETCHKHH', sendUserName: 'ap1_client01' },
     { customer: 'ap1_bank01', userName: 'Asset Platform 1 Bank 01', customerWallet: '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca', recipientBankName: 'JETCHKHH', recipientWalletAddress: '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc', currency: 'HKD', receiveBankBicCode: 'JETCHKHH', sendUserName: 'ap1_bank01' },
   ]);
 
-  const location = useLocation();
-
   useEffect(() => {
-    // Check for auth token
+    // Check for auth token (simplified)
     const token = localStorage.getItem('authToken');
-    if (token) {
-      setIsLoggedIn(true);
-      try {
-        // Try to extract wallet address from token if available
-        const tokenData = JSON.parse(atob(token.split('.')[1]));
-        if (tokenData.address) {
-          setWalletAddress(tokenData.address);
-        }
-      } catch (error) {
-        console.error("Error parsing JWT token:", error);
-      }
+    if (!token) {
+      // Redirect to login if no token
+      navigate('/tdplatform');
+      return;
     }
-  
-    // Check if we have purchase details from location state
-    // Check if we have purchase details from location state
+
+    // Get customer from state
+    let customerValue = '';
+    
+    // From login flow
+    if (location.state?.username) {
+      customerValue = location.state.username;
+      setCustomer(customerValue);
+    }
+    
+    // From purchase flow
     if (location.state?.action === 'purchase' && location.state?.purchaseDetails) {
       const { purchaseDetails } = location.state;
-      console.log('Received purchase details:', purchaseDetails);
-      
-      // Set form fields with values from purchase details
-      setCustomer(purchaseDetails.customer || '');
-      setUserName(purchaseDetails.userName || '');
-      setCustomerWallet(purchaseDetails.customerWallet || '');
-      setRecipientBankName(purchaseDetails.recipientBankName || '');
-      setRecipientWalletAddress(purchaseDetails.recipientWalletAddress || '');
-      setCurrency(purchaseDetails.currency || '');
+      customerValue = purchaseDetails.customer || '';
+      setCustomer(customerValue);
       setTransferAmount(purchaseDetails.transferAmount || '');
-      setReceiveBankBicCode(purchaseDetails.receiveBankBicCode || '');
-      setSendUserName(purchaseDetails.sendUserName || '');
-      
-      // Optionally show a notification that data was filled automatically
-      // Remove location state after processing to prevent duplicate fills on refresh
-      window.history.replaceState({}, document.title);
     }
-    // Add some example wallet addresses to the options
-    setCustomerWalletOptions([
-      '0x6ef628f08cbe6bc2dc1df23a63ddea4c1d6c71e6',
-      '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc',
-      '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca',
-    ]);
     
-    setRecipientWalletOptions([
-      '0x6ef628f08cbe6bc2dc1df23a63ddea4c1d6c71e6',
-      '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc',
-      '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca',
-    ]);
-    
-    setRecipientBankOptions(['JETCHKHH', 'IBALHKHH']);
-  }, [location.state, accounts]);
-
-  // Add a special handler for customer selection
-  const handleCustomerSelect = (value) => {
-    if (value === 'custom') {
-      setCustomCustomer(true);
-      setCustomer('');
-      // Reset other fields
-      resetFormFields();
-    } else {
-      setCustomCustomer(false);
-      setCustomer(value);
-      
-      // Find matching customer details in paymentDetails
-      const customerDetails = paymentDetails.find(pd => pd.customer === value);
+    // Auto-populate fields based on customer
+    if (customerValue) {
+      const customerDetails = paymentDetails.find(pd => pd.customer === customerValue);
       if (customerDetails) {
-        // Auto-populate all fields
         setUserName(customerDetails.userName);
         setCustomerWallet(customerDetails.customerWallet);
         setRecipientBankName(customerDetails.recipientBankName);
         setRecipientWalletAddress(customerDetails.recipientWalletAddress);
         setCurrency(customerDetails.currency);
-        setTransferAmount(customerDetails.transferAmount);
         setReceiveBankBicCode(customerDetails.receiveBankBicCode);
         setSendUserName(customerDetails.sendUserName);
-        
-        // Reset all custom flags
-        setCustomUserName(false);
-        setCustomCustomerWallet(false);
-        setCustomRecipientBank(false);
-        setCustomRecipientWallet(false);
-        setCustomCurrency(false);
-        setCustomBicCode(false);
-        setCustomSendUserName(false);
       }
     }
-  };
+    
+    // Clear location state to prevent issues on refresh
+    window.history.replaceState({}, document.title);
+  }, [location.state, navigate, paymentDetails]);
 
-  // Helper function to reset all form fields
-  const resetFormFields = () => {
-    setUserName('');
-    setCustomerWallet('');
-    setRecipientBankName('');
-    setRecipientWalletAddress('');
-    setCurrency('');
-    setTransferAmount('');
-    setReceiveBankBicCode('');
-    setSendUserName('');
-  };
+  // Check balance before proceeding with transfer
+  // const balanceResponse = await axios.post('https://eurybia.xyz/api/test/jetcoBalance', 
+  //   { headers: { Authorization: `Bearer ${token}` } }
+  // );
+  
+  // const { data: balanceData, succ: balanceSucc } = balanceResponse.data;
+  
+  // if (balanceSucc !== 0) {
+  //   setStatus('error');
+  //   alert('Failed to check balance. Please try again.');
+  //   return;
+  // }
+  
+  // const userBalance = parseFloat(balanceData.balance);
+  // const transferAmountValue = parseFloat(transferAmount);
+  
+  // if (userBalance < transferAmountValue) {
+  //   setStatus('error');
+  //   alert(`Insufficient balance. Your balance is ${userBalance} but you're trying to transfer ${transferAmountValue}.`);
+  //   return;
+  // }
 
   const handleConfirm = async () => {
     try {
-      // First check the user's balance
+      // Validate required fields
+      if (!customer || !userName || !customerWallet || !recipientBankName || 
+          !recipientWalletAddress || !currency || !transferAmount || 
+          !receiveBankBicCode || !sendUserName) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      // Get auth token
       const token = localStorage.getItem('authToken');
       if (!token) {
         alert('You are not logged in. Please login first.');
+        navigate('/tdplatform');
         return;
       }
-  
-      // Check balance before proceeding with transfer
-      // const balanceResponse = await axios.post('https://eurybia.xyz/api/test/jetcoBalance', 
-      //   { headers: { Authorization: `Bearer ${token}` } }
-      // );
       
-      // const { data: balanceData, succ: balanceSucc } = balanceResponse.data;
-      
-      // if (balanceSucc !== 0) {
-      //   setStatus('error');
-      //   alert('Failed to check balance. Please try again.');
-      //   return;
-      // }
-      
-      // const userBalance = parseFloat(balanceData.balance);
-      // const transferAmountValue = parseFloat(transferAmount);
-      
-      // if (userBalance < transferAmountValue) {
-      //   setStatus('error');
-      //   alert(`Insufficient balance. Your balance is ${userBalance} but you're trying to transfer ${transferAmountValue}.`);
-      //   return;
-      // }
-
-      // Debug: Log the full token value to verify it's correctly formatted
-      console.log('Token value:', token);
-      
-      // Create properly formatted authorization header
-      const authHeader = `Bearer ${token}`;
-      console.log('Authorization header:', authHeader);
-      
-      // If balance is sufficient, proceed with the transfer
-      console.log('Transfer payload:', {
+      // Prepare API payload
+      const payload = {
         customer,
         userName,
         customerWallet,
         recipientBankName,
         recipientWalletAddress,
         currency,
-        transferAmout: transferAmount,
+        transferAmout: transferAmount, // Note: API expects this misspelling
         recipientBankBicCode: receiveBankBicCode,
         sendUserName
-      });
+      };
       
-      // If balance is sufficient, proceed with the transfer
-      const response = await axios.post('https://eurybia.xyz/api/test/jetcoTransfer', 
-        {
-          customer,
-          userName,
-          customerWallet,
-          recipientBankName,
-          recipientWalletAddress,
-          currency,
-          transferAmout: transferAmount,
-          recipientBankBicCode: receiveBankBicCode,
-          sendUserName
-        },
+      console.log('Transfer payload:', payload);
+      
+      // Make transfer API call
+      const response = await axios.post(
+        'https://eurybia.xyz/api/test/jetcoTransfer', 
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
   
@@ -249,14 +162,13 @@ const TdToken = () => {
       if (succ === 0) {
         const { txnId } = data;
         setTxnId(txnId);
-        console.log('Transaction ID:', txnId);
         setTransactionHash(txnId);
         setStatus('pending');
         
-        // Poll for transaction status completion
+        // Poll for transaction status
         let completed = false;
         let attempts = 0;
-        const maxAttempts = 5; // Maximum number of polling attempts
+        const maxAttempts = 5;
         
         while (!completed && attempts < maxAttempts) {
           attempts++;
@@ -286,22 +198,22 @@ const TdToken = () => {
       setStatus('error');
       alert('Transaction failed. Please try again.');
     }
-};
+  };
 
   const checkStatus = async (txnId) => {
     try {
       const token = localStorage.getItem('authToken');
       
-      const response = await axios.post('https://eurybia.xyz/api/test/jetcoTransaction', 
+      const response = await axios.post(
+        'https://eurybia.xyz/api/test/jetcoTransaction', 
         { txnId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // console.log('Transaction status response:', response.data);
   
       const { data, succ } = response.data;
       if (succ === 0) {
         const { status } = data;
-        return status; // Just return the status, don't handle completion here
+        return status;
       } else {
         console.error('Transaction status check failed');
         return null;
@@ -312,9 +224,8 @@ const TdToken = () => {
     }
   };
 
-  const handleInputChange = (setter) => (event) => {
-    setter(event.target.value);
-  };
+  // Simplified input handlers
+  const handleInputChange = (setter) => (event) => setter(event.target.value);
   
   const handleSelectChange = (setter, setCustomFlag) => (value) => {
     if (value === 'custom') {
@@ -326,120 +237,87 @@ const TdToken = () => {
     }
   };
   
-  const handleCustomInputChange = (setter) => (event) => {
-    setter(event.target.value);
-  };
-
-  const handleBack = () => {
-    navigate('/token');
-  };
+  const handleBack = () => navigate('/tdplatform');
 
   return (
-    <div className='jetco-page-container'>
-      <div className="top-bar"></div>
+    <div className='tdtoken-page-container'>
+      <div className="tdtop-bar"></div>
       <img src={logo} alt="Logo" className="responsive-logo" />
+      <Typography.Title 
+        level={1} 
+        className="page-title"
+        style={{ 
+          color: '#000', 
+          textAlign: 'center', 
+          fontSize: '40px' 
+        }}
+      >
+        Tokenized Deposit Payment
+      </Typography.Title>
+
+      {/* Welcome message with customer name */}
+      {customer && (
+        <div className="welcome-message" style={{
+          textAlign: 'center',
+          color: '#1d3557'
+        }}>
+          <Typography.Text style={{ fontSize: '18px', fontWeight: '500' }}>
+            Welcome: <span style={{ color: '#457b9d', fontWeight: 'bold' }}>{userName}</span> -
+            <span style={{ fontFamily: 'monospace', backgroundColor: '#f8f9fa', padding: '3px 8px', borderRadius: '4px', marginLeft: '8px' }}>
+              {`${customer}`}
+            </span>
+            <br />
+            Wallet Address: <span style={{ fontFamily: 'monospace', backgroundColor: '#f8f9fa', padding: '3px 8px', borderRadius: '4px', marginLeft: '8px' }}>
+              {customerWallet}
+            </span>
+            <br />
+          </Typography.Text>
+        </div>
+      )}
+
+      <div className="button-container">
+        <Button 
+          icon={<ArrowLeftOutlined />}
+          onClick={handleBack}
+          className="back-button"
+        >
+          Back
+        </Button>
+      </div>
 
       <div className="main-content form-page-content">
         <div className="card-container payment-card">
-          <div className="title-container">
+          <div className="tdtitle-container">
             <Title level={2}>TD Token Payment</Title>
           </div>
           <Form layout='vertical' onFinish={handleConfirm} className="payment-form">
             <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
-              <Form.Item label="Customer" required className="form-item">
-                {!customCustomer ? (
-                  <Select
-                    value={customer}
-                    onChange={handleCustomerSelect}  // Use new handler here
-                    className="custom-select"
-                  >
-                    {customerOptions.map(opt => (
-                      <Option key={opt} value={opt}>{opt}</Option>
-                    ))}
-                    <Option value="custom">Enter custom customer</Option>
-                  </Select>
-                ) : (
-                  <Input
-                    value={customer}
-                    onChange={handleCustomInputChange(setCustomer)}
-                    placeholder="Enter customer"
-                    className="custom-input"
-                    addonAfter={
-                      <Button 
-                        type="link" 
-                        size="small" 
-                        onClick={() => setCustomCustomer(false)}
-                        style={{ padding: 0 }}
-                      >
-                        Back
-                      </Button>
-                    }
-                  />
-                )}
-              </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="User Name" required className="form-item">
-                  {!customUserName ? (
+                <Form.Item label="Recipient Wallet Address" required className="tdform-item">
+                  {!customRecipientWallet ? (
                     <Select
-                      value={userName}
-                      onChange={handleSelectChange(setUserName, setCustomUserName)}
-                      className="custom-select"
-                    >
-                      {userNameOptions.map(opt => (
-                        <Option key={opt} value={opt}>{opt}</Option>
-                      ))}
-                      <Option value="custom">Enter custom user name</Option>
-                    </Select>
-                  ) : (
-                    <Input
-                      value={userName}
-                      onChange={handleCustomInputChange(setUserName)}
-                      placeholder="Enter user name"
-                      className="custom-input"
-                      addonAfter={
-                        <Button 
-                          type="link" 
-                          size="small" 
-                          onClick={() => setCustomUserName(false)}
-                          style={{ padding: 0 }}
-                        >
-                          Back
-                        </Button>
-                      }
-                    />
-                  )}
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col span={12}>
-                <Form.Item label="Customer Wallet" required className="form-item">
-                  {!customCustomerWallet ? (
-                    <Select
-                      value={customerWallet}
-                      onChange={handleSelectChange(setCustomerWallet, setCustomCustomerWallet)}
+                      value={recipientWalletAddress}
+                      onChange={handleSelectChange(setRecipientWalletAddress, setCustomRecipientWallet)}
                       className="custom-select"
                       showSearch
                       optionFilterProp="children"
                     >
-                      {customerWalletOptions.map(opt => (
+                      {recipientWalletOptions.map(opt => (
                         <Option key={opt} value={opt}>{opt}</Option>
                       ))}
-                      <Option value="custom">Enter custom wallet</Option>
+                      <Option value="custom">Enter custom wallet address</Option>
                     </Select>
                   ) : (
                     <Input
-                      value={customerWallet}
-                      onChange={handleCustomInputChange(setCustomerWallet)}
-                      placeholder="Enter customer wallet"
+                      value={recipientWalletAddress}
+                      onChange={handleInputChange(setRecipientWalletAddress)}
+                      placeholder="Enter recipient wallet address"
                       className="custom-input"
                       addonAfter={
                         <Button 
                           type="link" 
                           size="small" 
-                          onClick={() => setCustomCustomerWallet(false)}
+                          onClick={() => setCustomRecipientWallet(false)}
                           style={{ padding: 0 }}
                         >
                           Back
@@ -450,7 +328,7 @@ const TdToken = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Recipient Bank Name" required className="form-item">
+                <Form.Item label="Recipient Bank Name" required className="tdform-item">
                   {!customRecipientBank ? (
                     <Select
                       value={recipientBankName}
@@ -465,7 +343,7 @@ const TdToken = () => {
                   ) : (
                     <Input
                       value={recipientBankName}
-                      onChange={handleCustomInputChange(setRecipientBankName)}
+                      onChange={handleInputChange(setRecipientBankName)}
                       placeholder="Enter recipient bank name"
                       className="custom-input"
                       addonAfter={
@@ -485,31 +363,29 @@ const TdToken = () => {
             </Row>
             <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
-                <Form.Item label="Recipient Wallet Address" required className="form-item">
-                  {!customRecipientWallet ? (
+                <Form.Item label="Receive Bank BIC Code" required className="tdform-item">
+                  {!customBicCode ? (
                     <Select
-                      value={recipientWalletAddress}
-                      onChange={handleSelectChange(setRecipientWalletAddress, setCustomRecipientWallet)}
+                      value={receiveBankBicCode}
+                      onChange={handleSelectChange(setReceiveBankBicCode, setCustomBicCode)}
                       className="custom-select"
-                      showSearch
-                      optionFilterProp="children"
                     >
-                      {recipientWalletOptions.map(opt => (
+                      {bicCodeOptions.map(opt => (
                         <Option key={opt} value={opt}>{opt}</Option>
                       ))}
-                      <Option value="custom">Enter custom wallet address</Option>
+                      <Option value="custom">Enter custom BIC code</Option>
                     </Select>
                   ) : (
                     <Input
-                      value={recipientWalletAddress}
-                      onChange={handleCustomInputChange(setRecipientWalletAddress)}
-                      placeholder="Enter recipient wallet address"
+                      value={receiveBankBicCode}
+                      onChange={handleInputChange(setReceiveBankBicCode)}
+                      placeholder="Enter BIC code"
                       className="custom-input"
                       addonAfter={
                         <Button 
                           type="link" 
                           size="small" 
-                          onClick={() => setCustomRecipientWallet(false)}
+                          onClick={() => setCustomBicCode(false)}
                           style={{ padding: 0 }}
                         >
                           Back
@@ -520,7 +396,7 @@ const TdToken = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Currency" required className="form-item">
+                <Form.Item label="Currency" required className="tdform-item">
                   {!customCurrency ? (
                     <Select
                       value={currency}
@@ -535,7 +411,7 @@ const TdToken = () => {
                   ) : (
                     <Input
                       value={currency}
-                      onChange={handleCustomInputChange(setCurrency)}
+                      onChange={handleInputChange(setCurrency)}
                       placeholder="Enter currency"
                       className="custom-input"
                       addonAfter={
@@ -554,8 +430,8 @@ const TdToken = () => {
               </Col>
             </Row>
             <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col span={12}>
-                <Form.Item label="Transfer Amount" required className="form-item">
+              <Col span={24}>
+                <Form.Item label="Transfer Amount" required className="tdform-item">
                   <Input
                     type="number"
                     value={transferAmount}
@@ -565,79 +441,13 @@ const TdToken = () => {
                   />
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <Form.Item label="Receive Bank BIC Code" required className="form-item">
-                  {!customBicCode ? (
-                    <Select
-                      value={receiveBankBicCode}
-                      onChange={handleSelectChange(setReceiveBankBicCode, setCustomBicCode)}
-                      className="custom-select"
-                    >
-                      {bicCodeOptions.map(opt => (
-                        <Option key={opt} value={opt}>{opt}</Option>
-                      ))}
-                      <Option value="custom">Enter custom BIC code</Option>
-                    </Select>
-                  ) : (
-                    <Input
-                      value={receiveBankBicCode}
-                      onChange={handleCustomInputChange(setReceiveBankBicCode)}
-                      placeholder="Enter BIC code"
-                      className="custom-input"
-                      addonAfter={
-                        <Button 
-                          type="link" 
-                          size="small" 
-                          onClick={() => setCustomBicCode(false)}
-                          style={{ padding: 0 }}
-                        >
-                          Back
-                        </Button>
-                      }
-                    />
-                  )}
-                </Form.Item>
-              </Col>
             </Row>
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col span={12}>
-                <Form.Item label="Send User Name" required className="form-item">
-                  {!customSendUserName ? (
-                    <Select
-                      value={sendUserName}
-                      onChange={handleSelectChange(setSendUserName, setCustomSendUserName)}
-                      className="custom-select"
-                    >
-                      {sendUserNameOptions.map(opt => (
-                        <Option key={opt} value={opt}>{opt}</Option>
-                      ))}
-                      <Option value="custom">Enter custom user name</Option>
-                    </Select>
-                  ) : (
-                    <Input
-                      value={sendUserName}
-                      onChange={handleCustomInputChange(setSendUserName)}
-                      placeholder="Enter send user name"
-                      className="custom-input"
-                      addonAfter={
-                        <Button 
-                          type="link" 
-                          size="small" 
-                          onClick={() => setCustomSendUserName(false)}
-                          style={{ padding: 0 }}
-                        >
-                          Back
-                        </Button>
-                      }
-                    />
-                  )}
-                </Form.Item>
-              </Col>
-            </Row>
+            
             <Form.Item className="submit-container">
               <Button type="primary" htmlType="submit" className="submit-button">Confirm</Button>
             </Form.Item>
           </Form>
+          
           {status === 'success' && (
             <div className="status-success">
               <p>Payment confirmed!</p>

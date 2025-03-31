@@ -45,7 +45,7 @@ html, body {
 }
 
 .card-container {
-    background: rgba(0, 0, 0, 0.9) !important;
+    background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(10px);
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -91,7 +91,7 @@ html, body {
 
 /* Update form label color */
 .form-item label {
-    color: #ffffff !important;
+    color: #ffffff;
     font-weight: 500;
     font-size: 16px;
 }

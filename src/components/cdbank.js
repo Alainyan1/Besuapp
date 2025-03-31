@@ -81,7 +81,7 @@ const Cdbank = () => {
             color: '#1d3557'
             }}>
             <Typography.Text style={{ fontSize: '18px', fontWeight: '500' }}>
-                Welcome: <span style={{ color: '#457b9d', fontWeight: 'bold' }}> {handleBankName(walletAddress)} </span> :
+                Welcome <span style={{ color: '#457b9d', fontWeight: 'bold' }}> {handleBankName(walletAddress)} </span> :
                 <span style={{ fontFamily: 'monospace', backgroundColor: '#f8f9fa', padding: '3px 8px', borderRadius: '4px', marginLeft: '8px' }}>
                 {`${walletAddress}`}
                 </span>

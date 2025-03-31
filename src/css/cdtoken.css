@@ -86,7 +86,7 @@
 }
 /* Update the title styles for dark background */
 .title-container h2 {
-  color: #ffffff;
+  color: #000;
   margin: 0;
 }
 
@@ -128,8 +128,8 @@
 }
 
 .submit-button {
-    background: linear-gradient(90deg, #1d3557, #457b9d);
-    color: white;
+    background: linear-gradient(90deg, #c0c8d3, #93bcd6);
+    color: #000;
     font-weight: 600;
     border: none;
     border-radius: 8px;

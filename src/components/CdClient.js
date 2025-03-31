@@ -153,7 +153,7 @@ const CDClient = () => {
           // Show a success message
           Modal.success({
             title: 'Automatic Redemption',
-            content: `Successfully redeemed ${redeemedCount} matured certificate${redeemedCount !== 1 ? 's' : ''}.\n Informed Bank and TTP to transfer the Tokenized Depoist.`,
+            content: `Successfully redeemed ${redeemedCount} matured certificate${redeemedCount !== 1 ? 's' : ''}.\n Informed Bank to transfer the Tokenized Depoist.`,
           });
         }, 2000);
       }
@@ -493,7 +493,7 @@ const CDClient = () => {
       // Show success message
       Modal.success({
         title: 'Redemption Successful',
-        content: 'Your deposit has been successfully redeemed.'
+        content: 'Your deposit has been successfully redeemed. Informed Bank to transfer the Tokenized Deposit.',
       });
     } catch (error) {
       console.error('Error redeeming deposit:', error);
@@ -844,7 +844,7 @@ const CDClient = () => {
           color: '#1d3557'
         }}>
           <Typography.Text style={{ fontSize: '18px', fontWeight: '500' }}>
-            Welcome: <span style={{ color: '#457b9d', fontWeight: 'bold' }}></span>
+            Welcome <span style={{ color: '#457b9d', fontWeight: 'bold' }}> Client: </span>
             <span style={{ fontFamily: 'monospace', backgroundColor: '#f8f9fa', padding: '3px 8px', borderRadius: '4px', marginLeft: '8px' }}>
               {`${walletAddress}`}
             </span>

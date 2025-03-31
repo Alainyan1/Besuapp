@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { AccountsContext } from './AccountsContext';
 import { Form, Input, Button, Select, Typography, Spin, Alert } from 'antd';
-import { WalletOutlined, ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/cdtoken.css';
 import logo from '../images/aift.png';
@@ -32,9 +32,14 @@ const CDToken = () => {
   // Handle purchase details that might be passed from CdClient
   useEffect(() => {
     // Set wallet address from localStorage if available
-    const storedWalletAddress = localStorage.getItem('walletAddress');
-    if (storedWalletAddress) {
-      setWalletAddress(storedWalletAddress);
+    // const storedWalletAddress = localStorage.getItem('walletAddress');
+    if (location.state && location.state.walletAddress) {
+      setWalletAddress(location.state.walletAddress);
+      console.log('Using wallet address from previous page:', location.state.walletAddress);
+    } else {
+      console.warn('No wallet address provided. Redirecting to platform page');
+      // Optional: redirect to platform page if no wallet is connected
+      // navigate('/cdplatform');
     }
     
     // If purchase details were passed from CDClient
@@ -254,14 +259,22 @@ const CDToken = () => {
           <Text className="hash">{transactionHash}</Text>
         </div>
       </div>
-      <Button 
+      {/* <Button 
         type="primary"
         size="large"
         onClick={() => navigate('/cdclient')}
         className="view-cds-button"
       >
         Return to CD Marketplace
-      </Button>
+      </Button> */}
+      <Button
+        type="primary"
+        size="large"
+        onClick={() => navigate('/cdtoken')}
+        className="view-cds-button"
+        >
+          Back to CD Transfer
+        </Button>
     </div>
   );
 
@@ -400,7 +413,7 @@ const CDToken = () => {
           color: '#1d3557'
         }}>
           <Typography.Text style={{ fontSize: '18px', fontWeight: '500' }}>
-            Welcome: <span style={{ color: '#457b9d', fontWeight: 'bold' }}> {handleBankName(walletAddress)} </span> -
+            Welcome <span style={{ color: '#457b9d', fontWeight: 'bold' }}> {handleBankName(walletAddress)} </span>:
             <span style={{ fontFamily: 'monospace', backgroundColor: '#f8f9fa', padding: '3px 8px', borderRadius: '4px', marginLeft: '8px' }}>
               {`${walletAddress}`}
             </span>

@@ -48,6 +48,7 @@ html, body {
 }
 
 .token-card {
+    /* background: linear-gradient(145deg, #05568E 0%, #a095bd 100%); */
     background: linear-gradient(145deg, #2c3e50 0%, #1a2533 100%);
     border-radius: 12px;
     transition: all 0.3s ease;
@@ -98,7 +99,7 @@ html, body {
     transform: translateX(-50%);
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #e63946, #1d3557);
+    background: linear-gradient(90deg, #3992e6, #536864);
     border-radius: 2px;
 }
 

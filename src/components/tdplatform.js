@@ -67,7 +67,8 @@ const TdPlatform = () => {
         setLoginBicCode(credentials.bicCode);
       }
     }
-  };
+  }
+
 
   // Login function
   const handleLogin = async () => {
@@ -93,7 +94,7 @@ const TdPlatform = () => {
         setTimeout(() => {
           setIsLoginModalVisible(false);
           setIsLoggedIn(true);
-          navigate('/tdtoken', { state: { walletAddress: data.address } });
+          navigate('/tdtoken', { state: { action: 'login', username: loginUserName, bicCode: loginBicCode} });
         }, 2000);
       } else {
         setLoginError('Login failed. Please try again.');

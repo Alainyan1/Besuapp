@@ -23,8 +23,8 @@ const CDDeployment = () => {
       {
         termId: "1MINTEST", // Simplified termId
         duration: 60, // 1 min in seconds
-        fixedRate: 375, // 3.75% (stored as basis points)
-        demandRate: 100, // 1% (stored as basis points)
+        fixedRate: 10000, // 100% (stored as basis points)
+        demandRate: 1000, // 10% (stored as basis points)
         isActive: true
       },
     ]
@@ -228,6 +228,7 @@ const CDDeployment = () => {
 
   return (
     <div className="cdbank-page-container" style={{ padding: '20px'}}>
+      <div className="cd-top-bar"></div>
       <img src={logo} alt="Logo" style={{ position: 'absolute', top: '20px', left: '20px', height: '80px' }} />
       <Typography.Title level={1} style={{ color: '#000', margin: '10px', textAlign: 'center', minHeight: '8vh', fontSize: '45px' }}>Certificate of Deposit Configuration</Typography.Title>
       
@@ -247,7 +248,7 @@ const CDDeployment = () => {
           right: 10
         }}
       >
-        Back
+        Back to Selection
       </Button>
       
       {/* Welcome message with wallet address */}
@@ -259,7 +260,7 @@ const CDDeployment = () => {
           color: '#1d3557'
         }}>
           <Typography.Text style={{ fontSize: '18px', fontWeight: '500' }}>
-            Welcome: <span style={{ color: '#457b9d', fontWeight: 'bold' }}> {handleBankName(walletAddress)} </span> :
+            Welcome <span style={{ color: '#457b9d', fontWeight: 'bold' }}> {handleBankName(walletAddress)} </span> :
             <span style={{ fontFamily: 'monospace', backgroundColor: '#f8f9fa', padding: '3px 8px', borderRadius: '4px', marginLeft: '8px' }}>
               {`${walletAddress}`}
             </span>

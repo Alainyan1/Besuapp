@@ -13,6 +13,15 @@
   margin: 0 auto;
 }
 
+.cd-top-bar {
+  position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #6EA1EB 0%, #6EA1EB 50%, #0569C8 50%, #0569C8 100%);
+}
+
 .cd-form .ant-form-item {
   margin-bottom: 20px;
 }
