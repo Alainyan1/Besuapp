@@ -35,7 +35,7 @@ const CDToken = () => {
     // const storedWalletAddress = localStorage.getItem('walletAddress');
     if (location.state && location.state.walletAddress) {
       setWalletAddress(location.state.walletAddress);
-      console.log('Using wallet address from previous page:', location.state.walletAddress);
+      // console.log('Using wallet address from previous page:', location.state.walletAddress);
     } else {
       console.warn('No wallet address provided. Redirecting to platform page');
       // Optional: redirect to platform page if no wallet is connected
@@ -106,8 +106,10 @@ const CDToken = () => {
 
         // Check if the signer is the trusted third party
         const ttpAddress = await contract.trustedThirdParty();
+        console.log('Trusted Third Party Address:', ttpAddress);
+        console.log('Signer Address:', signerAddress);
         if (signerAddress.toLowerCase() !== ttpAddress.toLowerCase()) {
-          throw new Error('Only the Trusted Third Party can issue certificates');
+          throw new Error('Only the Bank can transfer cd');
         }
 
         const bytes32TermId = ethers.utils.formatBytes32String(termId);
@@ -270,10 +272,10 @@ const CDToken = () => {
       <Button
         type="primary"
         size="large"
-        onClick={() => navigate('/cdtoken')}
+        onClick={() => navigate('/cdbank')}
         className="view-cds-button"
         >
-          Back to CD Transfer
+          Back to Selection Page
         </Button>
     </div>
   );

@@ -6,9 +6,10 @@ import { ContractContext } from './ContractContext';
 import { AccountsContext } from './AccountsContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, Button, Spin, Typography, Input, Modal, Form, InputNumber, Row, Col, Divider, Tag, Tooltip, Table, Tabs, Select } from 'antd';
-import { WalletOutlined, BankOutlined, CalendarOutlined, PercentageOutlined, InfoCircleOutlined, LoadingOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { WalletOutlined, ArrowLeftOutlined, CalendarOutlined, PercentageOutlined, InfoCircleOutlined, LoadingOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import '../css/cdclient.css';
 import logo from '../images/aift.png';
+import { ConstructorFragment } from 'ethers/lib/utils';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -48,7 +49,7 @@ const CDClient = () => {
   useEffect(() => {
       if (location.state && location.state.walletAddress) {
         setWalletAddress(location.state.walletAddress);
-        console.log('Using wallet address from previous page:', location.state.walletAddress);
+        // console.log('Using wallet address from previous page:', location.state.walletAddress);
       } else {
         console.warn('No wallet address provided. Redirecting to platform page');
         // Optional: redirect to platform page if no wallet is connected
@@ -118,6 +119,13 @@ const CDClient = () => {
     const errors = [];
     let redeemedCount = 0;
     
+    // Keep track of total principal and interest
+    let totalPrincipal = 0;
+    let totalInterest = 0;
+    
+    // Store details of successfully redeemed deposits
+    const redeemedDeposits = [];
+    
     try {
       // Process each matured deposit using the backend API
       for (const deposit of maturedDeposits) {
@@ -134,6 +142,22 @@ const CDClient = () => {
           if (response.data && response.data.success) {
             console.log(`Auto-redemption successful for deposit ID: ${deposit.depositId}`);
             redeemedCount++;
+            
+            // Add to total principal and interest
+            const principal = parseFloat(deposit.amount) || 0;
+            const interest = parseFloat(deposit.currentInterest) || 0;
+            
+            totalPrincipal += principal;
+            totalInterest += interest;
+            
+            // Store redeemed deposit details
+            redeemedDeposits.push({
+              depositId: deposit.depositId,
+              principal,
+              interest,
+              total: principal + interest
+            });
+            
             setAutoRedemptionStatus(prev => ({ ...prev, redeemedCount: prev.redeemedCount + 1 }));
           } else {
             throw new Error(response.data?.message || 'Unknown error from redemption API');
@@ -150,10 +174,40 @@ const CDClient = () => {
         setTimeout(() => {
           fetchUserDeposits();
           
-          // Show a success message
+          // Format the totals using the formatCurrency function
+          const formattedPrincipal = formatCurrency(totalPrincipal);
+          const formattedInterest = formatCurrency(totalInterest);
+          const formattedTotal = formatCurrency(totalPrincipal + totalInterest);
+          
+          // Show a success message with detailed breakdown
           Modal.success({
             title: 'Automatic Redemption',
-            content: `Successfully redeemed ${redeemedCount} matured certificate${redeemedCount !== 1 ? 's' : ''}.\n Informed Bank to transfer the Tokenized Depoist.`,
+            content: (
+              <div>
+                <p>Successfully redeemed {redeemedCount} matured certificate{redeemedCount !== 1 ? 's' : ''}.</p>
+                <p>The bank will transfer the following amount:</p>
+                
+                <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#f0f9ff', borderRadius: '6px' }}>
+                  <p><strong>Principal:</strong> {formattedPrincipal}</p>
+                  <p><strong>Interest:</strong> {formattedInterest}</p>
+                  <p style={{ fontSize: '18px', fontWeight: 'bold', marginTop: '5px', borderTop: '1px solid #ccc', paddingTop: '5px' }}>
+                    Total: {formattedTotal}
+                  </p>
+                </div>
+                
+                {redeemedCount > 1 && (
+                  <div style={{ marginTop: '10px', fontSize: '14px' }}>
+                    <p><strong>Breakdown by certificate:</strong></p>
+                    {redeemedDeposits.map((item, index) => (
+                      <p key={index}>
+                        Certificate #{item.depositId}: {formatCurrency(item.total)} 
+                        ({formatCurrency(item.principal)} + {formatCurrency(item.interest)})
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ),
           });
         }, 2000);
       }
@@ -487,13 +541,30 @@ const CDClient = () => {
     //     redeemDate: new Date().toISOString().substring(0, 10)
     //   });
 
+      const principalAmount = parseFloat(deposit.amount) || 0;
+      const interestAmount = parseFloat(deposit.currentInterest) || 0;
+      const totalAmount = principalAmount + interestAmount;
+      const formattedPrincipal = formatCurrency(principalAmount);
+      const formattedInterest = formatCurrency(interestAmount);
+      const formattedTotal = formatCurrency(totalAmount);
       // Refresh user deposits
       fetchUserDeposits();
       
       // Show success message
       Modal.success({
         title: 'Redemption Successful',
-        content: 'Your deposit has been successfully redeemed. Informed Bank to transfer the Tokenized Deposit.',
+        content: (
+          <div>
+            <p>Your deposit has been successfully redeemed. Inform the bank to transfer principal and interest:</p>
+            <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#f0f9ff', borderRadius: '6px' }}>
+              <p><strong>Principal:</strong> {formattedPrincipal}</p>
+              <p><strong>Interest:</strong> {formattedInterest}</p>
+              <p style={{ fontSize: '18px', fontWeight: 'bold', marginTop: '5px', borderTop: '1px solid #ccc', paddingTop: '5px' }}>
+                Total: {formattedTotal}
+              </p>
+            </div>
+          </div>
+        ),
       });
     } catch (error) {
       console.error('Error redeeming deposit:', error);
@@ -832,10 +903,25 @@ const CDClient = () => {
     );
   };
 
+  const handleback = () => {
+    navigate('/cdplatform');
+  }
+
   return (
     <div className="cd-client-container">
+      <div className="cdclient-top-bar"></div>
       <img src={logo} alt="Logo" style={{ position: 'absolute', top: '20px', left: '20px', height: '80px' }} />
       <Title level={1} style={{ textAlign: 'center', margin: '20px 0 40px' }}>Certificate of Deposit Marketplace</Title>
+
+      <div className="button-container">
+        <Button 
+          icon={<ArrowLeftOutlined />}
+          onClick={handleback}
+          className="back-button"
+        >
+          Back
+        </Button>
+      </div>
 
       {/* Welcome message with wallet address */}
       {walletAddress && (

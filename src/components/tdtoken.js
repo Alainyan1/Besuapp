@@ -237,7 +237,10 @@ const TdToken = () => {
     }
   };
   
-  const handleBack = () => navigate('/tdplatform');
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    navigate('/tdplatform');
+  }
 
   return (
     <div className='tdtoken-page-container'>
@@ -278,10 +281,10 @@ const TdToken = () => {
       <div className="button-container">
         <Button 
           icon={<ArrowLeftOutlined />}
-          onClick={handleBack}
+          onClick={handleLogout}
           className="back-button"
         >
-          Back
+          Logout
         </Button>
       </div>
 
@@ -328,36 +331,15 @@ const TdToken = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Recipient Bank Name" required className="tdform-item">
-                  {!customRecipientBank ? (
-                    <Select
-                      value={recipientBankName}
-                      onChange={handleSelectChange(setRecipientBankName, setCustomRecipientBank)}
-                      className="custom-select"
-                    >
-                      {recipientBankOptions.map(opt => (
-                        <Option key={opt} value={opt}>{opt}</Option>
-                      ))}
-                      <Option value="custom">Enter custom bank name</Option>
-                    </Select>
-                  ) : (
-                    <Input
-                      value={recipientBankName}
-                      onChange={handleInputChange(setRecipientBankName)}
-                      placeholder="Enter recipient bank name"
-                      className="custom-input"
-                      addonAfter={
-                        <Button 
-                          type="link" 
-                          size="small" 
-                          onClick={() => setCustomRecipientBank(false)}
-                          style={{ padding: 0 }}
-                        >
-                          Back
-                        </Button>
-                      }
-                    />
-                  )}
+                <Form.Item label="Recipient Name" required className="tdform-item">
+                  <Input
+                    placeholder="Fubon"
+                    className="custom-input"
+                    style={{ 
+                      backgroundColor: '#f9f9f9',
+                      cursor: 'default'
+                    }}
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -367,7 +349,7 @@ const TdToken = () => {
                   {!customBicCode ? (
                     <Select
                       value={receiveBankBicCode}
-                      onChange={handleSelectChange(setReceiveBankBicCode, setCustomBicCode)}
+                      onChange={handleSelectChange(setRecipientBankName, setReceiveBankBicCode, setCustomBicCode)}
                       className="custom-select"
                     >
                       {bicCodeOptions.map(opt => (
@@ -378,7 +360,7 @@ const TdToken = () => {
                   ) : (
                     <Input
                       value={receiveBankBicCode}
-                      onChange={handleInputChange(setReceiveBankBicCode)}
+                      onChange={handleInputChange(setCustomRecipientBank, setReceiveBankBicCode)}
                       placeholder="Enter BIC code"
                       className="custom-input"
                       addonAfter={

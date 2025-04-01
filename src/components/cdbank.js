@@ -16,7 +16,7 @@ const Cdbank = () => {
   useEffect(() => {
     if (location.state && location.state.walletAddress) {
       setWalletAddress(location.state.walletAddress);
-      console.log('Using wallet address from previous page:', location.state.walletAddress);
+      // console.log('Using wallet address from previous page:', location.state.walletAddress);
     } else {
       console.warn('No wallet address provided. Redirecting to platform page');
       // Optional: redirect to platform page if no wallet is connected

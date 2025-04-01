@@ -33,6 +33,16 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Top decorative bar */
+.cdclient-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, #6EA1EB 0%, #6EA1EB 50%, #0569C8 50%, #0569C8 100%);
+}
+
 .cd-tabs .ant-tabs-nav {
   margin-bottom: 20px;
 }
