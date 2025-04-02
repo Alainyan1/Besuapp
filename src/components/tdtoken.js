@@ -117,6 +117,38 @@ const TdToken = () => {
   //   alert(`Insufficient balance. Your balance is ${userBalance} but you're trying to transfer ${transferAmountValue}.`);
   //   return;
   // }
+  const checkBalance = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      console.log('Checking balance with token:', token);
+      const balanceResponse = await axios.post('https://eurybia.xyz/api/test/jetcoBalance', { headers: { Authorization: `Bearer ${token}` } });
+
+      const { data: balanceData, succ: balanceSucc } = balanceResponse.data;
+      
+      if (balanceSucc !== 0) {
+        setStatus('error');
+        alert('Failed to check balance. Please try again.');
+        return false;
+      }
+      
+      console.log('Balance data:', balanceData);
+      const userBalance = parseFloat(balanceData.availableBalance);
+      const transferAmountValue = parseFloat(transferAmount);
+      
+      if (userBalance < transferAmountValue) {
+        setStatus('error');
+        alert(`Insufficient balance. Your balance is ${userBalance} HKD but you're trying to transfer ${transferAmountValue} HKD.`);
+        return false;
+      }
+      
+      return true; // Balance is sufficient
+    } catch (error) {
+      console.error('Error checking balance:', error);
+      setStatus('error');
+      alert('Failed to check balance. Please try again.');
+      return false;
+    }
+  };
 
   const handleConfirm = async () => {
     try {
@@ -150,7 +182,13 @@ const TdToken = () => {
       };
       
       console.log('Transfer payload:', payload);
-      
+
+      // Check balance before proceeding
+      const balanceOk = await checkBalance();
+      if (!balanceOk) {
+        return; // Stop here if balance is insufficient
+      }
+
       // Make transfer API call
       const response = await axios.post(
         'https://eurybia.xyz/api/test/jetcoTransfer', 
