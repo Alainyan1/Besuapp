@@ -16,8 +16,10 @@ const CDDeployment = () => {
     name: "Certificate of Deposit",
     symbol: "CD",
     initialSupply: 100000000,
-    bankAddress: "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
-    trustedThirdParty: "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
+    // bankAddress: "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
+    bankAddress: walletAddress ? `Fubon:${walletAddress}` : "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
+    // trustedThirdParty: "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
+    trustedThirdParty: walletAddress ? `Fubon:${walletAddress}` : "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
     ancillaryInfo: "Certificate of Deposit\nEarly Withdrawal: Demand rate applies",
     depositTerms: [
       {
