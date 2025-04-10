@@ -23,6 +23,10 @@ const TdToken = () => {
   const [transferAmount, setTransferAmount] = useState('');
   const [receiveBankBicCode, setReceiveBankBicCode] = useState('');
   const [sendUserName, setSendUserName] = useState('');
+
+  // 展示recipientName
+  const [recipientName, setRecipientName] = useState('Fubon');
+
   
   // Transaction status tracking
   const [status, setStatus] = useState(null);
@@ -369,17 +373,15 @@ const TdToken = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Recipient Name" required className="tdform-item">
-                  <Input
-                    placeholder="Fubon"
-                    className="custom-input"
-                    style={{ 
-                      backgroundColor: '#f9f9f9',
-                      cursor: 'default'
-                    }}
-                  />
-                </Form.Item>
-              </Col>
+              <Form.Item label="Recipient Name" required className="tdform-item">
+                <Input
+                  placeholder="Fubon"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  className="custom-input"
+                />
+              </Form.Item>
+            </Col>
             </Row>
             <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>

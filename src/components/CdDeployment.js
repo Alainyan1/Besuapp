@@ -12,6 +12,12 @@ import '../css/cddeployment.css';
 import logo from '../images/aift.png';
 
 const CDDeployment = () => {
+  const { setContractAddress } = useContext(ContractContext);
+  const { clearAccounts, addAccount } = useContext(AccountsContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [walletAddress, setWalletAddress] = useState(location.state.walletAddress || null);
+
   const [cdData, setCDData] = useState({
     name: "Certificate of Deposit",
     symbol: "CD",
@@ -31,11 +37,6 @@ const CDDeployment = () => {
       },
     ]
   });
-  const [walletAddress, setWalletAddress] = useState(null);
-  const { setContractAddress } = useContext(ContractContext);
-  const { clearAccounts, addAccount } = useContext(AccountsContext);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   // Get wallet address from location state when component mounts
   useEffect(() => {
@@ -43,7 +44,7 @@ const CDDeployment = () => {
       const incomingAddress = location.state.walletAddress;
       setWalletAddress(incomingAddress);
       console.log('Using wallet address from previous page:', incomingAddress);
-      
+      // console.log('Wallet address:', walletAddress);
       // Update the cdData with the incoming wallet address
       setCDData(prevData => ({
         ...prevData,
