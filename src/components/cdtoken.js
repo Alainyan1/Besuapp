@@ -14,8 +14,8 @@ const { Title, Text } = Typography;
 
 const CDToken = () => {
   const { accounts, addAccount } = useContext(AccountsContext);
-  const [clientAddress, setClientAddress] = useState('');
-  const [termId, setTermId] = useState('');
+  const [clientAddress, setClientAddress] = useState('0x627306090abaB3A6e1400e9345bC60c78a8BEf57');
+  const [termId, setTermId] = useState('1MINTEST');
   const [amount, setAmount] = useState(10000);
   const [contractAddress, setContractAddress] = useState(localStorage.getItem('contractAddress') || '');
   const [status, setStatus] = useState(null);
@@ -41,6 +41,8 @@ const CDToken = () => {
       // Optional: redirect to platform page if no wallet is connected
       // navigate('/cdplatform');
     }
+
+    // setClientAddress("0x627306090abaB3A6e1400e9345bC60c78a8BEf57");
     
     // If purchase details were passed from CDClient
     if (location.state?.action === 'purchase' && location.state?.purchaseDetails) {
@@ -307,38 +309,13 @@ const CDToken = () => {
         </Form.Item>
 
         <Form.Item label="Client Address" required className="form-item">
-          <Select
-            value={selectedClientKey}
-            onChange={handleSelectChange(setClientAddress, 'clientAddress', setSelectedClientKey)}
-            className="custom-select"
-          >
-            <Option value="">Select a client</Option>
-            {Object.entries(accounts).map(([key, value]) => (
-              <Option key={key} value={key}>{key}</Option>
-            ))}
-            <Option value="custom">Enter custom address</Option>
-          </Select>
-          {selectedClientKey === 'custom' && (
-            <div className="custom-address-container">
-              <Input
-                type="text"
-                value={customClientAddress}
-                onChange={handleCustomAddressChange(setCustomClientAddress)}
-                placeholder="Enter address in format Name:address"
-                className="custom-input"
-              />
-              <Button 
-                type="button" 
-                onClick={() => handleAddCustomAddress(setClientAddress, 'clientAddress', setSelectedClientKey, customClientAddress)}
-                className="add-address-button"
-              >
-                Add Address
-              </Button>
-            </div>
-          )}
-          {selectedClientKey && selectedClientKey !== 'custom' && (
-            <p className="address-display">Address: {accounts[selectedClientKey]?.address}</p>
-          )}
+          <Input
+            type="text"
+            value={clientAddress}
+            onChange={handleInputChange(setClientAddress, 'clientAddress')}
+            className="custom-input"
+            placeholder="Enter client wallet address"
+          />
         </Form.Item>
         
         <Form.Item label="Amount" required className="form-item">

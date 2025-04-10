@@ -56,6 +56,9 @@ const TdToken = () => {
     { customer: 'ap1_bank01', userName: 'Asset Platform 1 Bank 01', customerWallet: '0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca', recipientBankName: 'JETCHKHH', recipientWalletAddress: '0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc', currency: 'HKD', receiveBankBicCode: 'JETCHKHH', sendUserName: 'ap1_bank01' },
   ]);
 
+  // Field editability control based on customer
+  const [isRestrictedUser, setIsRestrictedUser] = useState(false);
+
   useEffect(() => {
     // Check for auth token (simplified)
     const token = localStorage.getItem('authToken');
@@ -89,10 +92,32 @@ const TdToken = () => {
         setUserName(customerDetails.userName);
         setCustomerWallet(customerDetails.customerWallet);
         setRecipientBankName(customerDetails.recipientBankName);
-        setRecipientWalletAddress(customerDetails.recipientWalletAddress);
-        setCurrency(customerDetails.currency);
         setReceiveBankBicCode(customerDetails.receiveBankBicCode);
         setSendUserName(customerDetails.sendUserName);
+        
+        // Handle specific fixed values based on customer type
+        if (customerValue === 'ap1_client01') {
+          setIsRestrictedUser(true);
+          // Set fixed values for ap1_client01
+          setRecipientWalletAddress('0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca');
+          setRecipientName('Fubon Bank');
+          setReceiveBankBicCode('JETCHKHH');
+          setCurrency('HKD');
+        } 
+        else if (customerValue === 'ap1_bank01') {
+          setIsRestrictedUser(true);
+          // Set fixed values for ap1_bank01
+          setRecipientWalletAddress('0x1774b3bfe779c733e3efef93a9861e97e7d6fdcc');
+          setRecipientName('Client');
+          setReceiveBankBicCode('JETCHKHH');
+          setCurrency('HKD');
+        } 
+        else {
+          setIsRestrictedUser(false);
+          setRecipientWalletAddress(customerDetails.recipientWalletAddress);
+          setRecipientName('Fubon'); // Default value
+          setCurrency(customerDetails.currency);
+        }
       }
     }
     
@@ -339,7 +364,13 @@ const TdToken = () => {
             <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
                 <Form.Item label="Recipient Wallet Address" required className="tdform-item">
-                  {!customRecipientWallet ? (
+                  {isRestrictedUser ? (
+                    <Input
+                      value={recipientWalletAddress}
+                      className="custom-input"
+                      disabled
+                    />
+                  ) : !customRecipientWallet ? (
                     <Select
                       value={recipientWalletAddress}
                       onChange={handleSelectChange(setRecipientWalletAddress, setCustomRecipientWallet)}
@@ -373,20 +404,27 @@ const TdToken = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-              <Form.Item label="Recipient Name" required className="tdform-item">
-                <Input
-                  placeholder="Fubon"
-                  value={recipientName}
-                  onChange={(e) => setRecipientName(e.target.value)}
-                  className="custom-input"
-                />
-              </Form.Item>
-            </Col>
+                <Form.Item label="Recipient Name" required className="tdform-item">
+                  <Input
+                    value={recipientName}
+                    onChange={!isRestrictedUser ? handleInputChange(setRecipientName) : undefined}
+                    placeholder="Recipient name"
+                    className="custom-input"
+                    disabled={isRestrictedUser}
+                  />
+                </Form.Item>
+              </Col>
             </Row>
             <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col span={12}>
                 <Form.Item label="Receive Bank BIC Code" required className="tdform-item">
-                  {!customBicCode ? (
+                  {isRestrictedUser ? (
+                    <Input
+                      value={receiveBankBicCode}
+                      className="custom-input"
+                      disabled
+                    />
+                  ) : !customBicCode ? (
                     <Select
                       value={receiveBankBicCode}
                       onChange={handleSelectChange(setRecipientBankName, setReceiveBankBicCode, setCustomBicCode)}
@@ -400,7 +438,7 @@ const TdToken = () => {
                   ) : (
                     <Input
                       value={receiveBankBicCode}
-                      onChange={handleInputChange(setCustomRecipientBank, setReceiveBankBicCode)}
+                      onChange={handleInputChange(setReceiveBankBicCode)}
                       placeholder="Enter BIC code"
                       className="custom-input"
                       addonAfter={
@@ -419,7 +457,13 @@ const TdToken = () => {
               </Col>
               <Col span={12}>
                 <Form.Item label="Currency" required className="tdform-item">
-                  {!customCurrency ? (
+                  {isRestrictedUser ? (
+                    <Input
+                      value={currency}
+                      className="custom-input"
+                      disabled
+                    />
+                  ) : !customCurrency ? (
                     <Select
                       value={currency}
                       onChange={handleSelectChange(setCurrency, setCustomCurrency)}

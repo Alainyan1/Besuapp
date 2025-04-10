@@ -31,7 +31,7 @@ const CDDeployment = () => {
       {
         termId: "1MINTEST", // Simplified termId
         duration: 60, // 1 min in seconds
-        fixedRate: 10000, // 100% (stored as basis points)
+        fixedRate: 100000, // 100% (stored as basis points)
         demandRate: 1000, // 10% (stored as basis points)
         isActive: true
       },
