@@ -25,7 +25,7 @@ const TdToken = () => {
   const [sendUserName, setSendUserName] = useState('');
 
   // 展示recipientName
-  const [recipientName, setRecipientName] = useState('Fubon');
+  const [recipientName, setRecipientName] = useState('Bank');
 
   
   // Transaction status tracking
@@ -100,7 +100,7 @@ const TdToken = () => {
           setIsRestrictedUser(true);
           // Set fixed values for ap1_client01
           setRecipientWalletAddress('0x55740d5b5ccd272ac74e2fb313bb8778de1ae5ca');
-          setRecipientName('Fubon Bank');
+          setRecipientName('Bank');
           setReceiveBankBicCode('JETCHKHH');
           setCurrency('HKD');
         } 
@@ -115,7 +115,7 @@ const TdToken = () => {
         else {
           setIsRestrictedUser(false);
           setRecipientWalletAddress(customerDetails.recipientWalletAddress);
-          setRecipientName('Fubon'); // Default value
+          setRecipientName('Bank'); // Default value
           setCurrency(customerDetails.currency);
         }
       }

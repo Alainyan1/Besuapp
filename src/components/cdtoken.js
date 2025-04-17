@@ -239,7 +239,7 @@ const CDToken = () => {
 
   const handleBankName = (address) => {
     if (address === '0xf17f52151EbEF6C7334FAD080c5704D77216b732') { 
-      return 'Fubon';
+      return 'Bank';
     } else {
       return 'Bank';
     }
@@ -301,7 +301,7 @@ const CDToken = () => {
         <Form.Item label="Term ID" required className="form-item">
           <Input
             type="text"
-            value={termId}
+            value="1MINTEST"
             onChange={handleInputChange(setTermId, 'termId')}
             className="custom-input"
             placeholder="Enter Term ID (e.g. 3MONTH, 6MONTH)"
@@ -311,7 +311,8 @@ const CDToken = () => {
         <Form.Item label="Client Address" required className="form-item">
           <Input
             type="text"
-            value={clientAddress}
+            //value={clientAddress}
+            value="0x627306090abaB3A6e1400e9345bC60c78a8BEf57"
             onChange={handleInputChange(setClientAddress, 'clientAddress')}
             className="custom-input"
             placeholder="Enter client wallet address"

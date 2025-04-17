@@ -39,7 +39,7 @@ const Cdbank = () => {
 
   const handleBankName = (address) => {
     if (address === '0xf17f52151EbEF6C7334FAD080c5704D77216b732') { 
-      return 'Fubon';
+      return 'Bank';
     } else {
       return 'Bank';
     }

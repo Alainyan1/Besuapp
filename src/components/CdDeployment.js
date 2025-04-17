@@ -5,8 +5,8 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { ContractContext } from './ContractContext';
 import { AccountsContext } from './AccountsContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Form, Button, Typography } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Form, Button, Typography, Alert } from 'antd';
+import { ArrowLeftOutlined, InfoCircleTwoTone } from '@ant-design/icons';
 import CDForm from './cdform';
 import '../css/cddeployment.css';
 import logo from '../images/aift.png';
@@ -16,16 +16,14 @@ const CDDeployment = () => {
   const { clearAccounts, addAccount } = useContext(AccountsContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const [walletAddress, setWalletAddress] = useState(location.state.walletAddress || null);
+  const [walletAddress, setWalletAddress] = useState(location.state?.walletAddress || null);
 
   const [cdData, setCDData] = useState({
     name: "Certificate of Deposit",
     symbol: "CD",
     initialSupply: 100000000,
-    // bankAddress: "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
-    bankAddress: walletAddress ? `Fubon:${walletAddress}` : "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
-    // trustedThirdParty: "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
-    trustedThirdParty: walletAddress ? `Fubon:${walletAddress}` : "Fubon:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
+    bankAddress: walletAddress ? `Bank:${walletAddress}` : "Bank:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
+    trustedThirdParty: walletAddress ? `Bank:${walletAddress}` : "Bank:0xf17f52151EbEF6C7334FAD080c5704D77216b732",
     ancillaryInfo: "Certificate of Deposit\nEarly Withdrawal: Demand rate applies",
     depositTerms: [
       {
@@ -44,12 +42,12 @@ const CDDeployment = () => {
       const incomingAddress = location.state.walletAddress;
       setWalletAddress(incomingAddress);
       console.log('Using wallet address from previous page:', incomingAddress);
-      // console.log('Wallet address:', walletAddress);
+      
       // Update the cdData with the incoming wallet address
       setCDData(prevData => ({
         ...prevData,
-        bankAddress: `Fubon:${incomingAddress}`,
-        trustedThirdParty: `Fubon:${incomingAddress}`
+        bankAddress: `Bank:${incomingAddress}`,
+        trustedThirdParty: `Bank:${incomingAddress}`
       }));
     } else {
       console.warn('No wallet address provided. Redirecting to platform page');
@@ -65,36 +63,15 @@ const CDDeployment = () => {
     return ethers.utils.formatBytes32String(truncated);
   };
 
+  // These input handlers are now no-ops since the form is read-only
   const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    const [field, index] = name.split('[');
-    if (index) {
-      const idx = parseInt(index.replace(']', ''), 10);
-      setCDData((prevState) => ({
-        ...prevState,
-        [field]: prevState[field].map((item, i) => (i === idx ? value : item))
-      }));
-    } else {
-      setCDData((prevState) => ({
-        ...prevState,
-        [name]: value
-      }));
-    }
+    // No-op: User cannot change fields
+    return;
   };
 
-  // Handle changes to deposit terms
   const handleDepositTermChange = (index, field, value) => {
-    setCDData(prevState => {
-      const updatedTerms = [...prevState.depositTerms];
-      updatedTerms[index] = {
-        ...updatedTerms[index],
-        [field]: value
-      };
-      return {
-        ...prevState,
-        depositTerms: updatedTerms
-      };
-    });
+    // No-op: User cannot change deposit terms
+    return;
   };
 
   const parseKeyValue = (input) => {
@@ -113,7 +90,7 @@ const CDDeployment = () => {
     }
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async () => {
     if (!walletAddress) {
       alert('No wallet connected. Please go back to the platform page and connect your wallet.');
       return;
@@ -223,7 +200,7 @@ const CDDeployment = () => {
 
   const handleBankName = (address) => {
     if (address === '0xf17f52151EbEF6C7334FAD080c5704D77216b732') { 
-      return 'Fubon';
+      return 'Bank';
     } else {
       return 'Bank';
     }
@@ -271,13 +248,14 @@ const CDDeployment = () => {
         </div>
       )}
       
-      {/* Directly render the CDForm with isVariable set to false (Fixed) */}
+      {/* Pass isReadOnly prop to CDForm */}
       <CDForm 
         cdData={cdData} 
         handleInputChange={handleInputChange}
         handleDepositTermChange={handleDepositTermChange}
         handleSubmit={handleSubmit} 
-        isVariable={false} 
+        isVariable={false}
+        isReadOnly={true} 
       />
     </div>
   );
