@@ -134,7 +134,7 @@ const TdPlatform = () => {
         <img src={logo} alt="Logo" className="responsive-logo" />
         <h1 className="title">Tokenized Deposit Payment Portal</h1>
         <p className="description">
-          Welcome to the Tokenized Deposit platform. 
+          Welcome to the Tokenized Deposit Payment Portal. 
           <br />
           Login to initiate your transactions. 
           <br />
