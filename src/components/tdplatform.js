@@ -132,7 +132,7 @@ const TdPlatform = () => {
       <div className="background-container"></div>
       <div className="content-container">
         <img src={logo} alt="Logo" className="responsive-logo" />
-        <h1 className="title">Bank Tokenized Asset Platform</h1>
+        <h1 className="title">JETCO Tokenized Deposit System</h1>
         <p className="description">
           Welcome to the Tokenized Deposit platform. 
           <br />
