@@ -4,7 +4,7 @@ import { AccountsContext } from './AccountsContext';
 import { useNavigate } from 'react-router-dom';
 import { Button, Typography, Modal, Form, Input, Alert, Select } from 'antd';
 import { LoginOutlined } from '@ant-design/icons';
-import '../css/aiftRouter.css';
+import '../css/tdplatform.css';
 import logo from '../images/jetco.png';
 
 const { Title } = Typography;
@@ -129,10 +129,10 @@ const TdPlatform = () => {
 
   return (
     <div className="app-container">
-      <div className="background-container"></div>
-      <div className="content-container">
+      <div className="tdbackground-container"></div>
+      <div className="tdcontent-container">
         <img src={logo} alt="Logo" className="responsive-logo" />
-        <h1 className="title">JETCO Tokenized Deposit System</h1>
+        <h1 className="title">Tokenized Deposit Payment Portal</h1>
         <p className="description">
           Welcome to the Tokenized Deposit platform. 
           <br />

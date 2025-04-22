@@ -1,0 +1,219 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
+  }
+  
+  .app-container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+  }
+  
+  .tdbackground-container {
+    width: 75%; /* Occupies 70% of the screen */
+    height: 100%;
+    background-image: url('../images/payment2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .tdcontent-container {
+    width: 25%; /* Occupies 30% of the screen */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-left: 2px solid #333; /* 添加左边框作为分隔线 */
+    margin-left: auto; /* Push the content container to the right */
+    margin-top: 20px; /* Add some top margin */
+    position: relative;
+    z-index: 1;
+  }
+  
+  .tdresponsive-logo {
+    width: 30%; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+    max-width: 150px; /* Set a maximum width */
+    position: absolute; /* Position the logo fixed to the viewport */
+    top: 20px;
+    right: 20px; /* Position the logo to the right */
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 40px;
+    margin-top: -3rem; /* Adjust the margin to control the gap between the logo and the title */
+  }
+  
+  .subtitle {
+    text-align: center;
+    font-size: 35px;
+    margin-top: -1rem; /* Adjust the margin to control the gap between the logo and the title */
+  }
+  
+  .description {
+    text-align: center;
+    font-size: 20px;
+    margin-top: 1rem;
+  }
+  
+  .selected-role {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 25px;
+  }
+  
+  .aift-select-container {
+    margin-top: 2rem;
+    font-size: 24px;
+  }
+  
+  .custom-select .ant-select-selection-placeholder {
+    color: black !important; /* Change the placeholder color */
+    text-align: center; /* Center the placeholder text */
+    font-size: 18px !important; /* Change the placeholder font size */
+  }
+  
+  .aift-select-container .ant-select-selection-item {
+    font-size: 20px !important;
+    text-align: center; /* Center the placeholder text */
+  }
+  
+  .role-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Media queries for responsiveness */
+  @media (max-width: 1200px) {
+    .background-container {
+      width: 60%;
+    }
+  
+    .content-container {
+      width: 40%;
+    }
+  
+    .responsive-logo {
+      width: 18%;
+      max-width: 130px;
+    }
+  
+    .title {
+      font-size: 35px;
+      margin-top: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .background-container {
+      width: 50%;
+    }
+  
+    .content-container {
+      width: 50%;
+    }
+  
+    .responsive-logo {
+      width: 16%;
+      max-width: 110px;
+    }
+  
+    .title {
+      font-size: 30px;
+      margin-top: 1rem;
+    }
+  
+    .description {
+      font-size: 18px;
+    }
+  
+    .selected-role {
+      font-size: 22px;
+    }
+  
+    .aift-select-container {
+      font-size: 22px;
+    }
+  
+    .aift-select-container .ant-select-selection-item, 
+    .aift-select-container .ant-select-selection-placeholder {
+      font-size: 18px !important;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .background-container {
+      display: none; /* Hide background image on small screens */
+    }
+  
+    .content-container {
+      width: 100%;
+      margin-left: 0;
+      padding: 1rem;
+    }
+  
+    .responsive-logo {
+      width: 14%;
+      max-width: 90px;
+    }
+  
+    .title {
+      font-size: 25px;
+      margin-top: 0.5rem;
+    }
+  
+    .description {
+      font-size: 16px;
+    }
+  
+    .selected-role {
+      font-size: 20px;
+    }
+  
+    .aift-select-container {
+      font-size: 20px;
+    }
+  
+    .aift-select-container .ant-select-selection-item, 
+    .aift-select-container .ant-select-selection-placeholder {
+      font-size: 16px !important;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .responsive-logo {
+      width: 12%;
+      max-width: 70px;
+    }
+  
+    .title {
+      font-size: 20px;
+      margin-top: 0.5rem;
+    }
+  
+    .description {
+      font-size: 14px;
+    }
+  
+    .selected-role {
+      font-size: 18px;
+    }
+  
+    .aift-select-container {
+      font-size: 18px;
+    }
+  
+    .aift-select-container .ant-select-selection-item, 
+    .aift-select-container .ant-select-selection-placeholder {
+      font-size: 14px !important;
+    }
+  }
